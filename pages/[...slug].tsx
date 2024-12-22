@@ -18,7 +18,7 @@ export default function Page({
       <Head>
         <meta property="og:site_name" content="kirsi spotify embed" />
         <meta property="og:title" content={track.name} />
-        <meta name="og:description" content={track.artists[0].name} />
+        <meta property="og:description" content={track.artists[0].name} />
         <meta property="description" content={track.artists[0].name} />
         <meta property="og:url" content={"https://s.kirsi.dev/${}"} />
         <meta property="theme-color" content="#7e22ce" />
