@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
+import Image from "next/image";
 
 const getSpotifyAuth = async () => {
   const client_id = process.env.client_id;
@@ -40,9 +41,11 @@ export interface TrackApi {
   preview_url: string;
   type: string;
   uri: string;
+  duration_ms: number;
 }
 
 export interface Album {
+  name: string;
   external_urls: ExternalUrls;
   href: string;
   id: string;
@@ -90,7 +93,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   return {
     props: {
+      trackId,
       og,
+      track: data,
 
       albumArt: data.album.images[0].url,
       artist: data.artists[0].name,
@@ -100,17 +105,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 export default function Page({
   og,
+  track,
   artist,
   songName,
-}: {
-  og: string;
+  trackId,
+}: Awaited<ReturnType<typeof getServerSideProps>>["props"]) {
+  const formatDuration = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = ((ms % 60000) / 1000).toFixed(0);
+    return `${minutes}:${Number(seconds) < 10 ? "0" : ""}${seconds}`;
+  };
 
-  albumArt: string;
-  artist: string;
-  songName: string;
-}) {
   return (
-    <div>
+    <>
       <Head>
         <meta name="og:title" content={songName} />
         <meta name="og:description" content={artist} />
@@ -121,6 +128,46 @@ export default function Page({
         <meta name="twitter:description" content={artist} />
         <meta name="twitter:image" content={og} />
       </Head>
-    </div>
+
+      <div className="min-h-screen bg-gray-900 text-gray-100">
+        <div className="container mx-auto py-8 px-4">
+          <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden max-w-3xl mx-auto">
+            <div className="p-6">
+              <h1 className="text-3xl font-bold text-gray-100 mb-2">
+                {track.name}
+              </h1>
+              <p className="text-gray-400 mb-4">
+                {track.artists.map((artist) => artist.name).join(", ")}
+              </p>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
+                <Image
+                  src={track.album.images[0].url}
+                  alt={`${track.album.name} cover`}
+                  width={150}
+                  height={150}
+                  className="rounded-md"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-200">Album</h3>
+                  <p className="text-gray-400">{track.album.name}</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-200 mb-2">
+                  Listen on Spotify
+                </h3>
+                <iframe
+                  src={`https://open.spotify.com/embed/track/${track.id}`}
+                  width="100%"
+                  height="80"
+                  allow="encrypted-media"
+                  className="rounded-md"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
