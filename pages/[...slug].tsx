@@ -7,6 +7,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const trackId = context.params.slug[3];
   const data = await getTrackData(trackId);
 
+  // "preload" the preview video
+  fetch(`https://s-video.kirsi.dev/${data.trackId}`);
+
   return { props: data };
 }
 export default function Page({
@@ -16,7 +19,6 @@ export default function Page({
   return (
     <>
       <Head>
-        <meta property="og:site_name" content="kirsi spotify embed" />
         <meta property="og:title" content={track.name} />
         <meta property="og:description" content={track.artists[0].name} />
         <meta property="description" content={track.artists[0].name} />
