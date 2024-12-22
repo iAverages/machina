@@ -2,9 +2,7 @@ import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const base = process.env.VERCEL_URL
-    ? "https://" + process.env.VERCEL_URL
-    : "";
+  const base = "https://s.kirsi.dev";
   const og =
     base +
     "/api/og?albumArt=https%3A%2F%2Fimage-cdn-ak.spotifycdn.com%2Fimage%2Fab67616d00001e0218285df0b7581a0fcc806afc&artist=%E5%A0%95%E5%A4%A9&songName=Creepy%20Nuts";
