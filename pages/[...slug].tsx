@@ -28,8 +28,6 @@ const getSpotifyAuth = async () => {
   const data = await response.json();
 
   const token = data.access_token;
-  console.log("Access token:", token);
-
   return token;
 };
 
@@ -99,23 +97,36 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       og,
+
+      albumArt: data.album.images[0].url,
+      artist: data.artists[0].name,
+      songName: data.name,
     },
   };
 }
-export default function Page({ og }: { og: string }) {
+export default function Page({
+  og,
+  artist,
+  songName,
+}: {
+  og: string;
+
+  albumArt: string;
+  artist: string;
+  songName: string;
+}) {
   return (
     <div>
       <Head>
-        <meta name="og:title" content="Vercel Edge Network" />
-        <meta name="og:description" content="Vercel Edge Network" />
-        <meta name="og:image" content={`${og}`} />
+        <meta name="og:title" content={songName} />
+        <meta name="og:description" content={artist} />
+        <meta name="og:image" content={og} />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Vercel Edge Network" />
-        <meta name="twitter:description" content="Vercel Edge Network" />
-        <meta name="twitter:image" content={`${og}`} />
+        <meta name="twitter:title" content={songName} />
+        <meta name="twitter:description" content={artist} />
+        <meta name="twitter:image" content={og} />
       </Head>
-      <div>path shit</div>
     </div>
   );
 }
