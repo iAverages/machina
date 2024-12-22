@@ -31,12 +31,6 @@ const getSpotifyAuth = async () => {
   return token;
 };
 
-const getTrackIdFromUrl = (url: string) => {
-  const regex = /https:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)(\?.*)?/;
-  const match = url.match(regex);
-  return match ? match[1] : null;
-};
-
 export interface TrackApi {
   album: Album;
   artists: Artist[];
