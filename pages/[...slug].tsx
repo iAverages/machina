@@ -32,8 +32,8 @@ export default function Page({
           content={`https://s-video.kirsi.dev/${track.id}.mp4`}
         />
         <meta property="og:video:type" content="video/mp4" />
-        <meta property="og:video:height" content="800" />
-        <meta property="og:video:width" content="300" />
+        <meta property="og:video:height" content="300" />
+        <meta property="og:video:width" content="800" />
         <meta
           property="og:video:secure_url"
           content={`https://s-video.kirsi.dev/${track.id}.mp4`}
