@@ -16,14 +16,25 @@ export default function Page({
   return (
     <>
       <Head>
-        <meta name="og:title" content={track.name} />
+        <meta property="og:site_name" content="kirsi spotify embed" />
+        <meta property="og:title" content={track.name} />
         <meta name="og:description" content={track.artists[0].name} />
-        <meta name="og:image" content={og} />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={track.name} />
-        <meta name="twitter:description" content={track.artists[0].name} />
-        <meta name="twitter:image" content={og} />
+        <meta property="description" content={track.artists[0].name} />
+        <meta property="og:url" content={"https://s.kirsi.dev/${}"} />
+        <meta property="theme-color" content="#7e22ce" />
+        <meta property="og:image" content={og} />
+        <meta property="og:type" content="video" />
+        <meta
+          property="og:video"
+          content={`https://s-video.kirsi.dev/${track.id}`}
+        />
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:height" content="800" />
+        <meta property="og:video:width" content="300" />
+        <meta
+          property="og:video:secure_url"
+          content={`https://s-video.kirsi.dev/${track.id}`}
+        />
       </Head>
 
       <div className="min-h-screen bg-gray-900 text-gray-100">
