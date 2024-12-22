@@ -20,20 +20,23 @@ export default function Page({
         <meta property="og:title" content={track.name} />
         <meta property="og:description" content={track.artists[0].name} />
         <meta property="description" content={track.artists[0].name} />
-        <meta property="og:url" content={"https://s.kirsi.dev/${}"} />
+        <meta
+          property="og:url"
+          content={`https://s.kirsi.dev/https:/open.spotify.com/track/${track.id}`}
+        />
         <meta property="theme-color" content="#7e22ce" />
         <meta property="og:image" content={og} />
         <meta property="og:type" content="video" />
         <meta
           property="og:video"
-          content={`https://s-video.kirsi.dev/${track.id}`}
+          content={`https://s-video.kirsi.dev/${track.id}.mp4`}
         />
         <meta property="og:video:type" content="video/mp4" />
         <meta property="og:video:height" content="800" />
         <meta property="og:video:width" content="300" />
         <meta
           property="og:video:secure_url"
-          content={`https://s-video.kirsi.dev/${track.id}`}
+          content={`https://s-video.kirsi.dev/${track.id}.mp4`}
         />
       </Head>
 
