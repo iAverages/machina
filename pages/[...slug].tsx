@@ -19,15 +19,19 @@ export default function Page({ og }: { og: string }) {
         <meta name="og:description" content="Vercel Edge Network" />
         <meta
           name="og:image"
-          content={
-            // Because OG images must have a absolute URL, we use the
-            // `VERCEL_URL` environment variable to get the deployment’s URL.
-            // More info:
-            // https://vercel.com/docs/concepts/projects/environment-variables
-            `${
-              process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : ""
-            }${og}`
-          }
+          content={`${
+            process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : ""
+          }${og}`}
+        />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Vercel Edge Network" />
+        <meta name="twitter:description" content="Vercel Edge Network" />
+        <meta
+          name="twitter:image"
+          content={`${
+            process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : ""
+          }${og}`}
         />
       </Head>
       <div>path shit</div>
