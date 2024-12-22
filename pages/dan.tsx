@@ -26,8 +26,8 @@ const Dan = () => {
           content="https://s-video.kirsi.dev/1EKldZ895Jw4k4Rh1ajVo8"
         />
         <meta property="og:video:type" content="video/mp4" />
-        <meta property="og:video:height" content="800" />
-        <meta property="og:video:width" content="300" />
+        <meta property="og:video:height" content="250" />
+        <meta property="og:video:width" content="306" />
         <meta
           property="og:video:secure_url"
           content="https://s-video.kirsi.dev/1EKldZ895Jw4k4Rh1ajVo8"
