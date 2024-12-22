@@ -29,6 +29,8 @@ const getSpotifyAuth = async () => {
 
   const token = data.access_token;
   console.log("Access token:", token);
+
+  return token;
 };
 
 const getTrackIdFromUrl = (url: string) => {
