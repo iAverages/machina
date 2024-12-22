@@ -78,7 +78,7 @@ export interface Artist {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const token = await getSpotifyAuth();
-  const trackId = getTrackIdFromUrl(context.params.slug[0]);
+  const trackId = context.params.slug[3];
   const url = `https://api.spotify.com/v1/tracks/${trackId}`;
 
   const response = await fetch(url, {
@@ -88,6 +88,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
   const data = (await response.json()) as TrackApi;
+  console.log({ url, data });
   const base = "https://s.kirsi.dev";
   const params = new URLSearchParams();
   params.set("albumArt", data.album.images[0].url);
