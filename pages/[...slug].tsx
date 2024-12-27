@@ -3,15 +3,22 @@ import Head from "next/head";
 import Image from "next/image";
 import { getTrackData } from "../og/get-track-data";
 
+export const config = {
+  runtime: "experimental-edge",
+};
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const trackId = context.params.slug[3];
   const data = await getTrackData(trackId);
 
   // "preload" the preview video
-  fetch(`https://s-video.kirsi.dev/${data.trackId}`);
+  fetch(`https://s-video.kirsi.dev/${data.trackId}`).then((res) =>
+    console.log("preload request", res),
+  );
 
   return { props: data };
 }
+
 export default function Page({
   og,
   track,
