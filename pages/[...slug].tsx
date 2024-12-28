@@ -12,7 +12,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const data = await getTrackData(trackId);
 
   // "preload" the preview video
-  fetch(`https://s-video.kirsi.dev/${data.trackId}`).then((res) =>
+  await fetch(`https://s-video.kirsi.dev/${data.trackId}`).then((res) =>
     console.log("preload request", res),
   );
 
