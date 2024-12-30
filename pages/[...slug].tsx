@@ -3,10 +3,6 @@ import Head from "next/head";
 import Image from "next/image";
 import { getTrackData } from "../og/get-track-data";
 
-export const config = {
-  runtime: "experimental-edge",
-};
-
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const trackId = context.params.slug[3];
   const data = await getTrackData(trackId);

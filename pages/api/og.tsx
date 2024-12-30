@@ -1,22 +1,11 @@
 import { ImageResponse } from "@vercel/og";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Vibrant } from "node-vibrant/node";
 
-export const config = {
-  runtime: "edge",
-};
-
-function generateColorFromString(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
-
-  return "#" + "00000".substring(0, 6 - c.length) + c;
-}
-
-export default async function handler(req: NextApiRequest) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   try {
     const { searchParams } = new URL(
       req.url as string,
@@ -27,13 +16,16 @@ export default async function handler(req: NextApiRequest) {
     const songName = searchParams.get("songName");
 
     if (!albumArt || !artist || !songName) {
-      return new Response("Missing required parameters", { status: 400 });
+      res.status(400);
+      res.send("Missing required parameters");
+      return;
     }
 
-    const baseColor = generateColorFromString(albumArt);
-    const gradientColor = generateColorFromString(artist + songName);
+    const palette = await Vibrant.from(albumArt).getPalette();
+    const baseColor = palette.Vibrant.hex;
+    const gradientColor = palette.DarkVibrant.hex;
 
-    return new ImageResponse(
+    const response = new ImageResponse(
       (
         <div
           style={{
@@ -113,10 +105,16 @@ export default async function handler(req: NextApiRequest) {
         height: 300,
       },
     );
-  } catch (e: any) {
-    console.log(`${e.message}`);
-    return new Response(`Failed to generate the image`, {
-      status: 500,
+
+    response.headers.forEach((value, key) => {
+      res.setHeader(key, value);
     });
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    res.setHeader("Content-Length", buffer.length.toString());
+    res.send(buffer);
+  } catch (e: any) {
+    console.log(e);
+    res.send("error");
   }
 }
