@@ -39,6 +39,7 @@
             pnpm
             pkg-config
             openssl
+            just
             (rust-bin.stable.latest.default.override {
               extensions = [
                 "rust-src"
