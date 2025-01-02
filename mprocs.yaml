@@ -1,0 +1,5 @@
+procs:
+  video:
+    shell: "cargo watch -x run"
+  web:
+    shell: "pnpm run dev"

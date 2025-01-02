@@ -40,6 +40,7 @@
             pkg-config
             openssl
             just
+            mprocs
             (rust-bin.stable.latest.default.override {
               extensions = [
                 "rust-src"
