@@ -67,28 +67,44 @@ export default function Page(props: RouteSectionProps) {
             content={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().id}.mp4`}
           />
           <div
-            class="flex h-screen"
+            class="flex h-screen relative"
             style={{
               background: `linear-gradient(45deg, ${colors()?.baseColor}, ${colors()?.gradientColor})`,
             }}
           >
-            <div class="flex items-center justify-center w-3/4 h-full">
-              <div class="flex items-center justify-center w-fit h-fit rounded-xl overflow-hidden">
-                <img src={track().album.images[0].url} class="object-contain" />
+            <div class="flex w-full z-10">
+              <div class="flex items-center justify-center w-3/4 h-full">
+                <div class="flex items-center justify-center w-fit h-fit rounded-xl overflow-hidden">
+                  <img
+                    src={track().album.images[0].url}
+                    class="object-contain"
+                  />
+                </div>
+              </div>
+
+              <div class="w-1/2 text-white flex flex-col justify-center">
+                <h1 class="text-5xl font-bold mb-4">{track().name}</h1>
+                <p class="text-2xl mb-2">{track().artists[0].name}</p>
+                <p class="text-xl mb-6">{track().album.name}</p>
+                <iframe
+                  src={`https://open.spotify.com/embed/track/${track().id}`}
+                  width="50%"
+                  height="80"
+                  allow="encrypted-media"
+                  class="rounded-md"
+                ></iframe>
               </div>
             </div>
-
-            <div class="w-1/2 text-white flex flex-col justify-center">
-              <h1 class="text-5xl font-bold mb-4">{track().name}</h1>
-              <p class="text-2xl mb-2">{track().artists[0].name}</p>
-              <p class="text-xl mb-6">{track().album.name}</p>
-              <iframe
-                src={`https://open.spotify.com/embed/track/${track().id}`}
-                width="50%"
-                height="80"
-                allow="encrypted-media"
-                class="rounded-md"
-              ></iframe>
+            <div class="absolute top-0 right-0 z-0 h-screen">
+              <img
+                src={track().album.images[0].url}
+                class="object-contain w-full h-full opacity-25"
+                style={{
+                  "mask-image":
+                    "linear-gradient(to right, transparent 40%, black 100%)",
+                  "mask-repeat": "no-repeat",
+                }}
+              />
             </div>
           </div>
         </>
