@@ -4,6 +4,7 @@ import {
   RouteDefinition,
   RouteSectionProps,
 } from "@solidjs/router";
+import { Vibrant } from "node-vibrant/node";
 import { Show } from "solid-js";
 import { env } from "~/env";
 import { trackDataQuery } from "~/utils/get-track-data";
@@ -21,6 +22,22 @@ export default function Page(props: RouteSectionProps) {
     deferStream: true,
   });
 
+  // TODO: check client bundle isnt fucked from using node version of node-vibrant
+  const colors = createAsync(
+    async () => {
+      const d = data();
+      if (!d) return null;
+      const palette = await Vibrant.from(
+        d.data.album.images[0].url,
+      ).getPalette();
+      const baseColor = palette.Vibrant?.hex ?? "#000";
+      const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
+
+      return { baseColor, gradientColor };
+    },
+    { deferStream: true },
+  );
+
   return (
     <Show when={data()?.data} fallback={<>couldnt find that song</>}>
       {(track) => (
@@ -32,7 +49,10 @@ export default function Page(props: RouteSectionProps) {
             property="og:url"
             content={`${env.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track().id}`}
           />
-          <Meta property="theme-color" content="#7e22ce" />
+          <Meta
+            property="theme-color"
+            content={colors()?.baseColor ?? "#7e22ce"}
+          />
           <Meta property="og:image" content={data()?.og + "&baddiscord=true"} />
           <Meta property="og:type" content="video" />
           <Meta
@@ -46,45 +66,29 @@ export default function Page(props: RouteSectionProps) {
             property="og:video:secure_url"
             content={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().id}.mp4`}
           />
-          <div class="min-h-screen bg-gray-900 text-gray-100">
-            <div class="container mx-auto py-8 px-4">
-              <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden max-w-3xl mx-auto">
-                <div class="p-6">
-                  <h1 class="text-3xl font-bold text-gray-100 mb-2">
-                    {track.name}
-                  </h1>
-                  <p class="text-gray-400 mb-4">
-                    {track()
-                      .artists.map((artist) => artist.name)
-                      .join(", ")}
-                  </p>
-                  <div class="flex flex-col md:flex-row items-start md:items-center gap-4 mb-6">
-                    <img
-                      src={track().album.images[0].url}
-                      alt={`${track().album.name} cover`}
-                      width={150}
-                      height={150}
-                      class="rounded-md"
-                    />
-                    <div>
-                      <h3 class="text-lg font-semibold text-gray-200">Album</h3>
-                      <p class="text-gray-400">{track().album.name}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 class="text-lg font-semibold text-gray-200 mb-2">
-                      Listen on Spotify
-                    </h3>
-                    <iframe
-                      src={`https://open.spotify.com/embed/track/${track().id}`}
-                      width="100%"
-                      height="80"
-                      allow="encrypted-media"
-                      class="rounded-md"
-                    ></iframe>
-                  </div>
-                </div>
+          <div
+            class="flex h-screen"
+            style={{
+              background: `linear-gradient(45deg, ${colors()?.baseColor}, ${colors()?.gradientColor})`,
+            }}
+          >
+            <div class="flex items-center justify-center w-3/4 h-full">
+              <div class="flex items-center justify-center w-fit h-fit rounded-xl overflow-hidden">
+                <img src={track().album.images[0].url} class="object-contain" />
               </div>
+            </div>
+
+            <div class="w-1/2 text-white flex flex-col justify-center">
+              <h1 class="text-5xl font-bold mb-4">{track().name}</h1>
+              <p class="text-2xl mb-2">{track().artists[0].name}</p>
+              <p class="text-xl mb-6">{track().album.name}</p>
+              <iframe
+                src={`https://open.spotify.com/embed/track/${track().id}`}
+                width="50%"
+                height="80"
+                allow="encrypted-media"
+                class="rounded-md"
+              ></iframe>
             </div>
           </div>
         </>
