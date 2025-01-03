@@ -290,17 +290,22 @@ async fn generate_video_from_id(track_id: String, dir: String) -> Result<File> {
             "-crf",
             "23",
             "-c:a",
-            "copy",
+            "aac",
+            "-b:a",
+            "128k",
+            "-aac_coder",
+            "fast",
             "-pix_fmt",
             "yuv420p",
+            "-threads",
+            "0",
             "-shortest",
             "out.mp4",
         ])
         .current_dir(dir.clone())
         .stdout(Stdio::piped())
         .output()
-        .await
-        .expect("ffmpeg failed");
+        .await?;
     let out_file_path = dir + "out.mp4";
     let out_file = File::open(out_file_path).await.ok();
 

@@ -4,21 +4,27 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
+        "dev": "vinxi dev",
+        "build": "vinxi build",
+        "start": "vinxi start"
     },
     "dependencies": {
+        "og": "workspace:^",
+        "@resvg/resvg-js": "^2.6.2",
+        "@solidjs/meta": "^0.29.4",
+        "@solidjs/router": "^0.15.2",
+        "@solidjs/start": "^1.0.10",
+        "@t3-oss/env-core": "^0.11.1",
         "@vercel/og": "^0.6.4",
         "next": "15.0.0",
         "node-vibrant": "^4.0.0",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "satori": "^0.12.0",
+        "solid-js": "^1.9.3",
+        "vinxi": "^0.5.1",
+        "zod": "^3.24.1"
     },
     "devDependencies": {
         "@types/node": "^22.10.2",
-        "@types/react": "^19.0.2",
         "autoprefixer": "^10.4.20",
         "postcss": "^8.4.49",
         "tailwindcss": "^3.4.17",

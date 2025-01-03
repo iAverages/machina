@@ -3,3 +3,6 @@ procs:
     shell: "cargo watch -x run"
   web:
     shell: "pnpm run dev"
+  og:
+    cwd: "og"
+    shell: "pnpm run dev"
