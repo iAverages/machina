@@ -1,0 +1,32 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model test {
+    id   Int    @id @default(autoincrement())
+    name String
+}
+
+model user {
+    id         String @id
+    name       String
+    spotify_id String @unique
+
+    spotify_access_token  String  @db.Text
+    spotify_refresh_token String? @db.Text
+
+    spotify_expires_at DateTime?
+}
+
+model track {
+    id     String   @id
+    name   String
+    listen listen[]
+}
+
+model listen {
+    id       BigInt @id
+    track_id String
+    track    track  @relation(fields: [track_id], references: [id])
+}

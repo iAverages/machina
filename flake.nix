@@ -33,7 +33,13 @@
         mkShell {
           shellHook = ''
             export  PKG_CONFIG_PATH="${pkgs.openssl.dev}/lib/pkgconfig";
+
+            export PRISMA_QUERY_ENGINE_BINARY="${prisma-engines}/bin/query-engine";
+            export PRISMA_SCHEMA_ENGINE_BINARY="${prisma-engines}/bin/schema-engine";
+            export PRISMA_FMT_BINARY="${prisma-engines}/bin/prisma-fmt"
+            export PRISMA_QUERY_ENGINE_LIBRARY="${prisma-engines}/lib/libquery_engine.node"
           '';
+
           packages = with pkgs; [
             nodejs_22
             pnpm
