@@ -13,6 +13,8 @@ RUN rm video/*.rs && rm ./target/release/machina-video
 RUN rm ./target/release/deps/machina*
 
 COPY ./video ./video
+COPY ./query ./query
+COPY ./.sqlx ./.sqlx
 
 RUN cargo build --release
 

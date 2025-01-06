@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO\n    `user`(\n        `id`,\n        `name`,\n        `spotify_id`,\n        `spotify_access_token`,\n        `spotify_expires_at`,\n        `spotify_refresh_token`\n    )\nVALUES\n    (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY\nUPDATE\n    `name` =\nVALUES\n    (`name`),\n    `spotify_id` =\nVALUES\n    (`spotify_id`),\n    `spotify_access_token` =\nVALUES\n    (`spotify_access_token`),\n    `spotify_expires_at` =\nVALUES\n    (`spotify_expires_at`),\n    `spotify_refresh_token` =\nVALUES\n    (`spotify_refresh_token`)\n",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "16a605ea0b6b24e5eb3be3935ffebeff46a45a2e397154dc964a4f433efbcb79"
+}
