@@ -9,7 +9,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.95"
-axum = { version = "0.7.9", features = ["macros"] }
+axum = { version = "0.8.0", features = ["macros"] }
 axum-macros = "0.4.2"
 cuid = "1.3.3"
 futures = "0.3.31"
