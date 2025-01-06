@@ -8,8 +8,10 @@ use cuid::cuid2;
 use dotenvy::dotenv;
 use rspotify::prelude::{BaseClient, OAuthClient};
 use scraper::{Html, Selector};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::mysql::MySqlPoolOptions;
+use sqlx::prelude::FromRow;
 use sqlx::{MySql, Pool};
 use std::collections::HashMap;
 use std::env;
@@ -26,7 +28,7 @@ use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, HeaderValue, Request, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
-use axum::Router;
+use axum::{Json, Router};
 use tokio::process::Command;
 use tokio_util::io::ReaderStream;
 use tower_http::trace::TraceLayer;
@@ -70,6 +72,7 @@ async fn main() {
         .route("/:trackId", get(root))
         .route("/oauth/spotify/redirect", get(setup_spotify))
         .route("/oauth/spotify/callback", get(spotify_callback))
+        .route("/get-dans-listening-history", get(listen_hist))
         .layer(TraceLayer::new_for_http().make_span_with(|_: &Request<_>| {
             // let tracing_id = cuid2();
             // let matched_path = request
@@ -159,6 +162,23 @@ async fn serve_cached_video(
     }
 
     Err((StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))
+}
+
+#[derive(FromRow, Serialize)]
+struct TempListen {
+    id: String,
+    time: i64,
+    name: String,
+}
+#[axum::debug_handler]
+async fn listen_hist(
+    State(state): State<AppState>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    let items = sqlx::query_file_as!(TempListen, "query/get-listening-hist-dan.sql")
+        .fetch_all(&state.db)
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;
+    Ok(Json(items))
 }
 
 #[derive(Debug, Deserialize)]
