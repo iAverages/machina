@@ -334,7 +334,8 @@ async fn create_video_response(file: File) -> Result<Response, (StatusCode, Stri
 async fn get_track_og(track_id: &String, dir: String) -> Result<File> {
     tracing::info!("fetching og image");
     let response = reqwest::get(format!(
-        "https://s.kirsi.dev/direct/https:/open.spotify.com/track/{}",
+        // "https://s.kirsi.dev/direct/https:/open.spotify.com/track/{}",
+        "https://s.avrg.dev/direct/https:/open.spotify.com/track/{}",
         // "http://localhost:3000/direct/https:/open.spotify.com/track/{}",
         track_id
     ))
