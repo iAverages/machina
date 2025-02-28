@@ -1,8 +1,7 @@
-import { Meta } from "@solidjs/meta";
-import { createAsync, RouteSectionProps } from "@solidjs/router";
-import { createSignal, For, Show, Suspense } from "solid-js";
+import { format } from "date-fns";
+import { A, createAsync, RouteSectionProps } from "@solidjs/router";
+import { For, Suspense } from "solid-js";
 import { env } from "~/env";
-import { trackDataQuery } from "~/utils/get-track-data";
 
 export default function Page(props: RouteSectionProps) {
   const listens = createAsync(
@@ -44,13 +43,18 @@ export default function Page(props: RouteSectionProps) {
                   {(listen) => (
                     <tr class="hover:bg-gray-700 transition-colors duration-200">
                       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                        {listen.id}
+                        <A href={`https://open.spotify.com/track/${listen.id}`}>
+                          {listen.id}
+                        </A>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {listen.name}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {listen.time}
+                        {format(
+                          new Date(listen.time / 1000),
+                          "MMMM d, yyyy h:mm a",
+                        )}
                       </td>
                     </tr>
                   )}
