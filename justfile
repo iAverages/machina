@@ -1,4 +1,5 @@
 build: 
+    cargo sqlx prepare
     just build_web
     just build_api
 
