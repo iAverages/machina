@@ -28,6 +28,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                 expires_at: user.spotify_expires_at.map(|date| date.and_utc()),
                 ..Default::default()
             };
+            // TODO: store refreshed token
             let spotify = init_spotify_from_token(token);
             let recent = spotify.current_user_recently_played(Some(50), None).await?;
             let listens = recent
