@@ -12,6 +12,7 @@ model user {
   spotify_refresh_token String? @db.Text
 
   spotify_expires_at DateTime?
+  listen             listen[]
 }
 
 model track {
@@ -22,10 +23,10 @@ model track {
   explicit Boolean?
 
   artist_id String?
-  artist   artist? @relation(fields: [artist_id], references: [id])
+  artist    artist? @relation(fields: [artist_id], references: [id])
 
   album_id String?
-  album   album?  @relation(fields: [album_id], references: [id])
+  album    album?  @relation(fields: [album_id], references: [id])
 
   listen listen[]
 }
@@ -38,15 +39,19 @@ model artist {
 }
 
 model album {
-  id       String @id
-  name     String
+  id        String @id
+  name      String
   cover_art String
 
   track track[]
 }
 
 model listen {
-  id       BigInt @id
+  id BigInt @id
+
+  user_id String
+  user    user   @relation(fields: [user_id], references: [id])
+
   track_id String
   track    track  @relation(fields: [track_id], references: [id])
 }

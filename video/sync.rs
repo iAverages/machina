@@ -135,11 +135,11 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
             println!("returned : {:?}", returned);
 
             let mut qb: QueryBuilder<MySql> =
-                QueryBuilder::new("INSERT IGNORE INTO listen (id, track_id)");
+                QueryBuilder::new("INSERT IGNORE INTO listen (id, track_id, user_id)");
             qb.push_values(listens, |mut b, listen| {
                 let time = listen.played_at.timestamp_micros();
                 let track_id = listen.track.id.as_ref().unwrap().to_string();
-                b.push_bind(time).push_bind(track_id);
+                b.push_bind(time).push_bind(track_id).push_bind(&user.id);
             });
 
             qb.build().execute(&state.db).await?;
