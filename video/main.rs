@@ -9,7 +9,6 @@ use dotenvy::dotenv;
 use rspotify::prelude::{BaseClient, OAuthClient};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sqlx::mysql::MySqlPoolOptions;
 use sqlx::prelude::FromRow;
 use sqlx::{MySql, Pool};
@@ -169,7 +168,15 @@ struct TempListen {
     id: String,
     time: i64,
     name: String,
+    duration: Option<i32>,
+    explicit: Option<i8>,
+    artist_id: Option<String>,
+    album_id: Option<String>,
+    album_name: Option<String>,
+    cover_art: Option<String>,
+    artist_name: Option<String>,
 }
+
 #[axum::debug_handler]
 async fn listen_hist(
     State(state): State<AppState>,

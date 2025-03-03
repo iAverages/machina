@@ -1,12 +1,13 @@
 // just experimenting with spotify listening history sync
 
+use std::collections::HashSet;
+
 use anyhow::Result;
-use rspotify::model::PlayHistory;
+use rspotify::model::{PlayHistory, SimplifiedAlbum, SimplifiedArtist};
 use rspotify::prelude::OAuthClient;
 use rspotify::Token;
 use sqlx::{MySql, QueryBuilder};
 use tokio::time::{sleep, Duration};
-use tracing::info_span;
 
 use crate::models::User;
 use crate::spotify::init_spotify_from_token;
@@ -35,15 +36,100 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                 .filter(|listen| listen.track.id.is_some())
                 .collect::<Vec<&PlayHistory>>();
 
-            tracing::info!("found {} listens", listens.len());
+            let mut seen_albums = HashSet::new();
+            let albums = listens
+                .iter()
+                .filter_map(|listen| {
+                    let album = &listen.track.album;
+
+                    if let Some(id) = &album.id {
+                        if seen_albums.insert(id.clone()) {
+                            Some(album)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<&SimplifiedAlbum>>();
+
+            let mut seen_artists = HashSet::new();
+            let artists = listens
+                .iter()
+                .filter_map(|listen| {
+                    let artist = listen.track.artists.first().unwrap();
+
+                    if let Some(id) = &artist.id {
+                        if seen_artists.insert(id.clone()) {
+                            Some(artist)
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<&SimplifiedArtist>>();
+
+            tracing::info!(
+                "found {} listens, {} albums, {} artists",
+                listens.len(),
+                albums.len(),
+                artists.len(),
+            );
 
             let mut qb: QueryBuilder<MySql> =
-                QueryBuilder::new("INSERT IGNORE INTO track (id, name)");
+                QueryBuilder::new("INSERT IGNORE INTO artist (id, name)");
+
+            qb.push_values(artists, |mut b, artist| {
+                let id = artist.id.as_ref().unwrap().to_string();
+                let name = &artist.name;
+                b.push_bind(id).push_bind(name);
+            });
+            qb.push(" ON DUPLICATE KEY UPDATE ")
+                .push("name = VALUES(name)");
+            qb.build().execute(&state.db).await?;
+
+            let mut qb: QueryBuilder<MySql> =
+                QueryBuilder::new("INSERT IGNORE INTO album (id, name, cover_art)");
+
+            qb.push_values(albums, |mut b, album| {
+                let id = album.id.as_ref().unwrap().to_string();
+                let name = &album.name;
+                let image = &album.images.first().unwrap().url;
+                b.push_bind(id).push_bind(name).push_bind(image);
+            });
+            qb.push(" ON DUPLICATE KEY UPDATE ")
+                .push("name = VALUES(name), ")
+                .push("cover_art = VALUES(cover_art)");
+            qb.build().execute(&state.db).await?;
+
+            let mut qb: QueryBuilder<MySql> = QueryBuilder::new(
+                "INSERT IGNORE INTO track (id, name, album_id, artist_id, duration, explicit)",
+            );
             qb.push_values(listens.iter(), |mut b, listen| {
                 let track_name = &listen.track.name;
                 let track_id = listen.track.id.as_ref().unwrap();
-                b.push_bind(track_id.to_string()).push_bind(track_name);
+                let album_id = listen.track.album.id.as_ref().unwrap();
+                let artist_id = listen.track.artists.first().unwrap().id.as_ref().unwrap();
+                let duration = listen.track.duration.num_seconds();
+                let explicit = listen.track.explicit;
+
+                b.push_bind(track_id.to_string())
+                    .push_bind(track_name)
+                    .push_bind(album_id.to_string())
+                    .push_bind(artist_id.to_string())
+                    .push_bind(duration)
+                    .push_bind(explicit);
             });
+
+            qb.push(" ON DUPLICATE KEY UPDATE ")
+                .push("name = VALUES(name), ")
+                .push("album_id = VALUES(album_id), ")
+                .push("artist_id = VALUES(artist_id), ")
+                .push("duration = VALUES(duration), ")
+                .push("explicit = VALUES(explicit)");
 
             let returned = qb.build().execute(&state.db).await?;
             println!("returned : {:?}", returned);
