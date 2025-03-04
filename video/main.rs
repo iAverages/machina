@@ -32,6 +32,8 @@ use tokio::process::Command;
 use tokio_util::io::ReaderStream;
 use tower_http::trace::TraceLayer;
 
+use once_cell::sync::Lazy;
+
 use self::spotify::init_spotify;
 use self::spotify_embed::EmbedJsonData;
 use self::sync::sync_loop;
@@ -39,8 +41,11 @@ use self::sync::sync_loop;
 #[derive(Clone)]
 struct AppState {
     generation_tasks: Arc<Mutex<HashMap<String, Arc<Notify>>>>,
-    db: Pool<MySql>,
+    db: &'static Pool<MySql>,
 }
+
+static GLOBAL_DB_POOL: Lazy<Arc<Mutex<Option<&'static Pool<MySql>>>>> =
+    Lazy::new(|| Arc::new(Mutex::new(None)));
 
 #[tokio::main]
 async fn main() {
@@ -62,10 +67,17 @@ async fn main() {
         .await
         .expect("failed to connect to database");
 
+    let static_pool: &'static Pool<MySql> = Box::leak(Box::new(pool));
+
     let state = AppState {
         generation_tasks: Arc::new(Mutex::new(HashMap::new())),
-        db: pool,
+        db: static_pool,
     };
+
+    {
+        let mut db_pool = GLOBAL_DB_POOL.lock().await;
+        *db_pool = Some(static_pool);
+    }
 
     let app = Router::new()
         .route("/:trackId", get(root))
@@ -182,7 +194,7 @@ async fn listen_hist(
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let items = sqlx::query_file_as!(TempListen, "query/get-listening-hist-dan.sql")
-        .fetch_all(&state.db)
+        .fetch_all(state.db)
         .await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;
     Ok(Json(items))
@@ -221,7 +233,7 @@ async fn spotify_callback(
         token.expires_at.map(|f| f.naive_utc()),
         token.refresh_token,
     )
-    .execute(&state.db)
+    .execute(state.db)
     .await
     .map_err(|err| {
         println!("error adding user: {:?}", err);

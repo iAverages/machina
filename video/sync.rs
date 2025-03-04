@@ -17,19 +17,19 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
     loop {
         tracing::info!("updating listening history");
         let users = sqlx::query_file_as!(User, "query/get-users.sql")
-            .fetch_all(&state.db)
+            .fetch_all(state.db)
             .await?;
 
         for user in users {
-            tracing::info!("fetching history for {}", user.id);
+            tracing::info!(user_id = user.id, "fetching history");
             let token = Token {
                 access_token: user.spotify_access_token,
                 refresh_token: user.spotify_refresh_token,
                 expires_at: user.spotify_expires_at.map(|date| date.and_utc()),
                 ..Default::default()
             };
-            // TODO: store refreshed token
-            let spotify = init_spotify_from_token(token);
+
+            let spotify = init_spotify_from_token(user.id.clone(), token);
             let recent = spotify.current_user_recently_played(Some(50), None).await?;
             let listens = recent
                 .items
@@ -91,7 +91,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                 });
                 qb.push(" ON DUPLICATE KEY UPDATE ")
                     .push("name = VALUES(name)");
-                qb.build().execute(&state.db).await?;
+                qb.build().execute(state.db).await?;
             }
 
             if !albums.is_empty() {
@@ -107,7 +107,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                 qb.push(" ON DUPLICATE KEY UPDATE ")
                     .push("name = VALUES(name), ")
                     .push("cover_art = VALUES(cover_art)");
-                qb.build().execute(&state.db).await?;
+                qb.build().execute(state.db).await?;
             }
 
             if !listens.is_empty() {
@@ -137,7 +137,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                     .push("duration = VALUES(duration), ")
                     .push("explicit = VALUES(explicit)");
 
-                qb.build().execute(&state.db).await?;
+                qb.build().execute(state.db).await?;
 
                 let mut qb: QueryBuilder<MySql> =
                     QueryBuilder::new("INSERT IGNORE INTO listen (id, track_id, user_id)");
@@ -147,7 +147,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                     b.push_bind(time).push_bind(track_id).push_bind(&user.id);
                 });
 
-                qb.build().execute(&state.db).await?;
+                qb.build().execute(state.db).await?;
             }
         }
 
