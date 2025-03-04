@@ -83,7 +83,7 @@ async fn main() {
         .route("/:trackId", get(root))
         .route("/oauth/spotify/redirect", get(setup_spotify))
         .route("/oauth/spotify/callback", get(spotify_callback))
-        .route("/get-dans-listening-history", get(listen_hist))
+        .route("/history/:user_id", get(listen_hist))
         .layer(TraceLayer::new_for_http().make_span_with(|_: &Request<_>| {
             // let tracing_id = cuid2();
             // let matched_path = request
@@ -176,7 +176,7 @@ async fn serve_cached_video(
 }
 
 #[derive(FromRow, Serialize)]
-struct TempListen {
+struct Listen {
     id: String,
     time: i64,
     name: String,
@@ -192,8 +192,9 @@ struct TempListen {
 #[axum::debug_handler]
 async fn listen_hist(
     State(state): State<AppState>,
+    Path(user_id): Path<String>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let items = sqlx::query_file_as!(TempListen, "query/get-listening-hist-dan.sql")
+    let items = sqlx::query_file_as!(Listen, "query/get-listening-history.sql", user_id)
         .fetch_all(state.db)
         .await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;

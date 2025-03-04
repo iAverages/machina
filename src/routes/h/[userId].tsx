@@ -1,14 +1,14 @@
-import { formatDistanceToNow } from "date-fns";
-import { A, createAsync } from "@solidjs/router";
-import { For, Show, Suspense } from "solid-js";
+import { createAsync, useParams } from "@solidjs/router";
+import { For, Suspense } from "solid-js";
 import { env } from "~/env";
 import { ListenItem } from "~/components/listen-item";
 
 export default function Page() {
+  const params = useParams();
   const listens = createAsync(
     async () => {
       const data = await fetch(
-        env.PUBLIC_VIDEO_GENERATION_URL + "/history/fp0sllluqyvm69f5ukrc6buv",
+        env.PUBLIC_VIDEO_GENERATION_URL + `/history/${params.userId}`,
       );
       const json = (await data.json()) as {
         id: string;
@@ -34,7 +34,7 @@ export default function Page() {
         <div class="container max-w-[800px] mx-auto py-8 px-4">
           <header class="mb-8">
             <div class="flex items-center gap-3 mb-2">
-              <h1 class="text-3xl font-bold">Dans Listening History</h1>
+              <h1 class="text-3xl font-bold">Someones Listening History</h1>
             </div>
           </header>
 

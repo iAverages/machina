@@ -10,6 +10,6 @@ FROM
     LEFT OUTER JOIN artist ON track.artist_id = artist.id
     LEFT OUTER JOIN album ON track.album_id = album.id
 WHERE
-    listen.user_id = "fp0sllluqyvm69f5ukrc6buv"
+    listen.user_id = ?
 ORDER BY
     `time` DESC
