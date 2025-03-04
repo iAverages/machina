@@ -137,8 +137,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
                     .push("duration = VALUES(duration), ")
                     .push("explicit = VALUES(explicit)");
 
-                let returned = qb.build().execute(&state.db).await?;
-                println!("returned : {:?}", returned);
+                qb.build().execute(&state.db).await?;
 
                 let mut qb: QueryBuilder<MySql> =
                     QueryBuilder::new("INSERT IGNORE INTO listen (id, track_id, user_id)");
