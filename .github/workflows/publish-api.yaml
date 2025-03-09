@@ -62,4 +62,4 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           git commit -am "Update ${{ env.DEPLOYMENT_NAME }} to ${{ github.sha }}"
-          git push https://😛:$PUSH_TOKEN@github.com/verifye-app/argocd-deployments.git
+          git push https://😛:$PUSH_TOKEN@github.com/iAverages/k3s.git
