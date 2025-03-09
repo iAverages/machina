@@ -2,7 +2,8 @@ procs:
   video:
     shell: "cargo watch -x run"
   web:
+    cwd: "apps/website"
     shell: "pnpm run dev"
   og:
-    cwd: "og"
+    cwd: "packages/og"
     shell: "pnpm run dev"

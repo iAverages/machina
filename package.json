@@ -4,8 +4,8 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "dev": "mprocs",
-        "build": "turbo build",
+        "dev": "dotenvx run -- mprocs",
+        "build": "dotenvx run -- turbo build",
         "format:check": "biome format .",
         "format:write": "biome format --write .",
         "lint": "biome lint .",
@@ -20,6 +20,7 @@
     },
     "packageManager": "pnpm@10.6.1",
     "dependencies": {
-        "@biomejs/biome": "^1.9.4"
+        "@biomejs/biome": "^1.9.4",
+        "@dotenvx/dotenvx": "^1.38.4"
     }
 }
