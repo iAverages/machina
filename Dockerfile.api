@@ -8,7 +8,10 @@ RUN mv src video
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 
-RUN cargo build --release
+RUN --mount=type=cache,target=/app/target \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    cargo build --release
 RUN rm video/*.rs && rm ./target/release/machina-video
 RUN rm ./target/release/deps/machina*
 
@@ -16,7 +19,10 @@ COPY ./video ./video
 COPY ./query ./query
 COPY ./.sqlx ./.sqlx
 
-RUN cargo build --release
+RUN --mount=type=cache,target=/app/target \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    cargo build --release
 
 FROM debian:bookworm-slim
 

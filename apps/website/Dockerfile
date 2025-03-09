@@ -27,7 +27,9 @@ RUN --mount=type=cache,target=/pnpm,id=pnpm-store \
     pnpm install --frozen-lockfile 
 
 COPY --from=prune /app/out/full/ .
-COPY .env.production /app/apps/website/.env
+
+ARG PUBLIC_VIDEO_GENERATION_URL
+ARG PUBLIC_APP_URL
 
 RUN turbo run build
 
