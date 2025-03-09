@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-deploy:
-    uses: ./.github/workflows/reusable-build-and-push.yml
+    uses: ./.github/workflows/base-publish.yaml
     with:
       dockerfile_path: "./Dockerfile.api"
       deployment_name: "machina/api"
