@@ -45,13 +45,6 @@ jobs:
           registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
-      - name: Generate env file
-        run: |
-          echo "ENVIRONMENT=${{ inputs.environment }}" > .env
-          for var in $(env | grep -v -E "^(GITHUB_|PATH|HOME|USER|SHELL|HOSTNAME|PWD|TERM|SHLVL|_)" | cut -d= -f1); do
-            echo "$var=${!var}" >> .env
-          done
-          cat .env
       - name: "Build and push"
         uses: "docker/build-push-action@v4"
         with:
@@ -66,7 +59,8 @@ jobs:
             ENVIRONMENT=${{ inputs.environment }}
             GITHUB_SHA=${{ github.sha }}
             GITHUB_REF=${{ github.ref }}
-            ${{ vars }}
+            PUBLIC_VIDEO_GENERATION_URL=${{ vars.PUBLIC_VIDEO_GENERATION_URL }}
+            PUBLIC_APP_URL=${{ vars.PUBLIC_APP_URL }}
 
   argocd-sync:
     runs-on: ubuntu-latest
