@@ -40,4 +40,4 @@ COPY --from=installer --chown=machina:machina /app/apps/website/.output ./
 
 USER machina
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "server/index.mjs"]
