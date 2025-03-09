@@ -1,0 +1,17 @@
+name: Build Web
+
+on:
+  push:
+    branches: ["dev"]
+
+jobs:
+  build-and-deploy:
+    uses: ./.github/workflows/base-publish.yaml
+    environment: dev
+    with:
+      environment: dev
+      dockerfile_path: "./apps/website/Dockerfile"
+      deployment_name: "machina/web"
+      argo_deployments_path: "helm/machina/values/dev.yaml"
+      version_key: "webVersion"
+    secrets: inherit

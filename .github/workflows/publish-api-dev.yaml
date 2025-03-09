@@ -2,14 +2,16 @@ name: Build API
 
 on:
   push:
-    branches: ["main"]
+    branches: ["dev"]
 
 jobs:
   build-and-deploy:
     uses: ./.github/workflows/base-publish.yaml
+    environment: dev
     with:
+      environment: dev
       dockerfile_path: "./Dockerfile.api"
       deployment_name: "machina/api"
-      argo_deployments_path: "helm/machina/values/website.yaml"
+      argo_deployments_path: "helm/machina/values/dev.yaml"
       version_key: "apiVersion"
     secrets: inherit

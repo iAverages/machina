@@ -15,6 +15,9 @@ on:
       version_key:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
     secrets:
       DOCKER_REGISTRY:
         required: true

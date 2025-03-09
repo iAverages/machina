@@ -7,7 +7,9 @@ on:
 jobs:
   build-and-deploy:
     uses: ./.github/workflows/base-publish.yaml
+    environment: production
     with:
+      environment: production
       dockerfile_path: "./apps/website/Dockerfile"
       deployment_name: "machina/web"
       argo_deployments_path: "helm/machina/values/website.yaml"
