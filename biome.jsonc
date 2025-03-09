@@ -8,6 +8,7 @@
     "files": {
         "ignoreUnknown": true,
         "ignore": [
+            "./.sqlx/", // sqlx queries for backend
             "./.pnpm-store" // ignore pnpm-store when running in gha
         ]
     },
