@@ -7,7 +7,6 @@ on:
 jobs:
   build-and-deploy:
     uses: ./.github/workflows/base-publish.yaml
-    environment: production
     with:
       environment: production
       dockerfile_path: "./apps/website/Dockerfile"

@@ -34,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEPLOYMENT_NAME: ${{ inputs.deployment_name }}
+    environment: ${{ inputs.environment }}
 
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +59,7 @@ jobs:
           file: ${{ inputs.dockerfile_path }}
           push: true
           platforms: linux/amd64
-          tags: ${{ secrets.DOCKER_REGISTRY }}/${{ env.DEPLOYMENT_NAME }}:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_REGISTRY }}/${{ env.DEPLOYMENT_NAME }}:${{ inputs.environment }}-${{ github.sha }}
           cache-from: type=gha,scope=${{ github.workflow_ref }}
           cache-to: type=gha,scope=${{ github.workflow_ref }},mode=max
 
@@ -80,7 +81,7 @@ jobs:
           ARGO_DEPLOYMENTS_PATH: ${{ inputs.argo_deployments_path }}
           VERSION_KEY: ${{ inputs.version_key }}
         run: |
-          sed -i "s|$VERSION_KEY: .*|$VERSION_KEY: ${{ github.sha }}|g" "$ARGO_DEPLOYMENTS_PATH"
+          sed -i "s|$VERSION_KEY: .*|$VERSION_KEY: ${{ inputs.environment }}-${{ github.sha }}|g" "$ARGO_DEPLOYMENTS_PATH"
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
