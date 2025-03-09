@@ -4,6 +4,10 @@ on:
   push:
     branches: ["dev"]
 
+concurrency:
+  group: dev-web-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-deploy:
     uses: ./.github/workflows/base-publish.yaml
