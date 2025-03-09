@@ -1,9 +1,11 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "globalDependencies": [".env", ".env.production"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
-            "outputs": [".output/**", "dist/**"]
+            "outputs": [".output/**", "dist/**"],
+            "env": ["PUBLIC_*"]
         },
         "lint": {},
         "format:check": {},
