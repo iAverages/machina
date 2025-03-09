@@ -21,7 +21,6 @@
         "@t3-oss/env-core": "^0.12.0",
         "@vercel/og": "^0.6.5",
         "date-fns": "^4.1.0",
-        "next": "15.2.1",
         "node-vibrant": "^4.0.3",
         "prisma": "^6.4.1",
         "satori": "^0.12.1",
@@ -31,11 +30,9 @@
     },
     "devDependencies": {
         "@machina/tsconfig": "workspace:^",
+        "@tailwindcss/vite": "^4.0.12",
         "@types/node": "^22.13.10",
-        "autoprefixer": "^10.4.21",
-        "postcss": "^8.5.3",
-        "tailwindcss": "^3.4.17",
-        "turbo": "^2.4.4",
+        "tailwindcss": "^4.0.12",
         "typescript": "^5.8.2",
         "vite": "^6.2.1"
     },
