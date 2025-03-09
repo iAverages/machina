@@ -7,7 +7,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest-8 --activate
+RUN corepack enable && corepack prepare pnpm@latest-10 --activate
 RUN pnpm add -g turbo@^2
 
 FROM builder AS prune
