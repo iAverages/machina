@@ -80,10 +80,10 @@ async fn main() {
     }
 
     let app = Router::new()
-        .route("/:trackId", get(root))
+        .route("/{trackId}", get(root))
         .route("/oauth/spotify/redirect", get(setup_spotify))
         .route("/oauth/spotify/callback", get(spotify_callback))
-        .route("/history/:user_id", get(listen_hist))
+        .route("/history/{user_id}", get(listen_hist))
         .layer(TraceLayer::new_for_http().make_span_with(|_: &Request<_>| {
             // let tracing_id = cuid2();
             // let matched_path = request

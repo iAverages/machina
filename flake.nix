@@ -19,7 +19,7 @@
 
       pnpm = pkgs.nodePackages.pnpm;
 
-      rust = pkgs.rust-bin.stable.latest.default.override {
+      rust = pkgs.rust-bin.nightly.latest.default.override {
         extensions = ["rust-src" "rust-analyzer"];
         targets = ["x86_64-unknown-linux-gnu"];
       };
