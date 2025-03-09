@@ -51,6 +51,7 @@ jobs:
           for var in $(env | grep -v -E "^(GITHUB_|PATH|HOME|USER|SHELL|HOSTNAME|PWD|TERM|SHLVL|_)" | cut -d= -f1); do
             echo "$var=${!var}" >> .env
           done
+          echo .env
       - name: "Build and push"
         uses: "docker/build-push-action@v4"
         with:
