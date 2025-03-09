@@ -11,6 +11,6 @@ jobs:
       environment: production
       dockerfile_path: "./apps/website/Dockerfile"
       deployment_name: "machina/web"
-      argo_deployments_path: "helm/machina/values/website.yaml"
+      argo_deployments_path: "helm/machina/values/production.yaml"
       version_key: "webVersion"
     secrets: inherit
