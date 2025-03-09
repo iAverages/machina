@@ -1,15 +1,43 @@
-FROM node:22-alpine as BUILD
+FROM node:22-alpine AS base
 
-WORKDIR /build
+FROM base as builder
 
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && pnpm install
-COPY ./ ./
-RUN pnpm --dir og build
-RUN pnpm build
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 
-FROM node:alpine
 WORKDIR /app
-EXPOSE 3000
-COPY --from=BUILD /build/.output /app
-CMD ["node", "./server/index.mjs"]
+
+RUN corepack enable && corepack prepare pnpm@latest-8 --activate
+RUN pnpm add -g turbo@^2
+
+COPY . .
+
+RUN turbo prune @machina/website --docker
+
+FROM base AS installer
+WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+COPY --from=prune /app/out/json/ .
+RUN --mount=type=cache,target=/pnpm,id=pnpm-store \
+    pnpm install --frozen-lockfile --prod
+
+COPY --from=prune /app/out/full/ .
+RUN --mount=type=cache,target=/pnpm,id=pnpm-store \
+  pnpm install --frozen-lockfile
+
+RUN turbo run build
+
+FROM base AS runner
+WORKDIR /app
+
+RUN addgroup --system --gid 1001 machina
+RUN adduser --system --uid 1001 machina
+
+COPY --from=builder --chown=machina:machina /app/apps/website/.output ./
+
+USER machina
+
+CMD ["node", ".output/server/index.mjs"]

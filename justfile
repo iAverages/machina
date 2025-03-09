@@ -4,7 +4,7 @@ build:
     just build_api
 
 build_web:
-    docker build -f Dockerfile.web .  --tag ctr.avrg.dev/machina/web:latest && docker push ctr.avrg.dev/machina/web
+    docker build -f ./apps/website/Dockerfile . --tag ctr.avrg.dev/machina/web:dev
 
 build_api:
-    docker build -f Dockerfile.api .  --tag ctr.avrg.dev/machina/api:latest && docker push ctr.avrg.dev/machina/api
+    docker build -f Dockerfile.api . --tag ctr.avrg.dev/machina/api:dev
