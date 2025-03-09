@@ -1,14 +1,25 @@
 {
-  "name": "machina",
-  "repository": "https://github.com/iAverages/machina.git",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "dev": "mprocs",
-    "build": "turbo build"
-  },
-  "devDependencies": {
-    "turbo": "^2.4.4"
-  },
-  "packageManager": "pnpm@9.0.0"
+    "name": "machina",
+    "repository": "https://github.com/iAverages/machina.git",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "dev": "mprocs",
+        "build": "turbo build",
+        "format:check": "biome format .",
+        "format:write": "biome format --write .",
+        "lint": "biome lint .",
+        "lint:fix": "biome lint --write .",
+        "check": "turbo lint typecheck format:check",
+        "clean": "turbo clean"
+    },
+    "devDependencies": {
+        "@machina/tsconfig": "workspace:^",
+        "turbo": "^2.4.4",
+        "typescript": "^5.7.2"
+    },
+    "packageManager": "pnpm@9.0.0",
+    "dependencies": {
+        "@biomejs/biome": "^1.9.4"
+    }
 }

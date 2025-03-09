@@ -1,9 +1,13 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".output/**", "dist/**"]
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": [".output/**", "dist/**"]
+        },
+        "lint": {},
+        "format:check": {},
+        "typecheck": {},
+        "clean": {}
     }
-  }
 }

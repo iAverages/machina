@@ -1,0 +1,39 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "files": {
+        "ignoreUnknown": true,
+        "ignore": [
+            "./.pnpm-store" // ignore pnpm-store when running in gha
+        ]
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "lineEnding": "lf"
+    },
+    "json": {
+        "formatter": {
+            "trailingCommas": "none"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "a11y": {
+                // TODO: enable this again
+                "noSvgWithoutTitle": "off"
+            }
+        }
+    }
+}

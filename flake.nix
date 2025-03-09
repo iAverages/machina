@@ -28,6 +28,7 @@
         mkShell {
           packages = [
             nodejs
+            bun # dev scripts
             pnpm
             pkg-config
             openssl
