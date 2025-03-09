@@ -10,6 +10,6 @@ jobs:
     with:
       dockerfile_path: "./Dockerfile.api"
       deployment_name: "machina/api"
-      argo_deployments_path: "helm/machina/values/api.yaml"
+      argo_deployments_path: "helm/machina/values/website.yaml"
       version_key: "apiVersion"
     secrets: inherit
