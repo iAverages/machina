@@ -1,23 +1,21 @@
-use std::env;
 use std::sync::Arc;
 
 use rspotify::{
     scopes, AuthCodeSpotify, CallbackError, Config, Credentials, OAuth, Token, TokenCallback,
 };
 use sqlx::Error;
-use tokio::runtime::{Handle, Runtime};
-use tokio::task::{self, spawn_blocking};
+use tokio::task;
 
-use crate::GLOBAL_DB_POOL;
+use crate::{GLOBAL_DB_POOL, MACHINA_CONFIG};
 
 pub fn init_spotify() -> AuthCodeSpotify {
     let config = get_spotify_config(None);
     let oauth = get_spotify_oauth_config();
 
-    let client_id = env::var("client_id").expect("no client_id found");
-    let client_secret = env::var("client_secret").expect("no client_secret found");
-
-    let creds = Credentials::new(&client_id, &client_secret);
+    let creds = Credentials::new(
+        &MACHINA_CONFIG.spotify_client_id,
+        &MACHINA_CONFIG.spotify_client_secret,
+    );
     AuthCodeSpotify::with_config(creds, oauth, config)
 }
 
@@ -25,10 +23,10 @@ pub fn init_spotify_from_token(user_id: String, token: Token) -> AuthCodeSpotify
     let config = get_spotify_config(Some(user_id));
     let oauth = get_spotify_oauth_config();
 
-    let client_id = env::var("client_id").expect("no client_id found");
-    let client_secret = env::var("client_secret").expect("no client_secret found");
-
-    let creds = Credentials::new(&client_id, &client_secret);
+    let creds = Credentials::new(
+        &MACHINA_CONFIG.spotify_client_id,
+        &MACHINA_CONFIG.spotify_client_secret,
+    );
     AuthCodeSpotify::from_token_with_config(token, creds, oauth, config)
 }
 
@@ -78,7 +76,7 @@ pub fn get_spotify_config(user_id: Option<String>) -> Config {
 
 pub fn get_spotify_oauth_config() -> OAuth {
     OAuth {
-        redirect_uri: "http://localhost:3001/oauth/spotify/callback".to_string(),
+        redirect_uri: format!("{}/oauth/spotify/callback", MACHINA_CONFIG.api_url),
         scopes: scopes!(
             "user-read-recently-played",
             "user-read-playback-state",

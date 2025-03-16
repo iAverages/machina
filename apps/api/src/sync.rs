@@ -1,17 +1,27 @@
-// just experimenting with spotify listening history sync
-
-use std::collections::HashSet;
-
 use anyhow::Result;
 use rspotify::model::{PlayHistory, SimplifiedAlbum, SimplifiedArtist};
 use rspotify::prelude::OAuthClient;
 use rspotify::Token;
 use sqlx::{MySql, QueryBuilder};
+use std::collections::HashSet;
+use tokio::task;
 use tokio::time::{sleep, Duration};
 
 use crate::models::User;
 use crate::spotify::init_spotify_from_token;
 use crate::AppState;
+
+pub fn start_sync_loop(state: AppState) {
+    task::spawn(async move {
+        loop {
+            let res = sync_loop(state.clone()).await;
+            match res {
+                Ok(_) => println!("sync loop ended"),
+                Err(err) => println!("sync loop error {:?}", err),
+            }
+        }
+    });
+}
 
 pub async fn sync_loop(state: AppState) -> Result<()> {
     loop {

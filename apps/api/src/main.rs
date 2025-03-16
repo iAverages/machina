@@ -1,3 +1,4 @@
+mod config;
 mod models;
 mod spotify;
 mod spotify_embed;
@@ -5,7 +6,6 @@ mod sync;
 
 use anyhow::{anyhow, Result};
 use cuid::cuid2;
-use dotenvy::dotenv;
 use rspotify::prelude::{BaseClient, OAuthClient};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
@@ -14,6 +14,7 @@ use sqlx::prelude::FromRow;
 use sqlx::{MySql, Pool};
 use std::collections::HashMap;
 use std::env;
+use std::io::Read;
 use std::path::Path as StdPath;
 use std::process::Stdio;
 use std::sync::Arc;
@@ -24,33 +25,34 @@ use tracing::{span, Level};
 
 use axum::body::Body;
 use axum::extract::{Path, Query, State};
-use axum::http::{HeaderMap, HeaderValue, Request, StatusCode};
+use axum::http::{HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
 use axum::{Json, Router};
 use tokio::process::Command;
 use tokio_util::io::ReaderStream;
-use tower_http::trace::TraceLayer;
 
 use once_cell::sync::Lazy;
 
+use self::config::{get_config, MachinaConfig};
 use self::spotify::init_spotify;
 use self::spotify_embed::EmbedJsonData;
-use self::sync::sync_loop;
+use self::sync::start_sync_loop;
 
 #[derive(Clone)]
 struct AppState {
     generation_tasks: Arc<Mutex<HashMap<String, Arc<Notify>>>>,
     db: &'static Pool<MySql>,
+    // config: MachinaConfig,
 }
 
 static GLOBAL_DB_POOL: Lazy<Arc<Mutex<Option<&'static Pool<MySql>>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
 
+static MACHINA_CONFIG: Lazy<MachinaConfig> = Lazy::new(|| get_config().expect("config"));
+
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
-
     tracing_subscriber::fmt()
         .compact()
         .with_env_filter(
@@ -60,10 +62,9 @@ async fn main() {
         )
         .init();
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = MySqlPoolOptions::new()
         .max_connections(5)
-        .connect(&database_url)
+        .connect(&MACHINA_CONFIG.database_url)
         .await
         .expect("failed to connect to database");
 
@@ -84,27 +85,9 @@ async fn main() {
         .route("/oauth/spotify/redirect", get(setup_spotify))
         .route("/oauth/spotify/callback", get(spotify_callback))
         .route("/history/{user_id}", get(listen_hist))
-        .layer(TraceLayer::new_for_http().make_span_with(|_: &Request<_>| {
-            // let tracing_id = cuid2();
-            // let matched_path = request
-            //     .extensions()
-            //     .get::<MatchedPath>()
-            //     .map(MatchedPath::as_str);
-            tracing::debug_span!("request")
-        }))
         .with_state(state.clone());
 
-    use tokio::task;
-    task::spawn(async move {
-        // temp stuff, just messing around atm
-        loop {
-            let res = sync_loop(state.clone()).await;
-            match res {
-                Ok(_) => println!("sync loop ended"),
-                Err(err) => println!("sync loop error {:?}", err),
-            }
-        }
-    });
+    start_sync_loop(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     tracing::info!("listening on :3001");
@@ -121,6 +104,7 @@ async fn get_cached_video(track_id: String) -> Option<File> {
 
     None
 }
+
 async fn serve_cached_video(
     track_id: String,
     range: Option<&HeaderValue>,
@@ -354,10 +338,8 @@ async fn create_video_response(file: File) -> Result<Response, (StatusCode, Stri
 async fn get_track_og(track_id: &String, dir: String) -> Result<File> {
     tracing::info!("fetching og image");
     let response = reqwest::get(format!(
-        // "https://s.kirsi.dev/direct/https:/open.spotify.com/track/{}",
-        "https://s.avrg.dev/direct/https:/open.spotify.com/track/{}",
-        // "http://localhost:3000/direct/https:/open.spotify.com/track/{}",
-        track_id
+        "{}/direct/https:/open.spotify.com/track/{}",
+        MACHINA_CONFIG.app_url, track_id
     ))
     .await?;
 

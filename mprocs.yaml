@@ -1,5 +1,5 @@
 procs:
-  video:
+  api:
     shell: "cargo watch -x run"
   web:
     cwd: "apps/website"
