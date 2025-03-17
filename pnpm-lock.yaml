@@ -13,7 +13,7 @@ importers:
         version: 1.9.4
       '@dotenvx/dotenvx':
         specifier: ^1.38.4
-        version: 1.38.5
+        version: 1.39.0
     devDependencies:
       '@machina/tsconfig':
         specifier: workspace:^
@@ -274,8 +274,8 @@ packages:
   '@deno/shim-deno@0.19.2':
     resolution: {integrity: sha512-q3VTHl44ad8T2Tw2SpeAvghdGOjlnLPDNO2cpOxwMrBE/PVas6geWpbpIgrM+czOCH0yejp0yi8OaTuB+NU40Q==}
 
-  '@dotenvx/dotenvx@1.38.5':
-    resolution: {integrity: sha512-NAmo2Esp7vfOvagkTK2lBU9ptWCojPzFvI2slLtoGNH1hebMX9JWBHkByUGPYgAOnPZN5F4uGxVBGWQNyXse4Q==}
+  '@dotenvx/dotenvx@1.39.0':
+    resolution: {integrity: sha512-qGfDpL/3S17MQYXpR3HkBS5xNQ7wiFlqLdpr+iIQzv17aMRcSlgL4EjMIsYFZ540Dq17J+y5FVElA1AkVoXiUA==}
     hasBin: true
 
   '@ecies/ciphers@0.2.3':
@@ -3978,7 +3978,7 @@ snapshots:
       '@deno/shim-deno-test': 0.5.0
       which: 4.0.0
 
-  '@dotenvx/dotenvx@1.38.5':
+  '@dotenvx/dotenvx@1.39.0':
     dependencies:
       commander: 11.1.0
       dotenv: 16.4.7
