@@ -1,3 +1,4 @@
+import { Button } from "~/components/ui/button";
 import { env } from "~/env";
 import { authClient } from "~/utils/auth";
 
@@ -13,7 +14,7 @@ export default function SignIn() {
 
     return (
         <div>
-            <button onClick={signin}>signin</button>
+            <Button onClick={signin}>signin</Button>
         </div>
     );
 }

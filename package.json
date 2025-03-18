@@ -22,6 +22,6 @@
     "packageManager": "pnpm@10.6.1",
     "dependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@dotenvx/dotenvx": "^1.38.4"
+        "@dotenvx/dotenvx": "^1.39.0"
     }
 }

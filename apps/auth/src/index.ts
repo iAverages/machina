@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { auth } from "@machina/auth-client";
 import { cors } from "hono/cors";
+import { auth } from "~/auth";
 
 const app = new Hono();
 
