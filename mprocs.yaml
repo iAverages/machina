@@ -1,4 +1,7 @@
 procs:
+  auth:
+    cwd: "apps/auth"
+    shell: "pnpm run dev"
   api:
     shell: "cargo watch -x run"
   web:

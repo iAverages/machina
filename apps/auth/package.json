@@ -1,0 +1,15 @@
+{
+    "name": "@machina/auth",
+    "scripts": {
+        "dev": "bun run --hot src/index.ts"
+    },
+    "dependencies": {
+        "@t3-oss/env-core": "^0.12.0",
+        "better-auth": "^1.2.4",
+        "hono": "^4.7.4",
+        "mysql2": "^3.13.0"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    }
+}

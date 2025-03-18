@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "dotenvx run -- mprocs",
         "build": "dotenvx run -- turbo build",
+        "db": "dotenvx run -- pnpm run --dir ./packages/database/ prisma",
         "format:check": "biome format .",
         "format:write": "biome format --write .",
         "lint": "biome lint .",

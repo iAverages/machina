@@ -1,0 +1,115 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String    @id
+    name          String
+    email         String
+    emailVerified Boolean
+    image         String?
+    createdAt     DateTime
+    updatedAt     DateTime
+    sessions      Session[]
+    accounts      Account[]
+
+    listen Listen[]
+
+    @@unique([email])
+    @@map("user")
+}
+
+model Track {
+    id   String @id
+    name String
+
+    duration Int?     @db.Int
+    explicit Boolean?
+
+    artist_id String?
+    artist    Artist? @relation(fields: [artist_id], references: [id])
+
+    album_id String?
+    album    Album?  @relation(fields: [album_id], references: [id])
+
+    listen Listen[]
+
+    @@map("track")
+}
+
+model Artist {
+    id   String @id
+    name String
+
+    track Track[]
+
+    @@map("artist")
+}
+
+model Album {
+    id        String @id
+    name      String
+    cover_art String
+
+    track Track[]
+
+    @@map("album")
+}
+
+model Listen {
+    id BigInt @id
+
+    user_id String
+    user    User   @relation(fields: [user_id], references: [id])
+
+    track_id String
+    track    Track  @relation(fields: [track_id], references: [id])
+
+    @@map("listen")
+}
+
+model Session {
+    id        String   @id
+    expiresAt DateTime
+    token     String
+    createdAt DateTime
+    updatedAt DateTime
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@map("session")
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?   @db.Text
+    refreshToken          String?   @db.Text
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime
+    updatedAt             DateTime
+
+    @@map("account")
+}
+
+model Verification {
+    id         String    @id
+    identifier String
+    value      String    @db.Text
+    expiresAt  DateTime
+    createdAt  DateTime?
+    updatedAt  DateTime?
+
+    @@map("verification")
+}

@@ -1,0 +1,9 @@
+{
+    "name": "@machina/database",
+    "scripts": {
+        "prisma": "prisma"
+    },
+    "dependencies": {
+        "prisma": "^6.4.1"
+    }
+}
