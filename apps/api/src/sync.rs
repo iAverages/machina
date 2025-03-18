@@ -7,7 +7,7 @@ use std::collections::HashSet;
 use tokio::task;
 use tokio::time::{sleep, Duration};
 
-use crate::models::User;
+use crate::models::ListenSyncUser;
 use crate::spotify::init_spotify_from_token;
 use crate::AppState;
 
@@ -26,14 +26,14 @@ pub fn start_sync_loop(state: AppState) {
 pub async fn sync_loop(state: AppState) -> Result<()> {
     loop {
         tracing::info!("updating listening history");
-        let users = sqlx::query_file_as!(User, "query/get-users.sql")
+        let users = sqlx::query_file_as!(ListenSyncUser, "query/get-users.sql")
             .fetch_all(state.db)
             .await?;
 
         for user in users {
             tracing::info!(user_id = user.id, "fetching history");
             let token = Token {
-                access_token: user.spotify_access_token,
+                access_token: user.spotify_access_token.expect("need token"),
                 refresh_token: user.spotify_refresh_token,
                 expires_at: user.spotify_expires_at.map(|date| date.and_utc()),
                 ..Default::default()

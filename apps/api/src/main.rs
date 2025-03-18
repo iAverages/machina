@@ -5,8 +5,6 @@ mod spotify_embed;
 mod sync;
 
 use anyhow::{anyhow, Result};
-use cuid::cuid2;
-use rspotify::prelude::{BaseClient, OAuthClient};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
 use sqlx::mysql::MySqlPoolOptions;
@@ -14,7 +12,6 @@ use sqlx::prelude::FromRow;
 use sqlx::{MySql, Pool};
 use std::collections::HashMap;
 use std::env;
-use std::io::Read;
 use std::path::Path as StdPath;
 use std::process::Stdio;
 use std::sync::Arc;
@@ -24,9 +21,9 @@ use tokio::sync::{Mutex, Notify};
 use tracing::{span, Level};
 
 use axum::body::Body;
-use axum::extract::{Path, Query, State};
+use axum::extract::{Path, State};
 use axum::http::{HeaderMap, HeaderValue, StatusCode};
-use axum::response::{IntoResponse, Redirect, Response};
+use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::{Json, Router};
 use tokio::process::Command;
@@ -35,7 +32,6 @@ use tokio_util::io::ReaderStream;
 use once_cell::sync::Lazy;
 
 use self::config::{get_config, MachinaConfig};
-use self::spotify::init_spotify;
 use self::spotify_embed::EmbedJsonData;
 use self::sync::start_sync_loop;
 
@@ -82,8 +78,6 @@ async fn main() {
 
     let app = Router::new()
         .route("/{trackId}", get(root))
-        .route("/oauth/spotify/redirect", get(setup_spotify))
-        .route("/oauth/spotify/callback", get(spotify_callback))
         .route("/history/{user_id}", get(listen_hist))
         .with_state(state.clone());
 
@@ -188,54 +182,6 @@ async fn listen_hist(
 #[derive(Debug, Deserialize)]
 struct SpotifyCallbackSearchParams {
     code: String,
-}
-
-#[axum::debug_handler]
-async fn spotify_callback(
-    State(state): State<AppState>,
-    Query(query): Query<SpotifyCallbackSearchParams>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let spotify = init_spotify();
-    spotify
-        .request_token(&query.code)
-        .await
-        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;
-
-    let token_mutex = spotify.get_token();
-    let token = token_mutex.lock().await.unwrap().clone();
-    let token = token.expect("failed to get token");
-
-    let spotify_user = spotify.me().await.expect("failed to get spotify user");
-
-    sqlx::query_file!(
-        "query/spotify-callback-user-insert.sql",
-        cuid2(),
-        spotify_user
-            .display_name
-            .unwrap_or_else(|| spotify_user.id.to_string()),
-        spotify_user.id.to_string(),
-        token.access_token,
-        token.expires_at.map(|f| f.naive_utc()),
-        token.refresh_token,
-    )
-    .execute(state.db)
-    .await
-    .map_err(|err| {
-        println!("error adding user: {:?}", err);
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "failed to add user".to_string(),
-        )
-    })?;
-
-    Ok((StatusCode::OK, "setup complete"))
-}
-
-#[axum::debug_handler]
-async fn setup_spotify() -> Result<impl IntoResponse, (StatusCode, String)> {
-    let spotify = init_spotify();
-    let auth_url = spotify.get_authorize_url(true).unwrap();
-    Ok(Redirect::to(&auth_url))
 }
 
 #[axum::debug_handler]

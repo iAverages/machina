@@ -1,8 +1,8 @@
 UPDATE
-    `user`
+    `account`
 SET
-    `spotify_access_token` = ?,
-    `spotify_refresh_token` = ?,
-    `spotify_expires_at` = ?
+    `accessToken` = ?,
+    `refreshToken` = ?,
+    `accessTokenExpiresAt` = ?
 WHERE
-    `user`.`id` = ?;
+    `account`.`userId` = ?;

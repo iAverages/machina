@@ -16,6 +16,14 @@ pub struct User {
     pub spotify_expires_at: Option<NaiveDateTime>,
 }
 
+#[derive(FromRow, Debug)]
+pub struct ListenSyncUser {
+    pub id: String,
+    pub spotify_access_token: Option<String>,
+    pub spotify_refresh_token: Option<String>,
+    pub spotify_expires_at: Option<NaiveDateTime>,
+}
+
 pub struct Track {
     pub id: String,
     pub name: String,
