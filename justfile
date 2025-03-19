@@ -8,3 +8,6 @@ build_web:
 
 build_api:
     docker build -f ./apps/api/Dockerfile . --tag ctr.avrg.dev/machina/api:dev
+
+build_auth:
+    docker build -f ./apps/auth/Dockerfile . --tag ctr.avrg.dev/machina/auth:dev
