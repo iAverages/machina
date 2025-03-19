@@ -19,6 +19,7 @@ pub fn start_sync_loop(state: AppState) {
                 Ok(_) => println!("sync loop ended"),
                 Err(err) => println!("sync loop error {:?}", err),
             }
+            sleep(Duration::from_secs(60)).await;
         }
     });
 }
