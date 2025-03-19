@@ -5,7 +5,14 @@ import "./src/env";
 
 export default defineConfig({
     ssr: true,
-    server: { preset: "node-server" },
+    server: {
+        preset: "node-server",
+        esbuild: {
+            options: {
+                target: "es2024",
+            },
+        },
+    },
     vite: {
         envPrefix: "PUBLIC_",
         plugins: [tailwindcss()],

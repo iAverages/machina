@@ -61,7 +61,7 @@ export async function GET({ request: req }: APIEvent) {
                 "cache-control": "public, max-age=31536000, immutable",
             },
         });
-    } catch (e: any) {
+    } catch (e) {
         console.log(e);
         return new Response("error", { status: 500 });
     }
