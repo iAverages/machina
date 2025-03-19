@@ -3,12 +3,11 @@ on:
   push:
     branches: ["main"]
 
-concurrency:
-  group: prod-${{ matrix.app }}-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-and-deploy:
+    concurrency:
+      group: prod-${{ matrix.app }}-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       # TODO: replace with script that uses turbo+git to 
       # detech what services need building
