@@ -19,6 +19,7 @@ export const auth = betterAuth({
         spotify: {
             clientId: process.env.SPOTIFY_CLIENT_ID as string,
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
+            scope: ["user-read-recently-played", "user-read-playback-state", "user-read-currently-playing"],
         },
     },
 });
