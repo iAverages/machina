@@ -11,6 +11,7 @@ jobs:
     strategy:
       # TODO: replace with script that uses turbo+git to 
       # detech what services need building
+      fail-fast: false
       matrix:
         app: [auth, api, web]
     uses: ./.github/workflows/base-publish.yaml
