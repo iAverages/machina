@@ -10,7 +10,8 @@ COPY . ./
 RUN --mount=type=cache,target=/machina/target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
-    cargo build --release --bin machina-api
+    cargo build --release --bin machina-api && \
+    cp /machina/target/release/machina-api /machina/machina-api
 
 FROM debian:bookworm-slim
 
@@ -30,15 +31,12 @@ RUN tar -xJf ffmpeg-release-amd64-static.tar.xz  && \
 
 RUN mkdir -p /machina
 
-RUN --mount=type=cache,target=/machina/target \
-    cp /machina/target/release/machina-api /machina/machina-api
-
 # Don't run production as root
 RUN addgroup --system --gid 1001 machina
 RUN adduser --system --uid 1001 machina
 USER machina
 
-
+COPY --from=backend  /machina/machina-api /machina/machina-api 
 
 EXPOSE 3001
 
