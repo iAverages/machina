@@ -3,8 +3,8 @@ import { env } from "~/env";
 import { trackApiSchema } from "~/utils/spotify";
 
 const getSpotifyAuth = async () => {
-    const client_id = process.env.client_id;
-    const client_secret = process.env.client_secret;
+    const client_id = process.env.SPOTIFY_CLIENT_ID;
+    const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
     const authOptions = {
         method: "POST",
