@@ -12,7 +12,7 @@ jobs:
       # TODO: replace with script that uses turbo+git to 
       # detech what services need building
       matrix:
-        app: [auth, api, website]
+        app: [auth, api, web]
     uses: ./.github/workflows/base-publish.yaml
     with:
       environment: prod
