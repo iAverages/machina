@@ -39,7 +39,7 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 machina
 RUN adduser --system --uid 1001 machina
 
-COPY --from=installer --chown=machina:machina /app/apps/website/.output ./
+COPY --from=installer --chown=machina:machina /app/apps/web/.output ./
 
 USER machina
 
