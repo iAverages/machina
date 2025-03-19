@@ -1,0 +1,54 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    `user`.`id`,\n    `account`.`accessToken` AS \"spotify_access_token\",\n    `account`.`refreshToken` AS \"spotify_refresh_token\",\n    `account`.`accessTokenExpiresAt` AS \"spotify_expires_at\"\nFROM\n    `user`\n    INNER JOIN `account` ON `account`.`userId` = `user`.id\nWHERE\n    `account`.`providerId` = \"spotify\";\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "spotify_access_token",
+        "type_info": {
+          "type": "Blob",
+          "flags": "BLOB",
+          "max_size": 262140
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "spotify_refresh_token",
+        "type_info": {
+          "type": "Blob",
+          "flags": "BLOB",
+          "max_size": 262140
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "spotify_expires_at",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "BINARY",
+          "max_size": 23
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "ee7425a84d92b088fe94c38c35ead40d82a2cb8aee6ce1392d6742a0941b506f"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "UPDATE\n    `account`\nSET\n    `accessToken` = ?,\n    `refreshToken` = ?,\n    `accessTokenExpiresAt` = ?\nWHERE\n    `account`.`userId` = ?;\n",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "648372e3809137975344204ccbc4bf6a826f7df50bd0f8b90154a629edbf25c2"
+}
