@@ -44,7 +44,7 @@ importers:
         specifier: ^1.2.5
         version: 1.2.5
 
-  apps/website:
+  apps/web:
     dependencies:
       '@ark-ui/solid':
         specifier: ^5.1.1
@@ -5892,7 +5892,7 @@ snapshots:
       consola: 3.4.2
       defu: 6.1.4
       get-port-please: 3.1.2
-      h3: 1.13.0
+      h3: 1.15.1
       http-shutdown: 1.2.2
       jiti: 1.21.7
       mlly: 1.7.4
