@@ -5,14 +5,12 @@ WORKDIR /machina
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
 
-COPY ./video ./video
-COPY ./query ./query
-COPY ./.sqlx ./.sqlx
+COPY . ./
 
-RUN --mount=type=cache,target=/app/target \
+RUN --mount=type=cache,target=/machina/target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
-    cargo build --release
+    cargo build --release --bin machina-api
 
 FROM debian:bookworm-slim
 
@@ -32,13 +30,16 @@ RUN tar -xJf ffmpeg-release-amd64-static.tar.xz  && \
 
 RUN mkdir -p /machina
 
+RUN --mount=type=cache,target=/machina/target \
+    cp /machina/target/release/machina-api /machina/machina-api
+
 # Don't run production as root
 RUN addgroup --system --gid 1001 machina
 RUN adduser --system --uid 1001 machina
 USER machina
 
-COPY --from=backend /machina/target/release/machina-video /machina/machina-video
+
 
 EXPOSE 3001
 
-CMD ["/machina/machina-video"]
+CMD ["/machina/machina-api"]
