@@ -5,7 +5,7 @@ procs:
   api:
     shell: "cargo watch -x run"
   web:
-    cwd: "apps/website"
+    cwd: "apps/web"
     shell: "pnpm run dev"
   og:
     cwd: "packages/og"
