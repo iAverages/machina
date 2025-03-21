@@ -14,7 +14,7 @@ FROM builder AS prune
 
 COPY . .
 
-RUN turbo prune @machina/website --docker
+RUN turbo prune @machina/web --docker
 
 FROM builder AS installer
 WORKDIR /app
