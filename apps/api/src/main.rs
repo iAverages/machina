@@ -6,7 +6,7 @@ mod sync;
 
 use anyhow::{anyhow, Result};
 use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::mysql::MySqlPoolOptions;
 use sqlx::prelude::FromRow;
 use sqlx::{MySql, Pool};
@@ -177,11 +177,6 @@ async fn listen_hist(
         .await
         .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;
     Ok(Json(items))
-}
-
-#[derive(Debug, Deserialize)]
-struct SpotifyCallbackSearchParams {
-    code: String,
 }
 
 #[axum::debug_handler]

@@ -42,6 +42,7 @@ pub async fn sync_loop(state: AppState) -> Result<()> {
 
             let spotify = init_spotify_from_token(user.id.clone(), token);
             let recent = spotify.current_user_recently_played(Some(50), None).await?;
+
             let listens = recent
                 .items
                 .iter()

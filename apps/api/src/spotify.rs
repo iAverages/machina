@@ -1,23 +1,10 @@
 use std::sync::Arc;
 
-use rspotify::{
-    scopes, AuthCodeSpotify, CallbackError, Config, Credentials, OAuth, Token, TokenCallback,
-};
+use rspotify::{AuthCodeSpotify, CallbackError, Config, Credentials, OAuth, Token, TokenCallback};
 use sqlx::Error;
 use tokio::task;
 
 use crate::{GLOBAL_DB_POOL, MACHINA_CONFIG};
-
-pub fn init_spotify() -> AuthCodeSpotify {
-    let config = get_spotify_config(None);
-    let oauth = get_spotify_oauth_config();
-
-    let creds = Credentials::new(
-        &MACHINA_CONFIG.spotify_client_id,
-        &MACHINA_CONFIG.spotify_client_secret,
-    );
-    AuthCodeSpotify::with_config(creds, oauth, config)
-}
 
 pub fn init_spotify_from_token(user_id: String, token: Token) -> AuthCodeSpotify {
     let config = get_spotify_config(Some(user_id));
@@ -76,12 +63,6 @@ pub fn get_spotify_config(user_id: Option<String>) -> Config {
 
 pub fn get_spotify_oauth_config() -> OAuth {
     OAuth {
-        redirect_uri: format!("{}/oauth/spotify/callback", MACHINA_CONFIG.api_url),
-        scopes: scopes!(
-            "user-read-recently-played",
-            "user-read-playback-state",
-            "user-read-currently-playing"
-        ),
         ..Default::default()
     }
 }
