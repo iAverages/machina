@@ -42,7 +42,12 @@
         pkgs.dockerTools.buildLayeredImage {
           name = app.name;
           contents = [app pkgs.nodejs_22 pkgs.cacert];
-          config.Cmd = ["node" "server/index.mjs"];
+          config = {
+            Cmd = ["node" "server/index.mjs"];
+            Env = [
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+          };
         };
     in {
       packages = {
