@@ -61,6 +61,7 @@ jobs:
             GITHUB_REF=${{ github.ref }}
             PUBLIC_VIDEO_GENERATION_URL=${{ vars.PUBLIC_VIDEO_GENERATION_URL }}
             PUBLIC_APP_URL=${{ vars.PUBLIC_APP_URL }}
+            PUBLIC_AUTH_URL=${{ vars.PUBLIC_AUTH_URL }}
 
   argocd-sync:
     runs-on: ubuntu-latest

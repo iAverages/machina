@@ -30,6 +30,7 @@ COPY --from=prune /app/out/full/ .
 
 ARG PUBLIC_VIDEO_GENERATION_URL
 ARG PUBLIC_APP_URL
+ARG PUBLIC_AUTH_URL
 
 RUN turbo run build
 
