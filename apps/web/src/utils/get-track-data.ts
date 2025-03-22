@@ -1,15 +1,16 @@
 import { query } from "@solidjs/router";
-import { env } from "~/env";
+import { env } from "~/env-server";
+import { env as envClient } from "~/env-client";
 import { trackApiSchema } from "~/utils/spotify";
 
 const getSpotifyAuth = async () => {
-    const client_id = process.env.SPOTIFY_CLIENT_ID;
-    const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+    const client_id = env.SPOTIFY_CLIENT_ID;
+    const client_secret = env.SPOTIFY_CLIENT_SECRET;
 
     const authOptions = {
         method: "POST",
         headers: {
-            Authorization: "Basic " + Buffer.from(`${client_id}:${client_secret}`).toString("base64"),
+            Authorization: `Basic ${Buffer.from(`${client_id}:${client_secret}`).toString("base64")}`,
             "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
@@ -45,7 +46,7 @@ export const getTrackData = async (trackId: string) => {
     if (data.album.images[0]) params.set("albumArt", data.album.images[0].url);
     if (data.artists[0]) params.set("artist", data.artists[0].name);
     params.set("songName", data.name);
-    const og = `${env.PUBLIC_APP_URL}/api/og?${params.toString()}`;
+    const og = `${envClient.PUBLIC_APP_URL}/api/og?${params.toString()}`;
 
     return {
         id: trackId,
@@ -77,6 +78,6 @@ export const trackDataQuery = query(async (slug: string, preload = true) => {
     if (!track) {
         return null;
     }
-    preload && (await fetch(`${env.PUBLIC_VIDEO_GENERATION_URL}/${track.id}`));
+    preload && (await fetch(`${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.id}`));
     return track;
 }, "track");

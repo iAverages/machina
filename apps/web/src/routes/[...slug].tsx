@@ -1,8 +1,8 @@
 import { Meta } from "@solidjs/meta";
-import { createAsync, RouteDefinition, RouteSectionProps } from "@solidjs/router";
+import { createAsync, type RouteDefinition, type RouteSectionProps } from "@solidjs/router";
 import { Vibrant } from "node-vibrant/node";
 import { Show } from "solid-js";
-import { env } from "~/env";
+import { env } from "~/env-client";
 import { trackDataQuery } from "~/utils/get-track-data";
 
 export const route = {
@@ -14,6 +14,7 @@ export const route = {
 } satisfies RouteDefinition;
 
 export default function Page(props: RouteSectionProps) {
+    // biome-ignore lint/style/noNonNullAssertion: can this ever not be a string?
     const data = createAsync(() => trackDataQuery(props.params.slug!), {
         deferStream: true,
     });
@@ -44,7 +45,7 @@ export default function Page(props: RouteSectionProps) {
                         content={`${env.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track().id}`}
                     />
                     <Meta property="theme-color" content={colors()?.baseColor ?? "#7e22ce"} />
-                    <Meta property="og:image" content={data()?.og + "&baddiscord=true"} />
+                    <Meta property="og:image" content={`${data()?.og}&baddiscord=true`} />
                     <Meta property="og:type" content="video" />
                     <Meta property="og:video" content={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().id}.mp4`} />
                     <Meta property="og:video:type" content="video/mp4" />
@@ -63,7 +64,11 @@ export default function Page(props: RouteSectionProps) {
                         <div class="flex w-full z-10">
                             <div class="flex items-center justify-center w-3/4 h-full">
                                 <div class="flex items-center justify-center w-fit h-fit rounded-xl overflow-hidden">
-                                    <img src={track().album.images[0]?.url} class="object-contain" />
+                                    <img
+                                        src={track().album.images[0]?.url}
+                                        class="object-contain"
+                                        alt={`Album art for ${track().name}`}
+                                    />
                                 </div>
                             </div>
 
@@ -77,7 +82,8 @@ export default function Page(props: RouteSectionProps) {
                                     height="80"
                                     allow="encrypted-media"
                                     class="rounded-md"
-                                ></iframe>
+                                    title="spotify embed"
+                                />
                             </div>
                         </div>
                         <div class="absolute top-0 right-0 z-0 h-screen">
@@ -88,6 +94,7 @@ export default function Page(props: RouteSectionProps) {
                                     "mask-image": "linear-gradient(to right, transparent 40%, black 100%)",
                                     "mask-repeat": "no-repeat",
                                 }}
+                                aria-hidden
                             />
                         </div>
                     </div>

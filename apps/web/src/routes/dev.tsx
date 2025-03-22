@@ -1,7 +1,7 @@
 import { Meta } from "@solidjs/meta";
-import { createAsync, RouteSectionProps } from "@solidjs/router";
+import { createAsync, type RouteSectionProps } from "@solidjs/router";
 import { createSignal, Show, Suspense } from "solid-js";
-import { env } from "~/env";
+import { env } from "~/env-client";
 import { trackDataQuery } from "~/utils/get-track-data";
 
 export default function Page(_: RouteSectionProps) {

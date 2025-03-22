@@ -1,13 +1,13 @@
 import { createAsync, useParams } from "@solidjs/router";
 import { For, Suspense } from "solid-js";
-import { env } from "~/env";
+import { env } from "~/env-client";
 import { ListenItem } from "~/components/listen-item";
 
 export default function Page() {
     const params = useParams();
     const listens = createAsync(
         async () => {
-            const data = await fetch(env.PUBLIC_VIDEO_GENERATION_URL + `/history/${params.userId}`);
+            const data = await fetch(`${env.PUBLIC_VIDEO_GENERATION_URL}/history/${params.userId}`);
             const json = (await data.json()) as {
                 id: string;
                 time: number;
