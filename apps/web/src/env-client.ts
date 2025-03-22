@@ -7,6 +7,7 @@ export const env = createEnv({
     client: {
         PUBLIC_VIDEO_GENERATION_URL: z.string().url(),
         PUBLIC_APP_URL: z.string().url(),
+        PUBLIC_AUTH_URL: z.string().url(),
     },
     runtimeEnv: import.meta.env,
     emptyStringAsUndefined: true,

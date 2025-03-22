@@ -1,17 +1,14 @@
 import { betterAuth } from "better-auth";
-import { betterFetch } from "better-auth/client";
 import { genericOAuth } from "better-auth/plugins";
-import { SpotifyProfile } from "better-auth/social-providers";
 import { createPool } from "mysql2/promise";
+import { env } from "./env";
 
 export const auth = betterAuth({
     database: createPool({
-        uri: process.env.DATABASE_URL,
+        uri: env.DATABASE_URL,
     }),
-    baseURL: "http://localhost:3002", // TODO: change to env var for prod
-    trustedOrigins: () => {
-        return ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"];
-    },
+    baseURL: env.AUTH_URL,
+    trustedOrigins: [env.APP_URL],
     advanced: {
         crossSubDomainCookies: {
             enabled: true,
@@ -19,21 +16,13 @@ export const auth = betterAuth({
         cookiePrefix: "machina",
     },
 
-    socialProviders: {
-        spotify: {
-            clientId: process.env.SPOTIFY_CLIENT_ID as string,
-            clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
-            scope: ["user-read-recently-played", "user-read-playback-state", "user-read-currently-playing"],
-        },
-    },
-
     plugins: [
         genericOAuth({
             config: [
                 {
                     providerId: "spotify",
-                    clientId: process.env.SPOTIFY_CLIENT_ID as string,
-                    clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
+                    clientId: env.SPOTIFY_CLIENT_ID,
+                    clientSecret: env.SPOTIFY_CLIENT_SECRET,
                     scopes: [
                         "user-read-email",
                         "user-read-recently-played",
