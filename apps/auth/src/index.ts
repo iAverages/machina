@@ -2,13 +2,14 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "~/auth";
 import { env } from "./env";
+import { removeTrailingSlash } from "./utils";
 
 const app = new Hono();
 
 app.use(
     "/api/auth/*",
     cors({
-        origin: env.APP_URL,
+        origin: removeTrailingSlash(env.APP_URL),
         allowHeaders: ["Content-Type", "Authorization"],
         allowMethods: ["POST", "GET", "OPTIONS"],
         exposeHeaders: ["Content-Length"],

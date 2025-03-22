@@ -2,13 +2,14 @@ import { betterAuth } from "better-auth";
 import { genericOAuth } from "better-auth/plugins";
 import { createPool } from "mysql2/promise";
 import { env } from "./env";
+import { removeTrailingSlash } from "./utils";
 
 export const auth = betterAuth({
     database: createPool({
         uri: env.DATABASE_URL,
     }),
     baseURL: env.AUTH_URL,
-    trustedOrigins: [env.APP_URL],
+    trustedOrigins: [removeTrailingSlash(env.APP_URL)],
     advanced: {
         crossSubDomainCookies: {
             enabled: true,
