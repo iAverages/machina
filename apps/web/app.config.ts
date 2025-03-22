@@ -1,7 +1,7 @@
 import { defineConfig } from "@solidjs/start/config";
 import tailwindcss from "@tailwindcss/vite";
 
-import "./src/env";
+import "./src/env-client";
 
 export default defineConfig({
     ssr: true,
