@@ -16,7 +16,7 @@ jobs:
         app: [auth, api, web]
     uses: ./.github/workflows/base-publish.yaml
     with:
-      environment: prod
+      environment: production
       dockerfile_path: "./apps/${{ matrix.app }}/Dockerfile"
       deployment_name: "machina/${{ matrix.app }}"
       argo_deployments_path: "helm/machina/values/prod.yaml"
