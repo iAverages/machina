@@ -1,10 +1,11 @@
 mod config;
 mod models;
+mod routes;
 mod spotify;
 mod spotify_embed;
 mod sync;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use scraper::{Html, Selector};
 use serde::Serialize;
 use sqlx::mysql::MySqlPoolOptions;
@@ -18,7 +19,7 @@ use std::sync::Arc;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::{Mutex, Notify};
-use tracing::{span, Level};
+use tracing::{Level, span};
 
 use axum::body::Body;
 use axum::extract::{Path, State};
@@ -31,7 +32,8 @@ use tokio_util::io::ReaderStream;
 
 use once_cell::sync::Lazy;
 
-use self::config::{get_config, MachinaConfig};
+use self::config::{MachinaConfig, get_config};
+use self::routes::profile::user_profile;
 use self::spotify_embed::EmbedJsonData;
 use self::sync::start_sync_loop;
 
@@ -79,6 +81,7 @@ async fn main() {
     let app = Router::new()
         .route("/{trackId}", get(root))
         .route("/history/{user_id}", get(listen_hist))
+        .route("/profile/{user_id}", get(user_profile))
         .with_state(state.clone());
 
     start_sync_loop(state);

@@ -1,0 +1,84 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    t.id AS track_id,\n    t.name AS track_name,\n    t.duration AS duration,\n    al.name AS album_name,\n    al.cover_art AS album_art,\n    a.name AS artist_name,\n    COUNT(*) AS listen_count\nFROM\n    listen l\n    JOIN track t ON l.track_id = t.id\n    LEFT JOIN artist a ON t.artist_id = a.id\n    LEFT JOIN album al ON t.album_id = al.id\nWHERE\n    l.user_id = ?\nGROUP BY\n    t.id,\n    t.name,\n    a.name\nORDER BY\n    listen_count DESC\nLIMIT\n    12;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "track_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "track_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "duration",
+        "type_info": {
+          "type": "Long",
+          "flags": "",
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "album_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "album_art",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "artist_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "listen_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY",
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "1a1405472afbf0d1df7f0e83e88b42955511801ba982756cbd9ddc8b6041ceac"
+}

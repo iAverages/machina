@@ -1,0 +1,44 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    id,\n    name,\n    image\nFROM\n    `user`\nWHERE\n    id = ?;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "image",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "max_size": 764
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "16b34bd950f7b303b3972d5d08941c955961fd6a618657f3f6015a1df71e400e"
+}
