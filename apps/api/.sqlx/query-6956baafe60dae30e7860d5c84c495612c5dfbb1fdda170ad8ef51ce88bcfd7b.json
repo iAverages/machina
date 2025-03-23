@@ -1,0 +1,44 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    `account`.`accessToken` AS \"spotify_access_token\",\n    `account`.`refreshToken` AS \"spotify_refresh_token\",\n    `account`.`accessTokenExpiresAt` AS \"spotify_expires_at\"\nFROM\n    `account`\nWHERE\n    `account`.`userId` = ?;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "spotify_access_token",
+        "type_info": {
+          "type": "Blob",
+          "flags": "BLOB",
+          "max_size": 262140
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "spotify_refresh_token",
+        "type_info": {
+          "type": "Blob",
+          "flags": "BLOB",
+          "max_size": 262140
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "spotify_expires_at",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "BINARY",
+          "max_size": 23
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6956baafe60dae30e7860d5c84c495612c5dfbb1fdda170ad8ef51ce88bcfd7b"
+}

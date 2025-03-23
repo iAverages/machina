@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n    listen.id AS time,\n    track.*,\n    artist.name AS artist_name,\n    album.name AS album_name,\n    album.cover_art AS cover_art\nFROM\n    `listen`\n    INNER JOIN track ON listen.track_id = track.id\n    LEFT OUTER JOIN artist ON track.artist_id = artist.id\n    LEFT OUTER JOIN album ON track.album_id = album.id\nWHERE\n    listen.user_id = ?\nORDER BY\n    `time` DESC\n",
+  "query": "SELECT\n    listen.id AS time,\n    track.*,\n    artist.name AS artist_name,\n    album.name AS album_name,\n    album.cover_art AS cover_art\nFROM\n    `listen`\n    INNER JOIN track ON listen.track_id = track.id\n    LEFT OUTER JOIN artist ON track.artist_id = artist.id\n    LEFT OUTER JOIN album ON track.album_id = album.id\nWHERE\n    listen.user_id = ?\n    AND listen.id < ?\nORDER BY\n    `time` DESC\nLIMIT\n    ?\n",
   "describe": {
     "columns": [
       {
@@ -95,7 +95,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 3
     },
     "nullable": [
       false,
@@ -110,5 +110,5 @@
       true
     ]
   },
-  "hash": "107cf8507bcba115e1e0850ca991ad53a3a24a829b533acfc6bbfe1d6163a7e3"
+  "hash": "920bf40ff284cbe39334193fd8b51fd6942dddf048f5e93626374ad940a6d554"
 }
