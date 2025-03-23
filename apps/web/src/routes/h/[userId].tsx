@@ -1,30 +1,35 @@
 import { createAsync, useParams } from "@solidjs/router";
-import { For, Suspense } from "solid-js";
+import { createMemo, For, Suspense } from "solid-js";
 import { env } from "~/env-client";
 import { ListenItem } from "~/components/listen-item";
+import { useRecentTracks } from "~/queries/recent-tracks";
 
 export default function Page() {
     const params = useParams();
-    const listens = createAsync(
-        async () => {
-            const data = await fetch(`${env.PUBLIC_VIDEO_GENERATION_URL}/history/${params.userId}`);
-            const json = (await data.json()) as {
-                id: string;
-                time: number;
-                name: string;
-                duration?: number;
-                explicit?: number;
-                artist_id?: string;
-                album_id?: string;
-                album_name?: string;
-                cover_art?: string;
-                artist_name?: string;
-            }[];
-            console.log({ json });
-            return json;
-        },
-        { deferStream: false },
-    );
+    const data = useRecentTracks({ userId: params.userId });
+    const listens = createMemo(() => {
+        return data.data?.pages.flatMap((p) => p.data);
+    });
+    // const listens = createAsync(
+    //     async () => {
+    //         const data = await fetch(`${env.PUBLIC_VIDEO_GENERATION_URL}/history/${params.userId}`);
+    //         const json = (await data.json()) as {
+    //             id: string;
+    //             time: number;
+    //             name: string;
+    //             duration?: number;
+    //             explicit?: number;
+    //             artist_id?: string;
+    //             album_id?: string;
+    //             album_name?: string;
+    //             cover_art?: string;
+    //             artist_name?: string;
+    //         }[];
+    //         console.log({ json });
+    //         return json;
+    //     },
+    //     { deferStream: false },
+    // );
 
     return (
         <Suspense fallback={<>loading</>}>

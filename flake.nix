@@ -71,7 +71,8 @@
         mkShell {
           packages = [
             nodejs
-            bun # dev scripts
+            bun # dev scripts + auth server
+            openjdk23 # open api client
             pnpm
             pkg-config
             openssl

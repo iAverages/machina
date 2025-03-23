@@ -11,3 +11,8 @@ build_api:
 
 build_auth:
     docker build -f ./apps/auth/Dockerfile . --tag ctr.avrg.dev/machina/auth:dev
+
+generate_api_client:
+    mkdir -p .machina
+    curl http://localhost:3001/openapi.json -o ./.machina/schema.json
+    pnpm openapi-generator-cli generate -i ./.machina/schema.json -g typescript-fetch -o ./apps/web/src/api/client

@@ -53,3 +53,4 @@ yarn-error.log*
 .env
 # nix build output
 result 
+.machina

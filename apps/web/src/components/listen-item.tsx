@@ -9,12 +9,12 @@ export const ListenItem = (props: { listen: any }) => {
         <div class="bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-700">
             <div class="p-4">
                 <div class="flex items-center gap-4">
-                    <Show when={listen.cover_art}>
+                    <Show when={listen.coverArt}>
                         {(url) => (
                             <div class="relative min-w-[64px] h-16 sm:min-w-[80px] sm:h-20">
                                 <img
                                     src={url()}
-                                    alt={`${listen.album_name} album art`}
+                                    alt={`${listen.albumName} album art`}
                                     class="object-cover rounded-md w-[64px] sm:w-[80px]"
                                 />
                             </div>
@@ -31,13 +31,13 @@ export const ListenItem = (props: { listen: any }) => {
                             <h2 class="font-semibold text-lg sm:text-xl truncate">{listen.name}</h2>
                         </A>
 
-                        <Show when={listen.artist_name || listen.album_name}>
+                        <Show when={listen.artistName || listen.albumName}>
                             <p class="text-gray-400 truncate">
-                                <Show when={listen.artist_name}>{(name) => <span>{name()}</span>}</Show>
-                                <Show when={listen.artist_name && listen.album_name}>
+                                <Show when={listen.artistName}>{(name) => <span>{name()}</span>}</Show>
+                                <Show when={listen.artistName && listen.albumName}>
                                     <span> • </span>
                                 </Show>
-                                <Show when={listen.album_name}>{(name) => <span>{name()}</span>}</Show>
+                                <Show when={listen.albumName}>{(name) => <span>{name()}</span>}</Show>
                             </p>
                         </Show>
                     </div>

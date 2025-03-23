@@ -1,11 +1,13 @@
 mod config;
 mod models;
+mod openapi;
 mod routes;
 mod spotify;
 mod spotify_embed;
 mod sync;
 
 use anyhow::{Result, anyhow};
+use reqwest::Method;
 use scraper::{Html, Selector};
 use serde::Serialize;
 use sqlx::mysql::MySqlPoolOptions;
@@ -19,7 +21,12 @@ use std::sync::Arc;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::{Mutex, Notify};
+use tower_http::cors::{Any, CorsLayer};
 use tracing::{Level, span};
+use utoipa::OpenApi;
+use utoipa::openapi::LicenseBuilder;
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_scalar::{Scalar, Servable as ScalarServable};
 
 use axum::body::Body;
 use axum::extract::{Path, State};
@@ -33,7 +40,6 @@ use tokio_util::io::ReaderStream;
 use once_cell::sync::Lazy;
 
 use self::config::{MachinaConfig, get_config};
-use self::routes::profile::user_profile;
 use self::spotify_embed::EmbedJsonData;
 use self::sync::start_sync_loop;
 
@@ -43,6 +49,14 @@ struct AppState {
     db: &'static Pool<MySql>,
     // config: MachinaConfig,
 }
+
+#[derive(OpenApi)]
+#[openapi(
+        tags(
+            (name = "default", description = "default api")
+        )
+    )]
+pub struct ApiDoc;
 
 static GLOBAL_DB_POOL: Lazy<Arc<Mutex<Option<&'static Pool<MySql>>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
@@ -78,17 +92,41 @@ async fn main() {
         *db_pool = Some(static_pool);
     }
 
+    let base_router = routes::router(state.clone());
+
+    let mut doc = ApiDoc::openapi();
+    doc.info.license = Some(
+        LicenseBuilder::new()
+            .name("MIT")
+            .identifier(Some("MIT"))
+            .build(),
+    );
+
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET, Method::POST])
+        .allow_origin(MACHINA_CONFIG.app_url.parse::<HeaderValue>().unwrap()); // TODO: fix
+
+    let (openapi_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+        .nest("/api", base_router)
+        .split_for_parts();
+
     let app = Router::new()
         .route("/{trackId}", get(root))
-        .route("/history/{user_id}", get(listen_hist))
-        .route("/profile/{user_id}", get(user_profile))
+        .route("/openapi.json", get(Json(api.clone())))
         .with_state(state.clone());
+
+    let openapi_router = openapi_router
+        .merge(app)
+        .merge(Scalar::with_url("/scalar", api))
+        .layer(cors);
 
     start_sync_loop(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     tracing::info!("listening on :3001");
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, openapi_router.into_make_service())
+        .await
+        .unwrap();
 }
 
 async fn get_cached_video(track_id: String) -> Option<File> {
@@ -168,18 +206,6 @@ struct Listen {
     album_name: Option<String>,
     cover_art: Option<String>,
     artist_name: Option<String>,
-}
-
-#[axum::debug_handler]
-async fn listen_hist(
-    State(state): State<AppState>,
-    Path(user_id): Path<String>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let items = sqlx::query_file_as!(Listen, "query/get-listening-history.sql", user_id)
-        .fetch_all(state.db)
-        .await
-        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))?;
-    Ok(Json(items))
 }
 
 #[axum::debug_handler]

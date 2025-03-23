@@ -22,6 +22,7 @@
     "packageManager": "pnpm@10.6.1",
     "dependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@dotenvx/dotenvx": "^1.39.0"
+        "@dotenvx/dotenvx": "^1.39.0",
+        "@openapitools/openapi-generator-cli": "^2.18.4"
     }
 }

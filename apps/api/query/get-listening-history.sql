@@ -11,5 +11,8 @@ FROM
     LEFT OUTER JOIN album ON track.album_id = album.id
 WHERE
     listen.user_id = ?
+    AND listen.id < ?
 ORDER BY
     `time` DESC
+LIMIT
+    ?
