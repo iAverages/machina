@@ -18,7 +18,7 @@ export const TopTrack = (song: Profile["topTracks"][number]) => (
         <div class="text-right max-w-24">
             <div class="text-sm font-medium">{song.listenCount} plays</div>
             <div class="text-xs text-muted-foreground">
-                {Math.round((song.duration ?? 0 * song.listenCount) / 60)} mintues listened
+                {Math.round(((song.duration ?? 0) * song.listenCount) / 60)} mintues listened
             </div>
         </div>
     </div>

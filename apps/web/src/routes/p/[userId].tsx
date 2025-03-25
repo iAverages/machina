@@ -31,7 +31,7 @@ export default function SpotifyDashboard() {
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <TopSongs timeRange={timeRange()} />
+                                <TopSongs userId={params.userId} timeRange={timeRange()} />
                             </CardContent>
                         </Card>
                     </div>
