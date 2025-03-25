@@ -104,7 +104,13 @@ async fn main() {
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST])
-        .allow_origin(MACHINA_CONFIG.app_url.parse::<HeaderValue>().unwrap()); // TODO: fix
+        .allow_origin(
+            MACHINA_CONFIG
+                .app_url
+                .trim_end_matches('/')
+                .parse::<HeaderValue>()
+                .unwrap(),
+        );
 
     let (openapi_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api", base_router)
