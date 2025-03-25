@@ -4,6 +4,7 @@ import { api } from "~/api";
 export const useProfile = (props: { userId: string }) =>
     createQuery(() => ({
         queryKey: ["profile", props.userId],
+        refetchOnWindowFocus: true,
         queryFn: async () => {
             return api.userProfile({
                 id: props.userId,

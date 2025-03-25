@@ -2,17 +2,15 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { cn } from "~/utils/cn";
 import { useProfile } from "~/queries/profile";
-import { useParams } from "@solidjs/router";
 import { CurrentlyListening } from "./currently-listening";
 
 interface UserProfileProps {
     class?: string;
+    userId: string;
 }
 
 export function UserProfile(props: UserProfileProps) {
-    const params = useParams();
-    // biome-ignore lint/style/noNonNullAssertion: hush
-    const profile = useProfile({ userId: params.userId! });
+    const profile = useProfile({ userId: props.userId });
 
     return (
         <Card class={cn("border-none", props.class)}>
@@ -33,7 +31,7 @@ export function UserProfile(props: UserProfileProps) {
                             </div>
                         </div>
                     </div>
-                    <CurrentlyListening />
+                    <CurrentlyListening userId={props.userId} />
                 </div>
             </CardContent>
         </Card>

@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
@@ -8,16 +8,15 @@ import "@fontsource-variable/noto-sans-jp";
 import "@fontsource-variable/inter";
 
 import "./app.css";
-
-const queryClient = new QueryClient();
+import { QueryClient } from "@tanstack/solid-query";
 
 export default function App() {
+    const queryClient = new QueryClient();
     return (
         <Router
             root={(props) => (
                 <MetaProvider>
                     <Title>machina</Title>
-
                     <QueryClientProvider client={queryClient}>
                         <Suspense>{props.children}</Suspense>
                     </QueryClientProvider>
