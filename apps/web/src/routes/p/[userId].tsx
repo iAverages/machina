@@ -1,9 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { UserProfile } from "~/components/profile/user";
 import { TopSongs } from "~/components/profile/top-tracks";
 import { RecentTracks } from "~/components/profile/recent-tracks";
 import { useParams, type RouteDefinition } from "@solidjs/router";
+import { useProfile } from "~/queries/profile";
+import { Show } from "solid-js";
+import { FadeImage } from "~/components/fade-image";
+import { Button } from "~/components/ui/button";
 
 export const route = {
     matchFilters: {
@@ -13,10 +17,36 @@ export const route = {
 
 export default function SpotifyDashboard() {
     const params = useParams<{ userId: string }>();
+    const profile = useProfile({ userId: params.userId });
     const [timeRange, _setTimeRange] = createSignal("week");
 
+    const [fakeArt, setFakeArt] = createSignal(profile.data?.currentPlaying.track?.albumArt);
+    createEffect(() => {
+        console.log("updated fake art from profile");
+        setFakeArt(profile.data?.currentPlaying.track?.albumArt);
+    });
+
     return (
-        <div class="flex min-h-screen w-full flex-col bg-background">
+        <div class="flex min-h-screen w-full flex-col">
+            <Show when={profile.data?.currentPlaying.track?.albumArt}>
+                {(albumArt) => (
+                    <div class="sticky top-0 right-0 pointer-events-none w-full">
+                        <FadeImage
+                            src={fakeArt()!}
+                            opacity={0.25}
+                            containerClass="absolute top-0 right-0"
+                            imageWrapperClass="right-0"
+                            class="object-contain h-screen opacity-25"
+                            style={{
+                                "mask-image": "linear-gradient(to right, transparent 40%, black 100%)",
+                                "mask-repeat": "no-repeat",
+                            }}
+                            aria-hidden
+                        />
+                    </div>
+                )}
+            </Show>
+
             <div class="flex flex-col items-center">
                 <main class="flex flex-1 flex-col gap-6 p-6 md:gap-8 container">
                     <div>

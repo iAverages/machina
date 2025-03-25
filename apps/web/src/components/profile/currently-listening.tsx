@@ -3,6 +3,7 @@ import { Progress } from "../ui/progress";
 import { ExternalLink } from "~/icons/external";
 import { useProfile } from "~/queries/profile";
 import type { Profile } from "~/api/client";
+import { FadeImage } from "../fade-image";
 
 export function CurrentlyListening(props: { userId: string }) {
     const profile = useProfile({ userId: props.userId });
@@ -60,7 +61,7 @@ export function CurrentlyListening(props: { userId: string }) {
                     <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
                         <div class="relative">
                             <div class="relative h-24 w-24 md:h-28 md:w-28 rounded-md overflow-hidden">
-                                <img
+                                <FadeImage
                                     src={track().albumArt ?? ""}
                                     alt={`${track().trackName} album art`}
                                     class="object-cover"
