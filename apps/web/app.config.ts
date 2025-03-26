@@ -7,6 +7,10 @@ export default defineConfig({
     ssr: true,
     server: {
         preset: "node-server",
+        routeRules: {
+            "/dan": { redirect: "/p/fp0sllluqyvm69f5ukrc6buv" },
+            "/h/**": { redirect: "/p/**" },
+        },
         esbuild: {
             options: {
                 target: "es2024",
