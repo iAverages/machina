@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { UserProfile } from "~/components/profile/user";
 import { TopSongs } from "~/components/profile/top-tracks";
 import { RecentTracks } from "~/components/profile/recent-tracks";
@@ -7,7 +7,6 @@ import { useParams, type RouteDefinition } from "@solidjs/router";
 import { useProfile } from "~/queries/profile";
 import { Show } from "solid-js";
 import { FadeImage } from "~/components/fade-image";
-import { Button } from "~/components/ui/button";
 
 export const route = {
     matchFilters: {
@@ -20,19 +19,13 @@ export default function SpotifyDashboard() {
     const profile = useProfile({ userId: params.userId });
     const [timeRange, _setTimeRange] = createSignal("week");
 
-    const [fakeArt, setFakeArt] = createSignal(profile.data?.currentPlaying.track?.albumArt);
-    createEffect(() => {
-        console.log("updated fake art from profile");
-        setFakeArt(profile.data?.currentPlaying.track?.albumArt);
-    });
-
     return (
         <div class="flex min-h-screen w-full flex-col">
             <Show when={profile.data?.currentPlaying.track?.albumArt}>
                 {(albumArt) => (
                     <div class="sticky top-0 right-0 pointer-events-none w-full">
                         <FadeImage
-                            src={fakeArt()!}
+                            src={albumArt()}
                             opacity={0.25}
                             containerClass="absolute top-0 right-0"
                             imageWrapperClass="right-0"

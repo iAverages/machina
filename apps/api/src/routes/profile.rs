@@ -222,7 +222,7 @@ async fn listen_hist(
         // I do not want to make another .sql file just to handle the default no cursor  case,
         // instead, use a high epoch default
         pagination.cursor.unwrap_or(9999999999999999),
-        26
+        101
     )
     .fetch_all(state.db)
     .await
