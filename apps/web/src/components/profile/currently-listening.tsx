@@ -57,20 +57,18 @@ export function CurrentlyListening(props: { userId: string }) {
     return (
         <Show when={playing().track}>
             {(track) => (
-                <div class="rounded-xl p-4 md:p-5 w-md">
+                <div class="rounded-xl p-4 md:p-5 w-full md:w-md">
                     <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6">
-                        <div class="relative">
-                            <div class="relative h-24 w-24 md:h-28 md:w-28 rounded-md overflow-hidden">
-                                <FadeImage
-                                    src={track().albumArt ?? ""}
-                                    alt={`${track().trackName} album art`}
-                                    class="object-cover"
-                                />
-                            </div>
+                        <div class="relative size-36 md:size-28 rounded-md overflow-hidden">
+                            <FadeImage
+                                src={track().albumArt ?? ""}
+                                alt={`${track().trackName} album art`}
+                                class="object-cover"
+                            />
                         </div>
 
-                        <div class="flex-1 text-center md:text-left">
-                            <div class="flex items-center justify-between gap-2">
+                        <div class="flex-1 text-center md:text-left w-full">
+                            <div class="flex items-center  justify-center md:justify-between gap-2">
                                 <h2 class="text-xl md:text-2xl font-bold">{track().trackName}</h2>
                                 <a
                                     href={`https://open.spotify.com/track/${track().trackId.split(":")[2]}`}

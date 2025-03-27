@@ -11,7 +11,13 @@ import "./app.css";
 import { QueryClient } from "@tanstack/solid-query";
 
 export default function App() {
-    const queryClient = new QueryClient();
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                experimental_prefetchInRender: true,
+            },
+        },
+    });
     return (
         <Router
             root={(props) => (

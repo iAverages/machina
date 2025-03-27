@@ -3,7 +3,6 @@ import { useParams } from "@solidjs/router";
 import { createEffect, createMemo, For } from "solid-js";
 import { useRecentTracks } from "~/queries/recent-tracks";
 import { Track } from "./track";
-import { traceDeprecation } from "process";
 import { useInView } from "~/hooks/use-in-view";
 
 export function RecentTracks(props: {
@@ -33,9 +32,9 @@ export function RecentTracks(props: {
     );
 
     return (
-        <div class={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2", props.class)}>
+        <div class={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 w-full", props.class)}>
             <For each={tracks()}>{(song) => <Track {...song} />}</For>
-            <div ref={notifcationsScrollRef} />
+            {/* <div ref={notifcationsScrollRef} /> */}
         </div>
     );
 }

@@ -19,7 +19,6 @@ export const FadeImage = (props: FadeImageProps) => {
     const [showA, setShowA] = createSignal(true);
 
     createEffect(() => {
-        console.log(local.src);
         if (local.src !== imageA()) {
             // load image before switching
             // TODO: look at caching the next images
@@ -37,13 +36,14 @@ export const FadeImage = (props: FadeImageProps) => {
     });
 
     return (
-        <div class={cn("top-0 w-full h-full right-0", local.containerClass)}>
-            <div class="relative w-full h-full">
-                <Presence exitBeforeEnter>
+        <div class={cn("w-full", local.containerClass)}>
+            <div class="relative w-full">
+                <Presence>
                     <Show when={showA()}>
                         <div class={cn("absolute w-fit", local.imageWrapperClass)}>
                             <Motion.img
-                                initial={{ opacity: imageProps.opacity ?? 1 }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: imageProps.opacity ?? 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: FADE_TIME_MS / 1000 }}
                                 {...imageProps}

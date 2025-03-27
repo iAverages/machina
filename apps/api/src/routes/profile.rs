@@ -25,7 +25,7 @@ pub fn router(state: AppState) -> OpenApiRouter {
 }
 
 #[derive(Serialize, ToSchema)]
-struct Profile {
+pub struct Profile {
     top_tracks: Vec<TopTrack>,
     listen_stats: TotalListenStats,
     user: UserProfile,
@@ -95,7 +95,7 @@ struct CurrentlyPlaying {
 pub async fn user_profile(
     State(state): State<AppState>,
     Path(user_id): Path<String>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<Json<Profile>, (StatusCode, String)> {
     let tokens = sqlx::query_file_as!(SpotifyTokens, "query/get-user-spotify-tokens.sql", user_id)
         .fetch_one(state.db)
         .await

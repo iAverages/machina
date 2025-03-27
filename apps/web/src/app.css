@@ -158,3 +158,35 @@
 html {
     scroll-behavior: smooth;
 }
+
+/* transition background on profile page */
+/* doesnt work correctly, only one of the colors will aniamte even if they all change */
+/* only transitions  the last transition block defined, no using other classes doesnt work */
+
+@property --color-a {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: transparent;
+}
+
+@property --color-b {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: transparent;
+}
+
+@property --color-c {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: transparent;
+}
+
+@property --color-d {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: transparent;
+}
+
+.transition-gradient-background {
+    background: linear-gradient(45deg, var(--color-a), var(--color-b), var(--color-c), var(--color-d));
+}
