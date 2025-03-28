@@ -1,12 +1,9 @@
-use std::sync::mpsc::RecvError;
-
 use axum::Json;
 use axum::extract::{Path, Query, State};
-use axum::response::IntoResponse;
-use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, TimeDelta, Utc};
+use chrono::NaiveDateTime;
 use reqwest::StatusCode;
 use rspotify::Token;
-use rspotify::model::{AdditionalType, CurrentlyPlayingContext, PlayableItem};
+use rspotify::model::{AdditionalType, PlayableItem};
 use rspotify::prelude::OAuthClient;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
@@ -109,7 +106,7 @@ pub async fn user_profile(
     };
 
     let spotify = init_spotify_from_token(user_id.clone(), token);
-    let additional_types = [AdditionalType::Episode];
+    let additional_types = [AdditionalType::Track];
     let recent = spotify
         .current_playing(None, Some(&additional_types))
         .await
