@@ -1,4 +1,4 @@
 # machina
 
-Fix discord spotify embeds
+Fix discord spotify embeds & track your listening history
 
