@@ -190,3 +190,15 @@ html {
 .transition-gradient-background {
     background: linear-gradient(45deg, var(--color-a), var(--color-b), var(--color-c), var(--color-d));
 }
+
+.mask-gradient-horizontal {
+    mask-image: linear-gradient(to right, transparent 40%, black 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 40%, black 100%);
+    mask-repeat: no-repeat;
+}
+
+.mask-gradient-vertical {
+    mask-image: linear-gradient(to top, transparent 10%, black 100%);
+    -webkit-mask-image: linear-gradient(to top, transparent 10%, black 100%);
+    mask-repeat: no-repeat;
+}

@@ -16,13 +16,6 @@ export function RecentTracks(props: {
         return recent.data?.pages?.flatMap((p) => p.data) ?? [];
     });
 
-    createEffect(() => {
-        console.log({
-            tracks: tracks(),
-            recent: recent.data,
-        });
-    });
-
     const { ref: notifcationsScrollRef } = useInView(
         () => {
             if (recent.hasNextPage) recent.fetchNextPage();

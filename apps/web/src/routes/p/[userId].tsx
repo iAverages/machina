@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { createMemo, createSignal, onMount } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import { UserProfile } from "~/components/profile/user";
 import { TopSongs } from "~/components/profile/top-tracks";
 import { RecentTracks } from "~/components/profile/recent-tracks";
@@ -10,6 +10,7 @@ import { FadeImage } from "~/components/fade-image";
 import { useVibrant } from "~/hooks/use-vibrant";
 import { interpolateCubehelix } from "d3-interpolate";
 import { useWindowSize } from "@solid-primitives/resize-observer";
+import { cn } from "~/utils/cn";
 
 const GradientBackground = (props: { src: string }) => {
     const colors = useVibrant({ src: () => props.src });
@@ -46,7 +47,6 @@ export default function SpotifyDashboard() {
     const params = useParams<{ userId: string }>();
     const profile = useProfile({ userId: params.userId });
     const clientSize = useWindowSize();
-
     const [timeRange, _setTimeRange] = createSignal("week");
 
     return (
@@ -55,24 +55,19 @@ export default function SpotifyDashboard() {
                 {(albumArt) => <GradientBackground src={albumArt()} />}
             </Show>
             <div class="bg-background/90 z-10">
-                <Show when={profile.data?.currentPlaying.track?.albumArt}>
+                <Show when={profile.data?.currentPlaying?.track?.albumArt}>
                     {(albumArt) => (
                         <div class="sticky top-0 md right-0 pointer-events-none w-full h-fit">
                             <FadeImage
+                                fadeOnMount
                                 src={albumArt()}
-                                opacity={0.25}
+                                opacity="opacity-25"
                                 containerClass="absolute top-0 right-0"
                                 imageWrapperClass="right-0"
-                                class="object-contain opacity-25"
-                                style={{
-                                    height: clientSize.width > clientSize.height ? "100vh" : undefined,
-                                    width: clientSize.width > clientSize.height ? undefined : "100vw",
-                                    "mask-image":
-                                        clientSize.width > clientSize.height
-                                            ? "linear-gradient(to right, transparent 40%, black 100%)"
-                                            : "linear-gradient(to top , transparent 10%, black 100%)",
-                                    "mask-repeat": "no-repeat",
-                                }}
+                                class={cn("object-contain", {
+                                    "mask-gradient-horizontal h-screen": clientSize.width > clientSize.height,
+                                    "mask-gradient-vertical w-screen": clientSize.width <= clientSize.height,
+                                })}
                                 aria-hidden
                             />
                         </div>

@@ -1,5 +1,4 @@
-import { createEffect, createSignal, Show, splitProps, type JSX } from "solid-js";
-import { Motion, Presence } from "solid-motionone";
+import { createEffect, createSignal, onMount, splitProps, type JSX } from "solid-js";
 import { cn } from "~/utils/cn";
 
 export type FadeImageProps = JSX.ImgHTMLAttributes<HTMLImageElement> & {
@@ -7,15 +6,24 @@ export type FadeImageProps = JSX.ImgHTMLAttributes<HTMLImageElement> & {
     style?: JSX.CSSProperties;
     containerClass?: string;
     imageWrapperClass?: string;
-    opacity?: number;
+    opacity?: string;
+    fadeOnMount?: boolean;
 };
 
-const FADE_TIME_MS = 300;
-
 export const FadeImage = (props: FadeImageProps) => {
-    const [local, imageProps] = splitProps(props, ["containerClass", "src", "imageWrapperClass"]);
+    const [local, imageProps] = splitProps(props, [
+        "containerClass",
+        "src",
+        "imageWrapperClass",
+        "opacity",
+        "fadeOnMount",
+    ]);
     const [imageA, setImageA] = createSignal(local.src);
-    const [imageB, setImageB] = createSignal<string | null>(null);
+    const [imageB, setImageB] = createSignal<string>(local.src);
+
+    const [isMounted, setIsMounted] = createSignal(!local.fadeOnMount);
+    onMount(() => setIsMounted(true));
+
     const [showA, setShowA] = createSignal(true);
 
     createEffect(() => {
@@ -36,36 +44,34 @@ export const FadeImage = (props: FadeImageProps) => {
     });
 
     return (
-        <div class={cn("w-full", local.containerClass)}>
+        <div
+            class={cn(
+                "w-full opacity-0 transition-opacity duration-300",
+                local.containerClass,
+                isMounted() && "opacity-100",
+            )}
+        >
             <div class="relative w-full">
-                <Presence>
-                    <Show when={showA()}>
-                        <div class={cn("absolute w-fit", local.imageWrapperClass)}>
-                            <Motion.img
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: imageProps.opacity ?? 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: FADE_TIME_MS / 1000 }}
-                                {...imageProps}
-                                src={imageA()}
-                            />
-                        </div>
-                    </Show>
-                </Presence>
-                <Presence exitBeforeEnter>
-                    <Show when={!showA()}>
-                        <div class={cn("absolute w-fit h-fit", local.imageWrapperClass)}>
-                            <Motion.img
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: imageProps.opacity ?? 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: FADE_TIME_MS / 1000 }}
-                                {...imageProps}
-                                src={imageB() ?? ""}
-                            />
-                        </div>
-                    </Show>
-                </Presence>
+                <div class={cn("absolute w-fit h-fit", local.imageWrapperClass)}>
+                    <img
+                        aria-hidden
+                        class={cn("transition-opacity duration-300", imageProps.class, {
+                            "opacity-0": !showA(),
+                            [local.opacity ?? ""]: showA(),
+                        })}
+                        src={imageA()}
+                    />
+                </div>
+                <div class={cn("absolute w-fit h-fit", local.imageWrapperClass)}>
+                    <img
+                        aria-hidden
+                        class={cn("transition-opacity duration-300", imageProps.class, {
+                            "opacity-0": showA(),
+                            [local.opacity ?? ""]: !showA(),
+                        })}
+                        src={imageB()}
+                    />
+                </div>
             </div>
         </div>
     );

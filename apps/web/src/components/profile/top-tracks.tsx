@@ -16,11 +16,11 @@ export function TopSongs(props: TopSongsProps) {
     const profile = useProfile({ userId: props.userId });
 
     const firstTop = createMemo(() => {
-        return profile.data?.topTracks.slice(0, 6) ?? [];
+        return profile.data?.topTracks?.slice(0, 6) ?? [];
     });
 
     const secondTop = createMemo(() => {
-        return profile.data?.topTracks.slice(6) ?? [];
+        return profile.data?.topTracks?.slice(6) ?? [];
     });
 
     const buttonLabel = createMemo(() => (showMore() ? "Show Less" : "Show More"));
