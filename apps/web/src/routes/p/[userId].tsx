@@ -30,7 +30,7 @@ const GradientBackground = (props: { src: string }) => {
                     "--color-c": gradientColors()[2],
                     "--color-d": gradientColors()[3],
                 }}
-                class="transition-gradient-background w-screen h-screen absolute top-0 pointer-events-none z-0"
+                class="transition-gradient-background w-full h-screen absolute top-0 pointer-events-none z-0"
             />
         </div>
     );
