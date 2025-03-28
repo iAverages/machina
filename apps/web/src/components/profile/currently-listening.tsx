@@ -42,6 +42,8 @@ export function CurrentlyListening(props: { userId: string }) {
             timer = setInterval(() => {
                 if (progress() >= playing.track.duration) {
                     profile.refetch();
+                    timer && clearInterval(timer);
+                    timer = null;
                     setProgress(0);
                     return;
                 }
@@ -51,8 +53,6 @@ export function CurrentlyListening(props: { userId: string }) {
     );
 
     const progressPercent = createMemo(() => (progress() / (playing().track?.duration ?? 0)) * 100);
-
-    if (!playing().isPlaying) return null;
 
     return (
         <Show when={playing().track}>

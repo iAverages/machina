@@ -1,9 +1,10 @@
-import { createQuery, queryOptions } from "@tanstack/solid-query";
+import { createQuery } from "@tanstack/solid-query";
 import { api } from "~/api";
 
-export const profileQueryOptions = (props: { userId: string }) =>
-    queryOptions({
+export const useProfile = (props: { userId: string }) =>
+    createQuery(() => ({
         queryKey: ["profile", props.userId],
+        refetchInterval: 30 * 1000,
         refetchOnWindowFocus: true,
         deferStream: true,
         queryFn: () => {
@@ -16,6 +17,4 @@ export const profileQueryOptions = (props: { userId: string }) =>
                 throw e;
             }
         },
-    });
-
-export const useProfile = (props: { userId: string }) => createQuery(() => profileQueryOptions(props));
+    }));
