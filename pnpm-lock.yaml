@@ -38,7 +38,7 @@ importers:
         version: 1.2.4(typescript@5.8.2)
       hono:
         specifier: ^4.7.4
-        version: 4.7.4
+        version: 4.7.5
       mysql2:
         specifier: ^3.13.0
         version: 3.13.0
@@ -3113,8 +3113,8 @@ packages:
   hey-listen@1.0.8:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
 
-  hono@4.7.4:
-    resolution: {integrity: sha512-Pst8FuGqz3L7tFF+u9Pu70eI0xa5S3LPUmrNd5Jm8nTHze9FxLTK9Kaj5g/k4UcwuJSXTP65SyHOPLrffpcAJg==}
+  hono@4.7.5:
+    resolution: {integrity: sha512-fDOK5W2C1vZACsgLONigdZTRZxuBqFtcKh7bUQ5cVSbwI2RWjloJDcgFOVzbQrlI6pCmhlTsVYZ7zpLj4m4qMQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -8038,7 +8038,7 @@ snapshots:
 
   hey-listen@1.0.8: {}
 
-  hono@4.7.4: {}
+  hono@4.7.5: {}
 
   hookable@5.5.3: {}
 
