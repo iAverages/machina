@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { createMemo, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import { UserProfile } from "~/components/profile/user";
 import { TopSongs } from "~/components/profile/top-tracks";
 import { RecentTracks } from "~/components/profile/recent-tracks";
@@ -8,28 +8,51 @@ import { useProfile } from "~/queries/profile";
 import { Show } from "solid-js";
 import { FadeImage } from "~/components/fade-image";
 import { useVibrant } from "~/hooks/use-vibrant";
-import { interpolateCubehelix } from "d3-interpolate";
 import { useWindowSize } from "@solid-primitives/resize-observer";
 import { cn } from "~/utils/cn";
+import { darkenHexColor } from "~/utils/colors";
 
 const GradientBackground = (props: { src: string }) => {
     const colors = useVibrant({ src: () => props.src });
 
-    const gradientColors = createMemo(() => {
-        const a = colors();
-        if (!a || !a.gradientColor || !a.baseColor) return "";
-        const b = interpolateCubehelix(a.baseColor, a.gradientColor);
-        return [b(0), b(0.33), b(0.66), b(1)];
+    // const gradientColors = createMemo(() => {
+    //     const a = colors();
+    //     if (!a || !a.gradientColor || !a.baseColor) return "";
+    //     const b = interpolateHsl(a.baseColor, a.gradientColor);
+    //     return [b(0), b(0.33), b(0.66), b(1)];
+    // });
+
+    createEffect(() => {
+        const styleId = "scrollbar-color";
+        let styleElement = document.getElementById(styleId);
+
+        if (!styleElement) {
+            styleElement = document.createElement("style");
+            styleElement.id = styleId;
+            document.head.appendChild(styleElement);
+        }
+
+        const baseColor = colors()?.gradientColor;
+        const base = baseColor ? (darkenHexColor(baseColor, 30) ?? "hsl(var(--accent))") : "hsl(var(--accent))";
+        const thumbColor = baseColor ? (darkenHexColor(baseColor, 50) ?? "hsl(var(--accent))") : "hsl(var(--accent))";
+        styleElement.textContent = `
+            body {
+                background-color: ${base};
+            } 
+            ::-webkit-scrollbar-thumb {
+                background-color: ${thumbColor};
+            }
+    `;
     });
 
     return (
-        <div class="sticky h-0 top-0">
+        <div class="sticky h-0 top-0 inset-shadow-sm inset-shadow-red-500">
             <div
                 style={{
-                    "--color-a": gradientColors()[0],
-                    "--color-b": gradientColors()[1],
-                    "--color-c": gradientColors()[2],
-                    "--color-d": gradientColors()[3],
+                    "--color-a": colors()?.baseColor,
+                    "--color-b": colors()?.gradientColor,
+                    // "--color-c": gradientColors()[2],
+                    // "--color-d": gradientColors()[3],
                 }}
                 class="transition-gradient-background w-full h-screen absolute top-0 pointer-events-none z-0"
             />
@@ -54,7 +77,7 @@ export default function SpotifyDashboard() {
             <Show when={profile.data?.currentPlaying.track?.albumArt}>
                 {(albumArt) => <GradientBackground src={albumArt()} />}
             </Show>
-            <div class="bg-background/90 z-10">
+            <div class="bg-background/40 z-10">
                 <Show when={profile.data?.currentPlaying?.track?.albumArt}>
                     {(albumArt) => (
                         <div class="sticky top-0 md right-0 pointer-events-none w-full h-fit">
