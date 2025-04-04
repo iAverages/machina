@@ -153,7 +153,7 @@ importers:
         version: 3.0.2
       tailwindcss-animate:
         specifier: ^1.0.7
-        version: 1.0.7(tailwindcss@4.0.14)
+        version: 1.0.7(tailwindcss@4.1.3)
       vinxi:
         specifier: ^0.5.3
         version: 0.5.3(@types/node@22.13.10)(db0@0.3.1(mysql2@3.13.0))(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(mysql2@3.13.0)(terser@5.39.0)(typescript@5.8.2)(yaml@2.7.0)
@@ -180,8 +180,8 @@ importers:
         specifier: ^8.5.3
         version: 8.5.3
       tailwindcss:
-        specifier: 4.0.14
-        version: 4.0.14
+        specifier: 4.1.3
+        version: 4.1.3
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -4304,6 +4304,9 @@ packages:
 
   tailwindcss@4.0.14:
     resolution: {integrity: sha512-92YT2dpt671tFiHH/e1ok9D987N9fHD5VWoly1CdPD/Cd1HMglvZwP3nx2yTj2lbXDAHt8QssZkxTLCCTNL+xw==}
+
+  tailwindcss@4.1.3:
+    resolution: {integrity: sha512-2Q+rw9vy1WFXu5cIxlvsabCwhU2qUwodGq03ODhLJ0jW4ek5BUtoCsnLB0qG+m8AHgEsSJcJGDSDe06FXlP74g==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -9307,11 +9310,13 @@ snapshots:
 
   tailwind-merge@3.0.2: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@4.0.14):
+  tailwindcss-animate@1.0.7(tailwindcss@4.1.3):
     dependencies:
-      tailwindcss: 4.0.14
+      tailwindcss: 4.1.3
 
   tailwindcss@4.0.14: {}
+
+  tailwindcss@4.1.3: {}
 
   tapable@2.2.1: {}
 
