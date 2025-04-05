@@ -6,23 +6,21 @@
         "strictNullChecks": true,
         "allowUnusedLabels": false,
         "allowUnreachableCode": false,
+        "exactOptionalPropertyTypes": false,
         "noFallthroughCasesInSwitch": true,
         "noImplicitOverride": true,
         "noImplicitReturns": true,
+        "noPropertyAccessFromIndexSignature": false,
         "noUncheckedIndexedAccess": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-
         "isolatedModules": true,
-
         "allowJs": true,
         "checkJs": true,
-
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-
-        "lib": ["es2023"],
+        "lib": ["es2023", "DOM"],
         "module": "esnext",
         "target": "es2022",
         "moduleResolution": "bundler",
@@ -30,13 +28,11 @@
         "resolveJsonModule": true,
         "noEmit": true,
         "incremental": true,
-
         "declaration": true,
         "declarationMap": true,
         "sourceMap": true,
         "pretty": true,
         "preserveWatchOutput": true,
-
         "tsBuildInfoFile": "${configDir}/tsconfig.tsbuildinfo",
         "baseUrl": "${configDir}",
         "paths": {
@@ -55,7 +51,16 @@
         "${configDir}/**/*.cjs",
         "${configDir}/**/*.cjsx",
         "${configDir}/**/*.mjs",
-        "${configDir}/**/*.mjsx"
+        "${configDir}/**/*.mjsx",
+        "${configDir}/reset.d.ts"
     ],
-    "exclude": ["${configDir}/node_modules", "${configDir}/dist", "${configDir}/.output"]
+    "exclude": [
+        "${configDir}/node_modules",
+        "${configDir}/dist",
+        "${configDir}/storybook-static",
+        "${configDir}/playwright-report",
+        "${configDir}/test-results",
+        "${configDir}/rslib.config.ts",
+        "${configDir}/vite.config.ts"
+    ]
 }

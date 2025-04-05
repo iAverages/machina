@@ -3,7 +3,7 @@
     "type": "module",
     "exports": {
         ".": {
-            "types": "./src/open-graph.tsx",
+            "types": "./dist/open-graph.d.ts",
             "default": "./dist/index.js"
         }
     },
@@ -22,6 +22,7 @@
         "@vitejs/plugin-react-swc": "^3.8.1",
         "esbuild": "^0.25.2",
         "typescript": "^5.8.3",
-        "vite": "^6.2.5"
+        "vite": "^6.2.5",
+        "vite-plugin-dts": "^4.5.3"
     }
 }
