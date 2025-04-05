@@ -29,7 +29,7 @@ export async function getFont<TWeights extends readonly number[]>({
         .map((font) => {
             const u = /src: url\((.+)\) format\('(opentype|truetype)'\)/.exec(font);
             const w = /font-weight: (\d+)/.exec(font);
-            return u?.[1] && w?.[1] ? { url: u[1], weight: parseInt(w[1]) } : null;
+            return u?.[1] && w?.[1] ? { url: u[1], weight: Number.parseInt(w[1]) } : null;
         })
         .filter((font): font is { url: string; weight: TWeights[number] } => !!font);
 

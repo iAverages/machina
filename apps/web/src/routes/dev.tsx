@@ -61,7 +61,8 @@ export default function Page(_: RouteSectionProps) {
                                                 <p class="text-gray-400">{track().album.name}</p>
                                             </div>
                                         </div>
-                                        <img class="h-[300] w-[800]" src={data()?.og} />
+                                        <img class="h-[300] w-[800]" src={data()?.og} alt={"og"} />
+                                        {/** biome-ignore lint/a11y/useMediaCaption: dev so doesnt matter */}
                                         <video controls src={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().id}`} />
                                     </div>
                                 </div>
