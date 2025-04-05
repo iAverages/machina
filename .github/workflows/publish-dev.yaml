@@ -5,7 +5,11 @@ on:
 
 
 jobs:
+  checks:
+    uses: ./.github/workflows/checks.yaml
+
   build-and-deploy:
+    needs: checks
     concurrency:
       group: dev-${{ matrix.app }}-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true

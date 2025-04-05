@@ -1,6 +1,8 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "globalDependencies": [".env", ".env.production"],
+    "ui": "tui",
+    "globalPassThroughEnv": ["PKG_CONFIG_PATH"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
