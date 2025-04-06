@@ -7,6 +7,7 @@ import { Suspense } from "solid-js";
 import "@fontsource-variable/noto-sans-jp";
 import "@fontsource-variable/inter";
 
+import "~/api";
 import "./app.css";
 import { QueryClient } from "@tanstack/solid-query";
 import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
