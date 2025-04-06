@@ -11,7 +11,7 @@ export function CurrentlyListening(props: { userId: string }) {
     const playing = createMemo(() => {
         if (!profile.data)
             return { isPlaying: false, progress: 0, track: undefined } satisfies NonNullable<Profile["currentPlaying"]>;
-        if (!profile.data.currentPlaying.track)
+        if (!profile.data.currentPlaying?.track)
             return { isPlaying: false, progress: 0, track: undefined } satisfies NonNullable<Profile["currentPlaying"]>;
         return {
             ...profile.data.currentPlaying,

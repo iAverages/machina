@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { Show } from "solid-js";
-import type { CursorPaginatedStringVecListenDataInner, Profile } from "~/api/client";
+import type { Listen, Profile } from "~/api/client";
 import { ExternalLink } from "~/icons/external";
 
 export const TopTrack = (song: Profile["topTracks"][number]) => (
@@ -33,10 +33,7 @@ export const TopTrack = (song: Profile["topTracks"][number]) => (
     </a>
 );
 
-// TODO: change type name lol
-
-// export const Track = (song: CursorPaginatedStringVecListenDataInner) => <div class="size-0"></div>;
-export const Track = (song: CursorPaginatedStringVecListenDataInner) => (
+export const Track = (song: Listen) => (
     <a href={`https://open.spotify.com/track/${song.id.split(":")[2]}`} target="_blank" rel="noreferrer">
         <div class="flex items-center gap-2 rounded-lg border p-3 group cursor-pointer bg-black/20 backdrop-blur-sm">
             <div class="relative h-16 w-16 flex-shrink-0">

@@ -22,6 +22,7 @@ pub fn router(state: AppState) -> OpenApiRouter {
 }
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Profile {
     top_tracks: Vec<TopTrack>,
     listen_stats: TotalListenStats,
@@ -30,12 +31,14 @@ pub struct Profile {
 }
 
 #[derive(FromRow, Serialize, Clone, Debug, ToSchema)]
+#[serde(rename_all = "camelCase")]
 struct TotalListenStats {
     total_seconds: i64,
     unique_tracks_count: i64,
 }
 
 #[derive(FromRow, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 struct TopTrack {
     track_id: String,
     track_name: String,
@@ -47,6 +50,7 @@ struct TopTrack {
 }
 
 #[derive(FromRow, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 struct UserProfile {
     id: String,
     name: String,
@@ -60,6 +64,7 @@ struct SpotifyTokens {
 }
 
 #[derive(ToSchema, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct PlayingTrack {
     track_id: String,
     track_name: String,
@@ -70,6 +75,7 @@ struct PlayingTrack {
 }
 
 #[derive(ToSchema, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct CurrentlyPlaying {
     // #[serde(with = "ts_milliseconds")]
     // #[serde(with = "option_duration_ms", rename = "progress_ms")]
@@ -170,6 +176,7 @@ pub async fn user_profile(
 }
 
 #[derive(FromRow, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 struct Listen {
     id: String,
     time: i64,
@@ -204,7 +211,7 @@ struct CursorPaginated<CursorType, Data> {
             Pagination
         ),
         responses(
-            (status = 200, description = "listening history for given user", body = CursorPaginated<String, Vec<Listen>>)
+            (status = 200, description = "listening history for given user", body = CursorPaginated<i64, Vec<Listen>>)
         )
     )]
 async fn listen_hist(

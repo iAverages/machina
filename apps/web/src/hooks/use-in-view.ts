@@ -10,7 +10,6 @@ export type UseInViewOptions = {
 export const useInView = (onVisible?: () => void, onHidden?: () => void, options: UseInViewOptions = {}) => {
     const [isVisible, setIsVisible] = createSignal(false);
     const [firstVisibleAt, setFirstVisibleAt] = createSignal<number | null>(null);
-    let element: HTMLElement | null = null;
     let observer: IntersectionObserver | null = null;
 
     const defaultOptions = {
@@ -23,8 +22,6 @@ export const useInView = (onVisible?: () => void, onHidden?: () => void, options
     const mergedOptions = { ...defaultOptions, ...options };
 
     const setupObserver = (el: HTMLElement) => {
-        element = el;
-
         observer = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {

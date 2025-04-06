@@ -3,7 +3,6 @@ import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { cn } from "~/utils/cn";
 import { useProfile } from "~/queries/profile";
 import { CurrentlyListening } from "./currently-listening";
-import { createEffect } from "solid-js";
 
 interface UserProfileProps {
     class?: string;

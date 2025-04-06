@@ -8,6 +8,7 @@
         "dev": "vinxi dev",
         "build": "vinxi build",
         "start": "vinxi start",
+        "gen-api": "bun run ./scripts/openapi-ts.ts",
         "typecheck": "tsc --noEmit",
         "clean": "bun run rm -rf .output node_modules *.tsbuildinfo"
     },
@@ -18,6 +19,7 @@
         "@corvu/resizable": "^0.2.4",
         "@fontsource-variable/inter": "^5.2.5",
         "@fontsource-variable/noto-sans-jp": "^5.2.5",
+        "@hey-api/client-fetch": "^0.10.0",
         "@kobalte/core": "^0.13.9",
         "@machina/og": "workspace:^",
         "@resvg/resvg-js": "^2.6.2",
@@ -50,6 +52,7 @@
         "zod": "^3.24.2"
     },
     "devDependencies": {
+        "@hey-api/openapi-ts": "^0.66.3",
         "@machina/tsconfig": "workspace:^",
         "@tailwindcss/vite": "^4.1.3",
         "@types/d3-interpolate": "^3.0.4",

@@ -9,6 +9,7 @@ import "@fontsource-variable/inter";
 
 import "./app.css";
 import { QueryClient } from "@tanstack/solid-query";
+import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
 
 export default function App() {
     const queryClient = new QueryClient({
@@ -25,6 +26,9 @@ export default function App() {
                     <Title>machina</Title>
                     <QueryClientProvider client={queryClient}>
                         <Suspense>{props.children}</Suspense>
+                        <Suspense>
+                            <SolidQueryDevtools />
+                        </Suspense>
                     </QueryClientProvider>
                 </MetaProvider>
             )}

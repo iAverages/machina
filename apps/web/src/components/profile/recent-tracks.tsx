@@ -1,13 +1,11 @@
 import { cn } from "~/utils/cn";
 import { useParams } from "@solidjs/router";
-import { createEffect, createMemo, For } from "solid-js";
+import { createMemo, For } from "solid-js";
 import { useRecentTracks } from "~/queries/recent-tracks";
 import { Track } from "./track";
 import { useInView } from "~/hooks/use-in-view";
 
-export function RecentTracks(props: {
-    class?: string;
-}) {
+export function RecentTracks(props: { class?: string }) {
     const params = useParams();
     // biome-ignore lint/style/noNonNullAssertion:
     const recent = useRecentTracks({ userId: params.userId! });

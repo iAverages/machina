@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { UserProfile } from "~/components/profile/user";
 import { TopSongs } from "~/components/profile/top-tracks";
 import { RecentTracks } from "~/components/profile/recent-tracks";
@@ -74,7 +74,7 @@ export default function SpotifyDashboard() {
 
     return (
         <div class="flex min-h-screen w-full flex-col">
-            <Show when={profile.data?.currentPlaying.track?.albumArt}>
+            <Show when={profile.data?.currentPlaying?.track?.albumArt}>
                 {(albumArt) => <GradientBackground src={albumArt()} />}
             </Show>
             <div class="bg-background/40 z-10">
