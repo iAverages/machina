@@ -10,4 +10,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - run: pnpm install
+      # build packages so types exist for them for checks
+      - run: pnpm turbo build  --filter="./packages/**"
       - run: pnpm check
