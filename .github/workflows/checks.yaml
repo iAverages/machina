@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - run: pnpm checks
+      - run: pnpm check
