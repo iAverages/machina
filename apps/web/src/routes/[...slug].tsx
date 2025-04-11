@@ -46,11 +46,11 @@ export default function Page(props: RouteSectionProps) {
                         {(track) => (
                             <>
                                 <For each={Object.entries(track().twitter)}>
-                                    {([prop, content]) => <Meta property={prop} content={content} />}
+                                    {([prop, content]) => <Meta name={`twitter:${prop}`} content={content} />}
                                 </For>
 
                                 <For each={Object.entries(track().og)}>
-                                    {([prop, content]) => <Meta property={prop} content={content} />}
+                                    {([prop, content]) => <Meta property={`og:${prop}`} content={content} />}
                                 </For>
                                 <Meta property="theme-color" content={colors()?.baseColor ?? "#7e22ce"} />
                             </>
