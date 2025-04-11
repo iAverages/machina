@@ -16,5 +16,5 @@ export default function Page(props: RouteSectionProps) {
         deferStream: true,
     });
 
-    return <Navigate href={data()?.og.replace(env.PUBLIC_APP_URL, "") ?? "/not-found"} />;
+    return <Navigate href={data()?.data?.og.replace(env.PUBLIC_APP_URL, "") ?? "/not-found"} />;
 }
