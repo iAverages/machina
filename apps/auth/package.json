@@ -4,7 +4,7 @@
         "dev": "bun run --hot src/index.ts"
     },
     "dependencies": {
-        "@t3-oss/env-core": "^0.12.0",
+        "@t3-oss/env-core": "^0.13.0",
         "better-auth": "^1.2.5",
         "hono": "^4.7.5",
         "mysql2": "^3.14.0",
