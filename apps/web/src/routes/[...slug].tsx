@@ -1,7 +1,6 @@
 import { useWindowSize } from "@solid-primitives/resize-observer";
 import { Meta } from "@solidjs/meta";
 import { createAsync, type RouteDefinition, type RouteSectionProps } from "@solidjs/router";
-import { Vibrant } from "node-vibrant/node";
 import { For, Match, Show, Switch } from "solid-js";
 import { FadeImage } from "~/components/fade-image";
 import { GradientBackground } from "~/components/gradient-background";
