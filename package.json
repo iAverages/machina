@@ -15,7 +15,7 @@
         "clean": "turbo clean"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.0.0-beta.1",
+        "@biomejs/biome": "2.0.0-beta.2",
         "@machina/tsconfig": "workspace:^",
         "turbo": "^2.5.2",
         "typescript": "^5.8.3"
