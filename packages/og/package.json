@@ -18,11 +18,11 @@
     },
     "devDependencies": {
         "@machina/tsconfig": "workspace:^",
-        "@types/react": "^19.1.0",
-        "@vitejs/plugin-react-swc": "^3.8.1",
-        "esbuild": "^0.25.2",
+        "@types/react": "^19.1.2",
+        "@vitejs/plugin-react-swc": "^3.9.0",
+        "esbuild": "^0.25.3",
         "typescript": "^5.8.3",
-        "vite": "^6.2.5",
+        "vite": "^6.3.3",
         "vite-plugin-dts": "^4.5.3"
     }
 }
