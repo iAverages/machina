@@ -29,7 +29,7 @@ export default function Page(props: RouteSectionProps) {
             else if (d.type === "prerelease") artUrl = d.meta.twitter.image;
             if (!artUrl) return null;
 
-            const palette = await Vibrant.from(artUrl).getPalette();
+            const palette = await globalThis.$getVibrantPalette(artUrl);
             const baseColor = palette.Vibrant?.hex ?? "#000";
             const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
 
