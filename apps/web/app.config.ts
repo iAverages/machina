@@ -1,5 +1,6 @@
 import { defineConfig } from "@solidjs/start/config";
 import tailwindcss from "@tailwindcss/vite";
+import icons from "unplugin-icons/vite";
 
 import "./src/env-client";
 
@@ -19,6 +20,17 @@ export default defineConfig({
     },
     vite: {
         envPrefix: "PUBLIC_",
-        plugins: [tailwindcss()],
+        plugins: [
+            tailwindcss(),
+            icons({
+                compiler: "solid",
+                jsx: "react",
+                // ensure we can always set the color
+                iconCustomizer: (collection, icon, props) => {
+                    console.log({ collection, icon, props });
+                    // return svg.replace(/fill="[^"]*"/g, 'fill="currentColor"');
+                },
+            }),
+        ],
     },
 });

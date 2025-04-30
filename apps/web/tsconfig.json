@@ -8,6 +8,9 @@
         "declarationMap": false,
         "paths": {
             "~/*": ["./src/*"]
-        }
+        },
+        "types": [
+      "unplugin-icons/types/solid",
+        ]
     }
 }
