@@ -1,15 +1,15 @@
 use anyhow::Result;
+use rspotify::Token;
 use rspotify::model::{PlayHistory, SimplifiedAlbum, SimplifiedArtist};
 use rspotify::prelude::OAuthClient;
-use rspotify::Token;
 use sqlx::{MySql, QueryBuilder};
 use std::collections::HashSet;
 use tokio::task;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
+use crate::AppState;
 use crate::models::ListenSyncUser;
 use crate::spotify::init_spotify_from_token;
-use crate::AppState;
 
 pub fn start_sync_loop(state: AppState) {
     task::spawn(async move {
