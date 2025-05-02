@@ -5,14 +5,22 @@ use envconfig::Envconfig;
 pub struct MachinaConfig {
     #[envconfig(from = "APP_URL")]
     pub app_url: String,
-    #[envconfig(from = "API_URL")]
-    pub api_url: String,
+    // #[envconfig(from = "API_URL")]
+    // pub api_url: String,
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
     #[envconfig(from = "SPOTIFY_CLIENT_ID")]
     pub spotify_client_id: String,
     #[envconfig(from = "SPOTIFY_CLIENT_SECRET")]
     pub spotify_client_secret: String,
+    #[envconfig(from = "B2_BUCKET_ID")]
+    pub b2_bucket_id: String,
+    #[envconfig(from = "B2_APPLICATION_KEY_ID")]
+    pub b2_application_key_id: String,
+    #[envconfig(from = "B2_APPLICATION_KEY")]
+    pub b2_application_key: String,
+    #[envconfig(from = "MACHINA_VIDEO_GENERATION_DIR", default = "/tmp/machina")]
+    pub video_generator_dir: String,
 }
 
 #[derive(Debug, thiserror::Error)]

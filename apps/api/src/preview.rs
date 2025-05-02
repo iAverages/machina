@@ -1,113 +1,171 @@
+use crate::cache_manager::CacheManger;
+use crate::spotify_embed::EmbedJsonData;
+use crate::utils::{
+    get_audio_output_path, get_b2_video_path, get_og_output_path, get_track_output_path,
+    get_video_output_path, upload_to_b2,
+};
+use crate::{AppState, MACHINA_CONFIG, get_b2};
 use anyhow::{Result, anyhow};
+use axum::extract::{Path, State};
+use axum::http::{HeaderMap, StatusCode};
+use axum::response::{IntoResponse, Response};
+use backblaze_b2_client::definitions::query_params::{
+    B2DownloadFileQueryParameters, B2ListFileNamesQueryParameters,
+};
+use bytes::Bytes;
+use futures::stream::StreamExt;
+use reqwest::header;
 use scraper::{Html, Selector};
+use std::io::Cursor;
 use std::path::Path as StdPath;
 use std::process::Stdio;
 use std::sync::Arc;
-use tokio::fs::File;
-use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
-use tokio::sync::Notify;
-use tracing::{Level, span};
-
-use axum::body::Body;
-use axum::extract::{Path, State};
-use axum::http::{HeaderMap, HeaderValue, StatusCode};
-use axum::response::{IntoResponse, Response};
+use tokio::fs::{self, File};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::process::Command;
-use tokio_util::io::ReaderStream;
+use tokio::sync::Notify;
+use tokio::task;
 
-use crate::spotify_embed::EmbedJsonData;
-use crate::{AppState, MACHINA_CONFIG};
+#[derive(Debug, thiserror::Error)]
+pub enum B2VideoError {
+    #[error("video with prefix {0} was not found")]
+    NotFound(String),
+}
 
-pub async fn get_cached_video(track_id: String) -> Option<File> {
-    let dir_path = format!("/tmp/machina/{}/", track_id);
-    let dir = StdPath::new(&dir_path);
-    if dir.exists() {
-        tracing::info!("found cached {} directory", track_id);
-        return File::open(dir_path + "out.mp4").await.ok();
+#[derive(Debug, thiserror::Error)]
+pub enum LocalVideoError {
+    #[error("no video found on path {0}")]
+    NotFound(String),
+}
+
+pub struct LocalVideo {
+    path: String,
+    track_id: String,
+}
+
+impl LocalVideo {
+    pub async fn new(track_id: String, path: String) -> Result<LocalVideo, LocalVideoError> {
+        let path_path = std::path::Path::new(&path);
+        if !path_path.exists() {
+            return Err(LocalVideoError::NotFound(path));
+        }
+
+        Ok(LocalVideo { track_id, path })
+    }
+}
+
+impl StoredVideo for LocalVideo {
+    async fn get_file_stream_all(&self) -> Result<Bytes, StoredVideoError> {
+        let mut file = File::open(self.path.clone())
+            .await
+            .map_err(|_| StoredVideoError::StreamError)?;
+        let metadata = file
+            .metadata()
+            .await
+            .map_err(|_| StoredVideoError::StreamError)?;
+        let file_size = metadata.len() as usize;
+
+        let mut buffer: Vec<u8> = Vec::with_capacity(file_size);
+
+        file.read_to_end(&mut buffer).await.unwrap();
+
+        Ok(Bytes::from(buffer))
     }
 
-    None
+    fn get_id(&self) -> String {
+        self.track_id.clone()
+    }
+}
+
+pub struct B2Video {
+    pub file_id: String,
+    pub track_id: String,
+}
+
+impl B2Video {
+    pub async fn new(track_id: String) -> Result<B2Video, B2VideoError> {
+        let files = get_b2()
+            .basic_client()
+            .list_file_names(
+                B2ListFileNamesQueryParameters::builder()
+                    .bucket_id(MACHINA_CONFIG.b2_bucket_id.clone())
+                    .prefix(Some(get_b2_video_path(track_id.clone())))
+                    .build(),
+            )
+            .await
+            .unwrap();
+
+        if !files.files.is_empty() {
+            let file = files.files.first().unwrap();
+            tracing::info!("found video for track {:?} in b2", track_id);
+            return Ok(B2Video {
+                file_id: file.file_id.clone(),
+                track_id,
+            });
+        }
+
+        Err(B2VideoError::NotFound(track_id.clone()))
+    }
+}
+
+impl StoredVideo for B2Video {
+    fn get_id(&self) -> String {
+        self.track_id.clone()
+    }
+
+    async fn get_file_stream_all(&self) -> Result<Bytes, StoredVideoError> {
+        let video = get_b2()
+            .basic_client()
+            .download_file_by_id(
+                self.file_id.clone(),
+                Some(B2DownloadFileQueryParameters::builder().build()),
+            )
+            .await
+            .unwrap();
+        let (size, mut stream) = video.file.into_stream();
+
+        let mut buffer: Vec<u8> = Vec::with_capacity(size);
+
+        while let Some(value) = stream.next().await {
+            let value = value.map_err(|_| StoredVideoError::StreamError)?;
+            buffer.extend_from_slice(value.as_ref());
+        }
+
+        Ok(Bytes::from(buffer))
+    }
+}
+
+pub trait StoredVideo {
+    fn get_id(&self) -> String;
+
+    async fn get_file_stream_all(&self) -> Result<Bytes, StoredVideoError>;
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum StoredVideoError {
+    #[error("an error occured while streaming video data")]
+    StreamError,
 }
 
 pub async fn serve_cached_video(
+    state: AppState,
     track_id: String,
-    range: Option<&HeaderValue>,
 ) -> Result<Response, (StatusCode, String)> {
-    if let Some(file) = get_cached_video(track_id.clone()).await {
-        tracing::info!("found cached {} out.mp4", track_id);
-        let metadata = file.metadata().await.map_err(|_| {
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "failed to read metadata from existing video".to_string(),
-            )
-        })?;
-        let total_size = metadata.len();
-
-        // handle range header for video seeking
-        if let Some(range) = range {
-            if let Ok(range) = range.to_str() {
-                if let Some(range) = parse_range_header(range, total_size) {
-                    let (start, end) = range;
-
-                    let mut partial_file = file;
-                    partial_file
-                        .seek(tokio::io::SeekFrom::Start(start))
-                        .await
-                        .unwrap();
-
-                    let length = end - start + 1;
-                    let stream = ReaderStream::new(partial_file.take(length));
-
-                    let body = Body::from_stream(stream);
-
-                    let response = axum::response::Response::builder()
-                        .status(StatusCode::PARTIAL_CONTENT)
-                        .header("Content-Type", "video/mp4")
-                        .header(
-                            "Content-Range",
-                            format!("bytes {}-{}/{}", start, end, total_size),
-                        )
-                        .body(body)
-                        .unwrap();
-
-                    return Ok(response);
-                }
-            }
-
-            return create_video_response(file).await;
-        }
-
-        return create_video_response(file).await;
-    }
-
-    Err((StatusCode::INTERNAL_SERVER_ERROR, "error".to_string()))
-}
-
-async fn create_video_response(file: File) -> Result<Response, (StatusCode, String)> {
-    tracing::info!("got output file");
-    let metadata = file.metadata().await.map_err(|_| {
-        (
+    if let Some(bytes) = state
+        .cache_manager
+        .get_and_cache_video_bytes(&track_id)
+        .await
+    {
+        Ok(build_response(bytes))
+    } else {
+        Err((
             StatusCode::INTERNAL_SERVER_ERROR,
-            "failed to read metadata from existing video".to_string(),
-        )
-    })?;
-
-    let total_size = metadata.len();
-
-    let stream = ReaderStream::new(file);
-    let body = Body::from_stream(stream);
-
-    let response = axum::response::Response::builder()
-        .status(StatusCode::OK)
-        .header("Content-Type", "video/mp4")
-        .header("Content-Length", total_size.to_string())
-        .body(body)
-        .unwrap();
-
-    Ok(response)
+            "an error has occured".to_string(),
+        ))
+    }
 }
 
-async fn get_track_og(track_id: &String, dir: String) -> Result<File> {
+async fn get_track_og(track_id: String) -> Result<File> {
     tracing::info!("fetching og image");
     let response = reqwest::get(format!(
         "{}/direct/https:/open.spotify.com/track/{}",
@@ -116,7 +174,7 @@ async fn get_track_og(track_id: &String, dir: String) -> Result<File> {
     .await?;
 
     let bytes = response.bytes().await?;
-    let full_path = dir + "og.png";
+    let full_path = get_og_output_path(track_id.clone());
     let path = StdPath::new(&full_path);
     if let Some(parent) = path.parent() {
         tracing::info!("cache folder for {} did not exist, creating...", track_id);
@@ -150,13 +208,13 @@ async fn get_preview_url(track_id: &String) -> Result<String> {
     Ok(preview_url)
 }
 
-async fn get_track_preview_audio(track_id: String, dir: String) -> Result<File> {
+async fn get_track_preview_audio(track_id: String) -> Result<File> {
     tracing::info!("fetching preview audio");
     let preview_url = get_preview_url(&track_id).await?;
     let response = reqwest::get(preview_url).await?;
 
     let bytes = response.bytes().await?;
-    let full_path = dir + "audio.mp3";
+    let full_path = get_audio_output_path(track_id.clone());
     let path = StdPath::new(&full_path);
     if let Some(parent) = path.parent() {
         tracing::info!("cache folder for {} did not exist, creating...", track_id);
@@ -170,10 +228,16 @@ async fn get_track_preview_audio(track_id: String, dir: String) -> Result<File> 
     Ok(file)
 }
 
-async fn generate_video_from_id(track_id: String, dir: String) -> Result<File> {
+async fn generate_video_from_id(track_id: String) -> Result<File> {
     tracing::info!("preparing assets for video");
-    get_track_og(&track_id, dir.clone()).await?;
-    get_track_preview_audio(track_id, dir.clone()).await?;
+    let (track_og, preview_audio) = tokio::join!(
+        get_track_og(track_id.clone()),
+        get_track_preview_audio(track_id.clone())
+    );
+    // this looks silly
+    track_og?;
+    preview_audio?;
+
     Command::new("ffmpeg")
         .args([
             "-loop",
@@ -203,47 +267,21 @@ async fn generate_video_from_id(track_id: String, dir: String) -> Result<File> {
             "-shortest",
             "out.mp4",
         ])
-        .current_dir(dir.clone())
+        .current_dir(get_track_output_path(track_id.clone()))
         .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .output()
         .await?;
-    let out_file_path = dir + "out.mp4";
-    let out_file = File::open(out_file_path).await.ok();
+
+    let out_file = File::open(get_video_output_path(track_id)).await.ok();
 
     tracing::info!("generated video");
     out_file.ok_or(anyhow!("no file got created"))
 }
 
-fn parse_range_header(range: &str, total_size: u64) -> Option<(u64, u64)> {
-    if !range.starts_with("bytes=") {
-        return None;
-    }
-
-    let range = &range[6..]; // strip "bytes="
-    let parts: Vec<&str> = range.split('-').collect();
-
-    if parts.len() != 2 {
-        return None;
-    }
-
-    let start = parts[0].parse::<u64>().ok()?;
-    let end = if parts[1].is_empty() {
-        total_size - 1
-    } else {
-        parts[1].parse::<u64>().ok()?
-    };
-
-    if start <= end && end < total_size {
-        Some((start, end))
-    } else {
-        None
-    }
-}
-
 #[axum::debug_handler]
-pub async fn root(
+pub async fn get_preview_video(
     Path(track_id_path): Path<String>,
-    headers: HeaderMap,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     if track_id_path.starts_with("favicon") {
@@ -252,15 +290,20 @@ pub async fn root(
             "we dont have a favicon".to_string(),
         ));
     }
-
     let track_id = track_id_path.split('.').next().unwrap_or("").to_string();
-    let dir_path = format!("/tmp/machina/{}/", track_id);
-    let span = span!(Level::INFO, "generate", track_id = track_id);
-    let _enter = span.enter();
+    if track_id.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "you must include an id for the video".to_string(),
+        ));
+    }
 
-    let range = headers.get("Range");
-    if get_cached_video(track_id.clone()).await.is_some() {
-        return serve_cached_video(track_id, range).await;
+    if let Some(bytes) = state
+        .cache_manager
+        .get_and_cache_video_bytes(&track_id)
+        .await
+    {
+        return Ok(build_response(bytes));
     }
 
     let mut is_leader = false;
@@ -279,16 +322,16 @@ pub async fn root(
     if !is_leader {
         tracing::info!("waiting for leader to complete video");
         notify.notified().await;
-        return serve_cached_video(track_id, range).await;
+        return serve_cached_video(state, track_id).await;
     }
 
     tracing::info!("we are the leader");
 
-    if get_cached_video(track_id.clone()).await.is_some() {
-        return serve_cached_video(track_id, range).await;
+    if state.cache_manager.has_id(&track_id).await {
+        return serve_cached_video(state, track_id).await;
     }
 
-    let file = generate_video_from_id(track_id.clone(), dir_path.clone()).await;
+    let file = generate_video_from_id(track_id.clone()).await;
     if let Err(err) = file {
         tracing::error!("Error generating video: {:?}", err);
         {
@@ -301,6 +344,25 @@ pub async fn root(
         ));
     }
 
+    let _ = state
+        .cache_manager
+        .cache_video(
+            &LocalVideo::new(track_id.clone(), get_video_output_path(track_id.clone()))
+                .await
+                .unwrap(),
+        )
+        .await;
+
+    let cloned_track_id = track_id.clone();
+    let cloned_cache_manager = state.cache_manager.clone();
+    task::spawn(async move {
+        // if we error there was no b2 video so we should upload
+        if B2Video::new(cloned_track_id.clone()).await.is_err() {
+            upload_to_b2(cloned_cache_manager, cloned_track_id.clone()).await;
+        }
+        let _ = fs::remove_dir_all(get_track_output_path(cloned_track_id)).await;
+    });
+
     tracing::info!("video complete, notifying waiters");
 
     {
@@ -310,5 +372,12 @@ pub async fn root(
         }
     }
 
-    create_video_response(file.unwrap()).await
+    serve_cached_video(state, track_id).await
+}
+
+fn build_response(video_bytes: Bytes) -> Response {
+    let mut headers = HeaderMap::new();
+    headers.insert(header::ACCEPT_RANGES, "bytes".parse().unwrap());
+    headers.insert(header::CONTENT_TYPE, "video/mp4".parse().unwrap());
+    (StatusCode::OK, headers, video_bytes).into_response()
 }
