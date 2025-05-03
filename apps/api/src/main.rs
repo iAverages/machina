@@ -9,12 +9,21 @@ mod spotify_embed;
 mod sync;
 mod utils;
 
+use self::cache_manager::CacheManger;
+use self::config::{MachinaConfig, get_config};
+use self::preview::{B2Video, LocalVideo, get_preview_video};
+use self::sync::start_sync_loop;
+use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
+use axum::http::HeaderValue;
+use axum::routing::get;
+use axum::{Json, Router};
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use backblaze_b2_client::client::B2Client;
+use once_cell::sync::{Lazy, OnceCell};
 use reqwest::Method;
 use sqlx::mysql::MySqlPoolOptions;
 use sqlx::{MySql, Pool};
 use std::collections::HashMap;
-use std::env;
 use std::sync::Arc;
 use tokio::fs::{self};
 use tokio::sync::{Mutex, Notify};
@@ -24,18 +33,6 @@ use utoipa::OpenApi;
 use utoipa::openapi::LicenseBuilder;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_scalar::{Scalar, Servable as ScalarServable};
-
-use axum::http::HeaderValue;
-use axum::routing::get;
-use axum::{Json, Router};
-
-use once_cell::sync::{Lazy, OnceCell};
-
-use self::cache_manager::CacheManger;
-use self::config::{MachinaConfig, get_config};
-use self::preview::{B2Video, LocalVideo, LocalVideoError, get_preview_video};
-use self::sync::start_sync_loop;
-use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
 
 #[derive(Clone)]
 struct AppState {
@@ -65,14 +62,7 @@ static MACHINA_CONFIG: Lazy<MachinaConfig> = Lazy::new(|| get_config().expect("c
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt()
-        .compact()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!("{}=debug,axum::rejection=trace", env!("CARGO_CRATE_NAME")).into()
-            }),
-        )
-        .init();
+    let _guard = init_tracing_opentelemetry::tracing_subscriber_ext::init_subscribers().unwrap();
 
     let pool = MySqlPoolOptions::new()
         .max_connections(5)
@@ -131,6 +121,8 @@ async fn main() {
     let app = Router::new()
         .route("/{trackId}", get(get_preview_video))
         .route("/openapi.json", get(Json(api.clone())))
+        .layer(OtelInResponseLayer)
+        .layer(OtelAxumLayer::default())
         .with_state(state.clone());
 
     let openapi_router = openapi_router

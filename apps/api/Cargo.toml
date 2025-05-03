@@ -44,3 +44,10 @@ utoipa-scalar = { version = "0.3.0", features = ["axum"] }
 backblaze-b2-client = { git = "https://github.com/iAverages/backblaze-b2-client-rs" }
 bytes = "1.10.1"
 tokio-stream = "0.1.17"
+opentelemetry = "0.29.1"
+opentelemetry-otlp = { version = "0.29.0", features = ["grpc-tonic"] }
+axum-tracing-opentelemetry = "0.28.0"
+init-tracing-opentelemetry = { version = "0.28.0", features = [
+    "otlp",
+    "tracing_subscriber_ext",
+] }
