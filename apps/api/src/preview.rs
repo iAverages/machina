@@ -1,4 +1,3 @@
-use crate::cache_manager::CacheManger;
 use crate::spotify_embed::EmbedJsonData;
 use crate::utils::{
     get_audio_output_path, get_b2_video_path, get_og_output_path, get_track_output_path,
@@ -16,7 +15,6 @@ use bytes::Bytes;
 use futures::stream::StreamExt;
 use reqwest::header;
 use scraper::{Html, Selector};
-use std::io::Cursor;
 use std::path::Path as StdPath;
 use std::process::Stdio;
 use std::sync::Arc;
@@ -25,6 +23,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::process::Command;
 use tokio::sync::Notify;
 use tokio::task;
+use tracing::instrument;
 
 #[derive(Debug, thiserror::Error)]
 pub enum B2VideoError {
@@ -97,7 +96,7 @@ impl B2Video {
 
         if !files.files.is_empty() {
             let file = files.files.first().unwrap();
-            tracing::info!("found video for track {:?} in b2", track_id);
+            tracing::info!("found video for track in b2");
             return Ok(B2Video {
                 file_id: file.file_id.clone(),
                 track_id,
@@ -177,7 +176,7 @@ async fn get_track_og(track_id: String) -> Result<File> {
     let full_path = get_og_output_path(track_id.clone());
     let path = StdPath::new(&full_path);
     if let Some(parent) = path.parent() {
-        tracing::info!("cache folder for {} did not exist, creating...", track_id);
+        tracing::info!("cache folder did not exist, creating...");
         tokio::fs::create_dir_all(parent).await?;
     }
 
@@ -189,7 +188,7 @@ async fn get_track_og(track_id: String) -> Result<File> {
 }
 
 async fn get_preview_url(track_id: &String) -> Result<String> {
-    tracing::info!("fetching preview url for {}", track_id);
+    tracing::info!("fetching preview url");
     let response =
         reqwest::get(format!("https://open.spotify.com/embed/track/{}", track_id)).await?;
     let html_content = response.text().await?;
@@ -204,7 +203,7 @@ async fn get_preview_url(track_id: &String) -> Result<String> {
 
     let json: EmbedJsonData = serde_json::from_str(&json_text)?;
     let preview_url = json.props.page_props.state.data.entity.audio_preview.url;
-    tracing::info!("found preview url for {} - {}", track_id, preview_url);
+    tracing::info!("found preview url - {}", preview_url);
     Ok(preview_url)
 }
 
@@ -217,7 +216,7 @@ async fn get_track_preview_audio(track_id: String) -> Result<File> {
     let full_path = get_audio_output_path(track_id.clone());
     let path = StdPath::new(&full_path);
     if let Some(parent) = path.parent() {
-        tracing::info!("cache folder for {} did not exist, creating...", track_id);
+        tracing::info!("cache folderdid not exist, creating...");
         tokio::fs::create_dir_all(parent).await?;
     }
 
@@ -228,6 +227,7 @@ async fn get_track_preview_audio(track_id: String) -> Result<File> {
     Ok(file)
 }
 
+#[instrument(name = "ffmpeg::generate", skip_all)]
 async fn generate_video_from_id(track_id: String) -> Result<File> {
     tracing::info!("preparing assets for video");
     let (track_og, preview_audio) = tokio::join!(
@@ -280,6 +280,7 @@ async fn generate_video_from_id(track_id: String) -> Result<File> {
 }
 
 #[axum::debug_handler]
+#[instrument(name = "video-preview", skip(state, track_id_path), fields(track_id = track_id_path))]
 pub async fn get_preview_video(
     Path(track_id_path): Path<String>,
     State(state): State<AppState>,

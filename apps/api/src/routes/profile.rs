@@ -7,6 +7,7 @@ use rspotify::model::{AdditionalType, PlayableItem};
 use rspotify::prelude::OAuthClient;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use tracing::instrument;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
@@ -83,6 +84,7 @@ struct CurrentlyPlaying {
     pub is_playing: bool,
     pub track: Option<PlayingTrack>,
 }
+
 #[axum::debug_handler]
 #[utoipa::path(
         get,
