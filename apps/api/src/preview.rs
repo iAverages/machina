@@ -164,6 +164,7 @@ pub async fn serve_cached_video(
     }
 }
 
+#[instrument(skip_all)]
 async fn get_track_og(track_id: String) -> Result<File> {
     tracing::info!("fetching og image");
     let response = reqwest::get(format!(
@@ -187,6 +188,7 @@ async fn get_track_og(track_id: String) -> Result<File> {
     Ok(file)
 }
 
+#[instrument(skip_all)]
 async fn get_preview_url(track_id: &String) -> Result<String> {
     tracing::info!("fetching preview url");
     let response =
@@ -207,6 +209,7 @@ async fn get_preview_url(track_id: &String) -> Result<String> {
     Ok(preview_url)
 }
 
+#[instrument(skip_all)]
 async fn get_track_preview_audio(track_id: String) -> Result<File> {
     tracing::info!("fetching preview audio");
     let preview_url = get_preview_url(&track_id).await?;
