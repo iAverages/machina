@@ -6,7 +6,6 @@ use bytes::Bytes;
 use tokio::sync::RwLock;
 use tokio::task;
 use tokio::time::sleep;
-use tracing::instrument;
 
 use crate::preview::{B2Video, StoredVideo};
 

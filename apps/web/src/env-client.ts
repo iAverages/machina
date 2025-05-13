@@ -9,6 +9,7 @@ export const env = createEnv({
         PUBLIC_APP_URL: z.string().url(),
         PUBLIC_AUTH_URL: z.string().url(),
     },
+    // @ts-expect-error - why break now
     runtimeEnv: import.meta.env,
     emptyStringAsUndefined: true,
 });

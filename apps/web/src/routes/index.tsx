@@ -1,3 +1,4 @@
+// @ts-expect-error - waht
 import anna from "../anna-yanami-makeine.gif?url";
 
 export default function App() {
