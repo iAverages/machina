@@ -73,6 +73,7 @@
             nodejs
             bun # dev scripts + auth server
             openjdk23 # open api client
+            cargo-watch
             pnpm
             pkg-config
             openssl
