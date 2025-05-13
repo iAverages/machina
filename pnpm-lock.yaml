@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@dotenvx/dotenvx':
         specifier: ^1.41.0
-        version: 1.41.0
+        version: 1.44.0
       '@openapitools/openapi-generator-cli':
         specifier: ^2.20.0
         version: 2.20.0
@@ -503,8 +503,8 @@ packages:
     resolution: {integrity: sha512-KrkT6qO5NxqNfy68sBl6CTSoJ4SNDIS5iQArkibhlbGU4LaDukZ3q2HIkh8aUKDio6o4itU4xDR7t82Y2eP1Bg==}
     engines: {node: '>=14'}
 
-  '@dotenvx/dotenvx@1.41.0':
-    resolution: {integrity: sha512-lFZOSKLM2/Jm7FXYUIvnciUhMsuEatyxCgau4lnjDD59LaSYiaNLjyjnUL/aYpH1+iaDhD37+mPOzH9kBZlUJQ==}
+  '@dotenvx/dotenvx@1.44.0':
+    resolution: {integrity: sha512-18Aa+7KP/L2Kj9lxmT4EJZnsCq/xGIHgzU26rdzsKMhjpeT3YY+qin/dNAnIaVHPZnee7kXpZL55M9htd30r7Q==}
     hasBin: true
 
   '@ecies/ciphers@0.2.3':
@@ -6301,7 +6301,7 @@ snapshots:
       gonzales-pe: 4.3.0
       node-source-walk: 6.0.2
 
-  '@dotenvx/dotenvx@1.41.0':
+  '@dotenvx/dotenvx@1.44.0':
     dependencies:
       commander: 11.1.0
       dotenv: 16.5.0
