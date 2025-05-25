@@ -51,6 +51,28 @@ export type Profile = {
     user: UserProfile;
 };
 
+export type ProfileOverview = {
+    totalListeningHours: number;
+    totalPlays: number;
+    uniqueTracks: number;
+    weeklyAverage: number;
+};
+
+export type SelfProfile = {
+    currentPlaying: CurrentlyPlaying;
+    listenStats: TotalListenStats;
+    overview: ProfileOverview;
+    topArtists: Array<TopArtists>;
+    topTracks: Array<TopTrack>;
+    user: UserProfile;
+};
+
+export type TopArtists = {
+    artistId: string;
+    artistName: string;
+    listenCount: number;
+};
+
 export type TopTrack = {
     albumArt?: string | null;
     albumName?: string | null;
@@ -71,6 +93,22 @@ export type UserProfile = {
     image?: string | null;
     name: string;
 };
+
+export type SelfProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/profile/self';
+};
+
+export type SelfProfileResponses = {
+    /**
+     * data for users profile, includes more data compared to public profile view
+     */
+    200: SelfProfile;
+};
+
+export type SelfProfileResponse = SelfProfileResponses[keyof SelfProfileResponses];
 
 export type UserProfileData = {
     body?: never;

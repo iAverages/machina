@@ -17,6 +17,14 @@ export default defineConfig({
                 target: "es2024",
             },
         },
+        devProxy: {
+            "/api/auth/": {
+                target: "http://localhost:3002/api/auth",
+            },
+            "/api/": {
+                target: "http://localhost:3001/api",
+            },
+        },
     },
     vite: {
         envPrefix: "PUBLIC_",
@@ -25,11 +33,6 @@ export default defineConfig({
             icons({
                 compiler: "solid",
                 jsx: "react",
-                // ensure we can always set the color
-                iconCustomizer: (collection, icon, props) => {
-                    console.log({ collection, icon, props });
-                    // return svg.replace(/fill="[^"]*"/g, 'fill="currentColor"');
-                },
             }),
         ],
     },

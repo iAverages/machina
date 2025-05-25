@@ -1,3 +1,4 @@
+mod auth;
 mod cache_manager;
 mod config;
 mod models;
@@ -9,6 +10,7 @@ mod spotify_embed;
 mod sync;
 mod utils;
 
+use self::auth::session_middleware;
 use self::cache_manager::CacheManger;
 use self::config::{MachinaConfig, get_config};
 use self::preview::{B2Video, LocalVideo, get_preview_video};
@@ -116,6 +118,7 @@ async fn main() {
 
     let (openapi_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api", base_router)
+        .layer(axum::middleware::from_fn(session_middleware))
         .split_for_parts();
 
     let app = Router::new()
@@ -123,6 +126,7 @@ async fn main() {
         .route("/openapi.json", get(Json(api.clone())))
         .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default())
+        .layer(axum::middleware::from_fn(session_middleware))
         .with_state(state.clone());
 
     let openapi_router = openapi_router
