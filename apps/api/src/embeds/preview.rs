@@ -1,4 +1,4 @@
-use crate::spotify_embed::EmbedJsonData;
+use crate::embeds::spotify_embed::EmbedJsonData;
 use crate::utils::{
     get_audio_output_path, get_b2_video_path, get_og_output_path, get_track_output_path,
     get_video_output_path, upload_to_b2,

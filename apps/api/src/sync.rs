@@ -1,7 +1,9 @@
 use anyhow::Result;
+use chrono::NaiveDateTime;
 use rspotify::Token;
 use rspotify::model::{PlayHistory, SimplifiedAlbum, SimplifiedArtist};
 use rspotify::prelude::OAuthClient;
+use sqlx::prelude::FromRow;
 use sqlx::{MySql, QueryBuilder};
 use std::collections::HashSet;
 use tokio::task;
@@ -9,8 +11,15 @@ use tokio::time::{Duration, sleep};
 use tracing::instrument;
 
 use crate::AppState;
-use crate::models::ListenSyncUser;
 use crate::spotify::init_spotify_from_token;
+
+#[derive(FromRow, Debug)]
+pub struct ListenSyncUser {
+    pub id: String,
+    pub spotify_access_token: Option<String>,
+    pub spotify_refresh_token: Option<String>,
+    pub spotify_expires_at: Option<NaiveDateTime>,
+}
 
 pub fn start_sync_loop(state: AppState) {
     task::spawn(async move {

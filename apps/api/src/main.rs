@@ -1,20 +1,16 @@
 mod auth;
-mod cache_manager;
 mod config;
 mod database;
-mod models;
-mod openapi;
-mod preview;
+mod embeds;
 mod routes;
 mod spotify;
-mod spotify_embed;
 mod sync;
 mod utils;
 
 use self::auth::session_middleware;
-use self::cache_manager::CacheManger;
 use self::config::{MachinaConfig, get_config};
-use self::preview::{B2Video, LocalVideo, get_preview_video};
+use self::embeds::cache_manager::CacheManger;
+use self::embeds::preview::{B2Video, LocalVideo, get_preview_video};
 use self::sync::start_sync_loop;
 use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
 use axum::http::HeaderValue;

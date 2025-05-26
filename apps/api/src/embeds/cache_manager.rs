@@ -7,7 +7,7 @@ use tokio::sync::RwLock;
 use tokio::task;
 use tokio::time::sleep;
 
-use crate::preview::{B2Video, StoredVideo};
+use crate::embeds::preview::{B2Video, StoredVideo};
 
 #[derive(Debug, thiserror::Error)]
 pub enum CacheMangerError {

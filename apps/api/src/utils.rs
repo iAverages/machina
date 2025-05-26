@@ -1,7 +1,7 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use crate::cache_manager::CacheManger;
+use crate::embeds::cache_manager::CacheManger;
 use crate::{MACHINA_CONFIG, get_b2};
 
 pub fn get_track_output_path(track_id: String) -> String {
