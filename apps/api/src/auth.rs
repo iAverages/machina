@@ -14,14 +14,22 @@ use auth_api_client::apis::{configuration::Configuration, default_api::get_sessi
 static AUTH_COOKE_NAME: &str = "machina.session_token";
 
 // cannot set the cookie in the generated code, the apiKey prop is never used
-fn get_authed_client(token: &str) -> Client {
+fn get_authed_client(token: &str) -> Option<Client> {
     let jar = Arc::new(Jar::default());
-    let url = Url::parse(Configuration::default().base_path.as_str()).unwrap();
+    let url = Url::parse(Configuration::default().base_path.as_str())
+        .inspect_err(|err| {
+            tracing::error!("parsing url for auth server: {}", err);
+        })
+        .ok()?;
+
     jar.add_cookie_str(format!("{AUTH_COOKE_NAME}={}", token).as_str(), &url);
     reqwest::Client::builder()
         .cookie_provider(jar)
         .build()
-        .unwrap()
+        .inspect_err(|err| {
+            tracing::error!("error occured while calling auth server: {}", err);
+        })
+        .ok()
 }
 
 #[derive(Debug, Clone)]
@@ -30,8 +38,9 @@ pub struct User {
 }
 
 pub async fn get_user_from_session_id(token: &str) -> Option<User> {
+    tracing::info!("getting user : {}", token);
     let res = get_session_get(&Configuration {
-        client: get_authed_client(token),
+        client: get_authed_client(token)?,
         ..Default::default()
     })
     .await

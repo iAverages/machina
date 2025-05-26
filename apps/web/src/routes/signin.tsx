@@ -1,19 +1,30 @@
-import { A } from "@solidjs/router";
+import { A, useSearchParams } from "@solidjs/router";
 import { useMutation } from "@tanstack/solid-query";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env-client";
 import { SpotifyIcon } from "~/icons/external";
 import { authClient } from "~/utils/auth";
 import Music from "~icons/lucide/music";
 
+const locationSchema = z.object({
+    pathname: z.string(),
+    search: z.string(),
+});
+
 export default function SignIn() {
+    const [searchParams] = useSearchParams();
+
     // TODO: replace this with a popup
     const { mutate: signin, isPending: isLoading } = useMutation(() => ({
         mutationKey: ["signin"],
         mutationFn: async () => {
+            const validator = locationSchema.safeParse(searchParams);
+            const goto = validator.success ? validator.data.pathname : `${env.PUBLIC_APP_URL}/dashboard`;
+
             await authClient.signIn.social({
                 provider: "spotify",
-                callbackURL: `${env.PUBLIC_APP_URL}/dashboard`,
+                callbackURL: goto,
                 errorCallbackURL: `${env.PUBLIC_APP_URL}/error`,
                 newUserCallbackURL: `${env.PUBLIC_APP_URL}/welcome`,
             });

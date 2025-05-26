@@ -1,119 +1,65 @@
-import { createSignal, For, Show } from "solid-js";
-import { CurrentSongBg } from "~/components/current-song-page-bg";
-import { OverviewStats } from "~/components/pages/dashboard/overview-stats";
-import { TopArtist } from "~/components/profile/artist";
-import { TopTrack } from "~/components/profile/track";
-import { Button } from "~/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { ExternalLink } from "~/icons/external";
-import { useSelfProfile } from "~/queries/profile";
+import { useLocation, useNavigate, useResolvedPath } from "@solidjs/router";
+import { createEffect, type JSX, Match, Suspense, Switch } from "solid-js";
+import { ScreenLoader } from "~/components/screen-loader";
 import { authClient } from "~/utils/auth";
+import Warning from "~icons/lucide/triangle-alert";
 
-export default function Dashboard() {
+export default function Dashboard(props: { children: JSX.Element }) {
     const session = authClient.useSession();
-    return <Show when={session().data?.user.id}>{(id) => <Page id={id()} />}</Show>;
-}
+    const nav = useNavigate();
+    const location = useLocation();
 
-const Page = (props: { id: string }) => {
-    const [activeTab, setActiveTab] = createSignal("");
-
-    const profile = useSelfProfile();
-    const topTracks = () => profile.data?.topTracks.slice(0, 5) ?? [];
-    const topArtists = () => profile.data?.topArtists.slice(0, 5) ?? [];
+    createEffect(() => {
+        // we are not signed in in this state
+        if (!session().isPending && !session().data && !session().error) {
+            nav(`/signin?goto=${encodeURIComponent(JSON.stringify(location))}`);
+            return;
+        }
+    });
 
     return (
-        <CurrentSongBg albumArt={profile.data?.currentPlaying.track?.albumArt}>
-            <Show when={profile.data}>
-                {(profile) => (
-                    <div class="container mx-auto px-4 py-6 max-w-6xl">
-                        <div class="flex flex-col md:flex-row gap-6 mt-6">
-                            <div class="flex-1">
-                                <Tabs defaultValue="overview" class="w-full" onChange={setActiveTab}>
-                                    <TabsList class="bg-zinc-800/50 text-zinc-400 p-1 mb-6">
-                                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                                        <TabsTrigger value="music">Music</TabsTrigger>
-                                        <TabsTrigger value="history">History</TabsTrigger>
-                                    </TabsList>
-
-                                    <TabsContent value="overview" class="space-y-6">
-                                        <OverviewStats
-                                            totalListeningHours={profile().overview.totalListeningHours}
-                                            totalPlays={profile().overview.totalPlays}
-                                            uniqueTracks={profile().overview.uniqueTracks}
-                                            weeklyAverage={profile().overview.weeklyAverage}
-                                        />
-
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <h2 class="text-xl font-bold">Top Tracks</h2>
-                                                    <Button variant="link" size="sm" class="text-green-500 gap-1">
-                                                        View All
-                                                        <ExternalLink class="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </div>
-                                                <div class="flex flex-col gap-2">
-                                                    <For each={topTracks()}>{(song) => <TopTrack {...song} />}</For>
-                                                </div>
-                                            </div>
-
-                                            <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <h2 class="text-xl font-bold">Top Artists</h2>
-                                                    <Button variant="link" size="sm" class="text-green-500 gap-1">
-                                                        View All
-                                                        <ExternalLink class="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </div>
-                                                <div class="flex flex-col gap-2">
-                                                    <For each={topArtists()}>
-                                                        {(artist) => <TopArtist {...artist} />}
-                                                    </For>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            <div class="md:col-span-2 bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <h2 class="text-xl font-bold">Recent</h2>
-                                                </div>
-                                                {/* <PublicRecentActivity /> */}
-                                            </div>
-
-                                            <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <h2 class="text-xl font-bold">Genres</h2>
-                                                </div>
-                                                {/* <PublicGenreChart /> */}
-                                            </div>
-                                        </div>
-                                    </TabsContent>
-
-                                    <TabsContent value="music" class="space-y-6">
-                                        <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                            <h2 class="text-xl font-bold mb-4">All Time Favorites</h2>
-                                            {/* <PublicTopTracks limit={10} /> */}
-                                        </div>
-
-                                        <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                            <h2 class="text-xl font-bold mb-4">Favorite Artists</h2>
-                                            {/* <PublicTopArtists limit={10} /> */}
-                                        </div>
-                                    </TabsContent>
-
-                                    <TabsContent value="history" class="space-y-6">
-                                        <div class="bg-zinc-900/70 rounded-xl border border-zinc-800 p-5">
-                                            <h2 class="text-xl font-bold mb-4">Listening History</h2>
-                                            {/* <PublicListeningHistory /> */}
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
+        <Switch
+            fallback={
+                <div class="min-h-screen bg-gradient-to-b from-zinc-900 to-black text-white flex items-center justify-center p-4">
+                    <div class="text-center space-y-6">
+                        <div class="flex justify-center">
+                            <div class="h-16 w-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                                <Warning class="h-8 w-8 text-red-500/60" />
                             </div>
                         </div>
+
+                        <div class="space-y-2">
+                            <h1 class="text-2xl font-bold">Unknown error has occured</h1>
+                            <p class="text-zinc-400">
+                                An unknown error has occured, if this continues, please report this.
+                            </p>
+                        </div>
                     </div>
-                )}
-            </Show>
-        </CurrentSongBg>
+                </div>
+            }
+        >
+            <Match when={session().error}>
+                <div class="min-h-screen bg-gradient-to-b from-zinc-900 to-black text-white flex items-center justify-center p-4">
+                    <div class="text-center space-y-6">
+                        <div class="flex justify-center">
+                            <div class="h-16 w-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                                <Warning class="h-8 w-8 text-red-500/60" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h1 class="text-2xl font-bold">Authentication Error</h1>
+                            <p class="text-zinc-400">An error has occured while authenticating, please try agian.</p>
+                        </div>
+                    </div>
+                </div>
+            </Match>
+            <Match when={session().isPending || (!session().isPending && !session().data && !session().error)}>
+                <ScreenLoader />
+            </Match>
+            <Match when={session().data}>
+                {(data) => <Suspense fallback={<ScreenLoader />}>{props.children}</Suspense>}
+            </Match>
+        </Switch>
     );
-};
+}

@@ -1,7 +1,7 @@
 // @refresh reload
 import { createHandler, StartServer } from "@solidjs/start/server";
-
 import type { Vibrant } from "node-vibrant/node";
+
 declare global {
     var $getVibrantPalette: (src: string) => ReturnType<ReturnType<typeof Vibrant.from>["getPalette"]>;
 }
