@@ -1,0 +1,106 @@
+diff --git a/dist/plugins/generic-oauth/index.cjs b/dist/plugins/generic-oauth/index.cjs
+index 0932a4ce15711bbff1f97bf0df94a7ce270eaf9b..13191d2cb72f49e8578b7a512a35dccd60de5734 100644
+--- a/dist/plugins/generic-oauth/index.cjs
++++ b/dist/plugins/generic-oauth/index.cjs
+@@ -332,6 +332,17 @@ const genericOAuth = (options) => {
+           metadata: {
+             openapi: {
+               description: "OAuth2 callback",
++              parameters: [
++                {
++                  name: "providerId",
++                  in: "path",
++                  required: true,
++                  description: "The provider ID for the OAuth provider",
++                  schema: {
++                    type: "string",
++                  },
++                },
++              ],
+               responses: {
+                 200: {
+                   description: "OAuth2 callback",
+diff --git a/dist/plugins/generic-oauth/index.mjs b/dist/plugins/generic-oauth/index.mjs
+index 838f0aebed70c187b2803cc646581557c5ead717..fa66a500587d7f4f377f53c1514e005b8a599403 100644
+--- a/dist/plugins/generic-oauth/index.mjs
++++ b/dist/plugins/generic-oauth/index.mjs
+@@ -330,6 +330,17 @@ const genericOAuth = (options) => {
+           metadata: {
+             openapi: {
+               description: "OAuth2 callback",
++              parameters: [
++                {
++                  name: "providerId",
++                  in: "path",
++                  required: true,
++                  description: "The provider ID for the OAuth provider",
++                  schema: {
++                    type: "string",
++                  },
++                },
++              ],
+               responses: {
+                 200: {
+                   description: "OAuth2 callback",
+diff --git a/dist/shared/better-auth.CWwVo_61.mjs b/dist/shared/better-auth.CWwVo_61.mjs
+index 1771841645d4fdeeb24ee0cd4d3300b8b10bb689..3337d96003fff2e97906dd490ab5d92c6ceb6b88 100644
+--- a/dist/shared/better-auth.CWwVo_61.mjs
++++ b/dist/shared/better-auth.CWwVo_61.mjs
+@@ -2134,6 +2134,26 @@ const forgetPasswordCallback = createAuthEndpoint(
+     metadata: {
+       openapi: {
+         description: "Redirects the user to the callback URL with the token",
++        parameters: [
++          {
++            name: "token",
++            in: "path",
++            required: true,
++            description: "The token to reset the password",
++            schema: {
++              type: "string",
++            },
++          },
++          {
++            name: "callbackURL",
++            in: "query",
++            required: true,
++            description: "The URL to redirect the user to reset their password",
++            schema: {
++              type: "string",
++            },
++          },
++        ],
+         responses: {
+           "200": {
+             description: "Success",
+diff --git a/dist/shared/better-auth.Dg0siV5C.cjs b/dist/shared/better-auth.Dg0siV5C.cjs
+index 429b9e67fd2f141fc634e8578779d461ca4677a6..317e53a43bc3a92139280d967b0083598a214a49 100644
+--- a/dist/shared/better-auth.Dg0siV5C.cjs
++++ b/dist/shared/better-auth.Dg0siV5C.cjs
+@@ -2136,6 +2136,26 @@ const forgetPasswordCallback = createAuthEndpoint(
+     metadata: {
+       openapi: {
+         description: "Redirects the user to the callback URL with the token",
++        parameters: [
++          {
++            name: "token",
++            in: "path",
++            required: true,
++            description: "The token to reset the password",
++            schema: {
++              type: "string",
++            },
++          },
++          {
++            name: "callbackURL",
++            in: "query",
++            required: true,
++            description: "The URL to redirect the user to reset their password",
++            schema: {
++              type: "string",
++            },
++          },
++        ],
+         responses: {
+           "200": {
+             description: "Success",

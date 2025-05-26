@@ -1,11 +1,28 @@
+use std::sync::Arc;
+
 use axum::{
-    Extension,
     extract::{FromRequestParts, Request},
     http::{StatusCode, request::Parts},
     middleware::Next,
     response::Response,
 };
 use axum_extra::extract::CookieJar;
+use reqwest::{Client, Url, cookie::Jar};
+
+use auth_api_client::apis::{configuration::Configuration, default_api::get_session_get};
+
+static AUTH_COOKE_NAME: &str = "machina.session_token";
+
+// cannot set the cookie in the generated code, the apiKey prop is never used
+fn get_authed_client(token: &str) -> Client {
+    let jar = Arc::new(Jar::default());
+    let url = Url::parse(Configuration::default().base_path.as_str()).unwrap();
+    jar.add_cookie_str(format!("{AUTH_COOKE_NAME}={}", token).as_str(), &url);
+    reqwest::Client::builder()
+        .cookie_provider(jar)
+        .build()
+        .unwrap()
+}
 
 #[derive(Debug, Clone)]
 pub struct User {
@@ -13,9 +30,18 @@ pub struct User {
 }
 
 pub async fn get_user_from_session_id(token: &str) -> Option<User> {
-    // TODO: fetch actual user
+    let res = get_session_get(&Configuration {
+        client: get_authed_client(token),
+        ..Default::default()
+    })
+    .await
+    .inspect_err(|err| {
+        tracing::error!("error while getting auth state for user: {}", err);
+    })
+    .ok()?;
+
     Some(User {
-        id: "fp0sllluqyvm69f5ukrc6buv".to_string(),
+        id: res.user.id.unwrap(),
     })
 }
 
@@ -60,7 +86,7 @@ where
 }
 
 pub async fn session_middleware(jar: CookieJar, mut request: Request, next: Next) -> Response {
-    let user = if let Some(session_cookie) = jar.get("machina.session_token") {
+    let user = if let Some(session_cookie) = jar.get(AUTH_COOKE_NAME) {
         get_user_from_session_id(session_cookie.value()).await
     } else {
         None

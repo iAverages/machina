@@ -11,3 +11,13 @@ build_api:
 
 build_auth:
     docker build -f ./apps/auth/Dockerfile . --tag ctr.avrg.dev/machina/auth:dev
+
+update_api_auth_client:
+    -mkdir .machina
+    # bun run ./apps/auth/dev/openapi-schema.ts > .machina/auth-api-client-schema.json 
+    pnpm openapi-generator-cli generate \
+    --skip-validate-spec \
+    -i ./.machina/auth-api-client-schema.json \
+    -g rust \
+    -c ./openapitools-rust-options.json \
+    -o ./packages/auth-api-client/

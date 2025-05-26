@@ -1,6 +1,7 @@
 mod auth;
 mod cache_manager;
 mod config;
+mod database;
 mod models;
 mod openapi;
 mod preview;
@@ -118,7 +119,6 @@ async fn main() {
 
     let (openapi_router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api", base_router)
-        .layer(axum::middleware::from_fn(session_middleware))
         .split_for_parts();
 
     let app = Router::new()
@@ -126,12 +126,12 @@ async fn main() {
         .route("/openapi.json", get(Json(api.clone())))
         .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default())
-        .layer(axum::middleware::from_fn(session_middleware))
         .with_state(state.clone());
 
     let openapi_router = openapi_router
         .merge(app)
         .merge(Scalar::with_url("/scalar", api))
+        .layer(axum::middleware::from_fn(session_middleware))
         .layer(cors);
 
     state.cache_manager.start_cleanup_thread();

@@ -42,7 +42,8 @@ model Artist {
     id   String @id
     name String
 
-    track Track[]
+    imageUrl String?
+    track    Track[]
 
     @@map("artist")
 }

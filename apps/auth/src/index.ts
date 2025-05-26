@@ -19,7 +19,13 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
+    console.log(c.req.raw);
     return auth.handler(c.req.raw);
+});
+
+app.get("/openapi.json", async (c) => {
+    const openAPISchema = await auth.api.generateOpenAPISchema();
+    return c.json(openAPISchema);
 });
 
 app.get("*", (c) => {

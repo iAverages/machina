@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { genericOAuth } from "better-auth/plugins";
+import { openAPI } from "better-auth/plugins";
 import { createPool } from "mysql2/promise";
 import { env } from "./env";
 import { removeTrailingSlash } from "./utils";
@@ -18,6 +19,7 @@ export const auth = betterAuth({
     },
 
     plugins: [
+        openAPI(),
         genericOAuth({
             config: [
                 {
@@ -35,7 +37,6 @@ export const auth = betterAuth({
                     authorizationUrl: "https://accounts.spotify.com/authorize",
                     userInfoUrl: "https://api.spotify.com/v1/me",
                     mapProfileToUser: (profile) => {
-                        console.log("hit the custom one");
                         return {
                             id: profile.id,
                             name: profile.display_name,
