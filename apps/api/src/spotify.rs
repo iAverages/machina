@@ -17,7 +17,7 @@ pub fn init_spotify_from_token(user_id: String, token: Token) -> AuthCodeSpotify
     AuthCodeSpotify::from_token_with_config(token, creds, oauth, config)
 }
 
-pub fn store_refresh_token(user_id: String, token: Token) -> Result<(), CallbackError> {
+pub fn store_refresh_token(user_id: &str, token: Token) -> Result<(), CallbackError> {
     task::block_in_place(|| {
         tokio::runtime::Handle::current().block_on(async move {
             let lock = GLOBAL_DB_POOL.lock().await;
@@ -39,8 +39,12 @@ pub fn store_refresh_token(user_id: String, token: Token) -> Result<(), Callback
             Ok::<(), Error>(())
         })
     })
-    .map_err(|_| {
-        // TODO: handle this better?
+    .map_err(|err| {
+        tracing::error!(
+            "Failed to update tokens in database for user {}: {}",
+            user_id,
+            err
+        );
         CallbackError::CustomizedError("Failed to update tokens in database".to_string())
     })?;
 
@@ -52,7 +56,7 @@ pub fn get_spotify_config(user_id: Option<String>) -> Config {
         token_callback_fn: Arc::new(Some(TokenCallback(Box::new(move |token| {
             if let Some(id) = &user_id {
                 tracing::info!(user_id = id, "updating spotify token");
-                store_refresh_token(id.clone(), token)?;
+                store_refresh_token(id.as_str(), token)?;
             }
 
             Ok(())

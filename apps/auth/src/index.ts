@@ -19,7 +19,6 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
-    console.log(c.req.raw);
     return auth.handler(c.req.raw);
 });
 
