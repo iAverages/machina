@@ -12,13 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useProfile } from "~/queries/profile";
 import { cn } from "~/utils/cn";
 
-export const route = {
-    matchFilters: {
-        userId: (v) => typeof v === "string" && v.length > 0,
-    },
-} satisfies RouteDefinition<"/p/:userId">;
+import { createFileRoute } from "@tanstack/solid-router";
 
-export default function SpotifyDashboard() {
+export const Route = createFileRoute("/p/$userId")({
+    component: RouteComponent,
+});
+
+function RouteComponent() {
     return (
         <ClientOnly>
             <Dashboard />

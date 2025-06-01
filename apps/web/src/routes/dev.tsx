@@ -1,11 +1,17 @@
 // import { Meta } from "@solidjs/meta";
-import { useNavigate, type RouteSectionProps } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { onMount } from "solid-js";
 // import { createSignal, Show, Suspense } from "solid-js";
 // import { env } from "~/env-client";
 // import { trackDataQuery } from "~/utils/get-track-data";
 
-export default function Page(_: RouteSectionProps) {
+import { createFileRoute } from "@tanstack/solid-router";
+
+export const Route = createFileRoute("/dev")({
+    component: RouteComponent,
+});
+
+function RouteComponent() {
     // const [trackId, setTrackId] = createSignal("0uexYWFgZVLaomfgz1BL3T");
     // const data = createAsync(() => trackDataQuery(trackId()), {
     //     deferStream: true,

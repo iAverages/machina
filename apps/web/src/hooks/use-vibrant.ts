@@ -1,14 +1,16 @@
-import { createQuery } from "@tanstack/solid-query";
+import { useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
-import { getColorPalette } from "~/queries/color-palette";
+import { env } from "~/env-client";
 
 export const useVibrant = (props: { src: Accessor<string> }) => {
-    const data = createQuery(() => ({
+    const data = useQuery(() => ({
         placeholderData: (previousData) => previousData,
         queryKey: ["color-palette", props.src()],
         deferStream: true,
         queryFn: async () => {
-            return getColorPalette(props.src());
+            const data = await fetch(`${env.PUBLIC_APP_URL}/iapi/color-palette?url=${encodeURIComponent(props.src())}`);
+
+            return data.json();
         },
     }));
 

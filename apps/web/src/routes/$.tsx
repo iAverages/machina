@@ -1,44 +1,74 @@
 import { useWindowSize } from "@solid-primitives/resize-observer";
-import { Meta } from "@solidjs/meta";
-import { createAsync, type RouteDefinition, type RouteSectionProps } from "@solidjs/router";
-import { For, Match, Show, Switch } from "solid-js";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
+import { createEffect, For, Match, Show, Switch } from "solid-js";
 import { FadeImage } from "~/components/fade-image";
 import { GradientBackground } from "~/components/gradient-background";
 import { env } from "~/env-client";
 import { cn } from "~/utils/cn";
-import { trackDataQuery } from "~/utils/get-track-data";
+import { type SongData, trackDataQuery } from "~/utils/get-track-data";
 
-export const route = {
-    preload: async (props) => {
-        // i hate browsers
-        if (!props.params.slug || props.params.slug === "favicon.ico") return;
-        await trackDataQuery(props.params.slug);
+const songHead = (track: SongData) => [
+    { title: "machina" },
+    { property: "og:title", content: track.data.name },
+    { property: "og:description", content: track.data.artists[0]?.name },
+    { property: "description", content: track.data.artists[0]?.name },
+    {
+        property: "og:url",
+        content: `${env.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track.data.id}`,
     },
-} satisfies RouteDefinition;
+    // { property: "theme-color", content: colors?.baseColor ?? "#7e22ce" },
+    { property: "theme-color", content: "#7e22ce" },
+    { property: "og:image", content: `${track.og}&baddiscord=true` },
+    { property: "og:type", content: "video" },
+    { property: "og:video", content: `${env.PUBLIC_VIDEO_GENERATION_URL}/${track.data.id}.mp4` },
+    { property: "og:video:type", content: "video/mp4" },
+    { property: "og:video:height", content: "300" },
+    { property: "og:video:width", content: "800" },
+    {
+        property: "og:video:secure_url",
+        content: `${env.PUBLIC_VIDEO_GENERATION_URL}/${track.data.id}.mp4`,
+    },
+];
 
-export default function Page(props: RouteSectionProps) {
-    // biome-ignore lint/style/noNonNullAssertion: can this ever not be a string?
-    const data = createAsync(() => trackDataQuery(props.params.slug!), {
-        deferStream: true,
+const prereleaseHead = (data: unknown) => [];
+
+export const Route = createFileRoute("/$")({
+    component: RouteComponent,
+    loader: async ({ params }) => {
+        if (!params._splat) throw notFound();
+        console.log("fetching track data");
+        const song = await trackDataQuery({ data: { slug: params._splat } });
+        console.log({ song });
+        return song;
+    },
+    head: ({ loaderData }) => ({
+        meta: loaderData ? (loaderData.meta ? prereleaseHead(loaderData.meta) : songHead(loaderData.data)) : [],
+    }),
+});
+
+function RouteComponent() {
+    const data = Route.useLoaderData();
+
+    createEffect(() => {
+        console.log("data", data());
     });
-
-    const colors = createAsync(
-        async () => {
-            const d = data();
-            if (!d) return null;
-            let artUrl: string | undefined = undefined;
-            if (d.type === "track") artUrl = d.data?.data.album.images[0]?.url;
-            else if (d.type === "prerelease") artUrl = d.meta.twitter.image;
-            if (!artUrl) return null;
-
-            const palette = await globalThis.$getVibrantPalette(artUrl);
-            const baseColor = palette.Vibrant?.hex ?? "#000";
-            const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
-
-            return { baseColor, gradientColor };
-        },
-        { deferStream: true },
-    );
+    // const colors = createAsync(
+    //     async () => {
+    //         const d = data();
+    //         if (!d) return null;
+    //         let artUrl: string | undefined = undefined;
+    //         if (d.type === "track") artUrl = d.data?.data.album.images[0]?.url;
+    //         else if (d.type === "prerelease") artUrl = d.meta.twitter.image;
+    //         if (!artUrl) return null;
+    //
+    //         // const palette = await globalThis.$getVibrantPalette(artUrl);
+    //         // const baseColor = palette.Vibrant?.hex ?? "#000";
+    //         // const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
+    //         // return { baseColor, gradientColor };
+    //         return { baseColor: undefined, gradientColor: undefined };
+    //     },
+    //     { deferStream: true },
+    // );
 
     const clientSize = useWindowSize();
 
@@ -49,44 +79,23 @@ export default function Page(props: RouteSectionProps) {
                     <Match when={info().meta}>
                         {(track) => (
                             <>
-                                <For each={Object.entries(track().twitter)}>
-                                    {([prop, content]) => <Meta name={`twitter:${prop}`} content={content} />}
-                                </For>
-
-                                <For each={Object.entries(track().og)}>
-                                    {([prop, content]) => <Meta property={`og:${prop}`} content={content} />}
-                                </For>
-                                <Meta property="theme-color" content={colors()?.baseColor ?? "#7e22ce"} />
+                                {/* <For each={Object.entries(track().twitter)}> */}
+                                {/*     {([prop, content]) => <Meta name={`twitter:${prop}`} content={content} />} */}
+                                {/* </For> */}
+                                {/**/}
+                                {/* <For each={Object.entries(track().og)}> */}
+                                {/*     {([prop, content]) => <Meta property={`og:${prop}`} content={content} />} */}
+                                {/* </For> */}
+                                {/* <Meta property="theme-color" content={colors()?.baseColor ?? "#7e22ce"} /> */}
                             </>
                         )}
                     </Match>
                     <Match when={info().data}>
                         {(track) => (
                             <div class="flex min-h-screen w-full flex-col">
-                                <Meta property="og:title" content={track().data.name} />
-                                <Meta property="og:description" content={track().data.artists[0]?.name} />
-                                <Meta property="description" content={track().data.artists[0]?.name} />
-                                <Meta
-                                    property="og:url"
-                                    content={`${env.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track().data.id}`}
-                                />
-                                <Meta property="theme-color" content={colors()?.baseColor ?? "#7e22ce"} />
-                                <Meta property="og:image" content={`${track().og}&baddiscord=true`} />
-                                <Meta property="og:type" content="video" />
-                                <Meta
-                                    property="og:video"
-                                    content={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().data.id}.mp4`}
-                                />
-                                <Meta property="og:video:type" content="video/mp4" />
-                                <Meta property="og:video:height" content="300" />
-                                <Meta property="og:video:width" content="800" />
-                                <Meta
-                                    property="og:video:secure_url"
-                                    content={`${env.PUBLIC_VIDEO_GENERATION_URL}/${track().data.id}.mp4`}
-                                />
-                                <Show when={track().data.album.images[0]?.url}>
-                                    {(albumArt) => <GradientBackground src={albumArt()} />}
-                                </Show>
+                                {/* <Show when={track().data.album.images[0]?.url}> */}
+                                {/*     {(albumArt) => <GradientBackground src={albumArt()} />} */}
+                                {/* </Show> */}
                                 <div class="z-10 min-h-screen">
                                     <Show when={track().data.album.images[0]?.url}>
                                         {(albumArt) => (

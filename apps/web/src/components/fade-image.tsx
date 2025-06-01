@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onMount, splitProps, type JSX } from "solid-js";
+import { createEffect, createSignal, type JSX, onMount, splitProps } from "solid-js";
 import { cn } from "~/utils/cn";
 
 export type FadeImageProps = JSX.ImgHTMLAttributes<HTMLImageElement> & {

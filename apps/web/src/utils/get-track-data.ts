@@ -1,4 +1,4 @@
-import { query } from "@solidjs/router";
+import { createServerFn } from "@tanstack/solid-start";
 import { env } from "~/env-server";
 import { env as envClient } from "~/env-client";
 import { trackApiSchema } from "~/utils/spotify";
@@ -47,7 +47,7 @@ export const getTrackData = async (trackId: string) => {
     if (data.album.images[0]) params.set("albumArt", data.album.images[0].url);
     if (data.artists[0]) params.set("artist", data.artists[0].name);
     params.set("songName", data.name);
-    const og = `${envClient.PUBLIC_APP_URL}/api/og?${params.toString()}`;
+    const og = `${envClient.PUBLIC_APP_URL}/iapi/og?${params.toString()}`;
 
     return {
         id: trackId,
@@ -55,6 +55,8 @@ export const getTrackData = async (trackId: string) => {
         data,
     };
 };
+
+export type SongData = NonNullable<Awaited<ReturnType<typeof getTrackData>>>;
 
 type MetaTags = {
     og: {
@@ -138,21 +140,25 @@ export const getTrackIdFromSlug = (slug: string) => {
     }
 };
 
-export const trackDataQuery = query(async (slug: string, preload = true) => {
-    "use server";
-    const trackInfo = getTrackIdFromSlug(slug);
-    if (!trackInfo) {
-        return null;
-    }
-
-    if (trackInfo.type === "track") {
-        const track = await getTrackData(trackInfo.id);
-        if (!track) {
+export const trackDataQuery = createServerFn({
+    method: "GET", // HTTP method to use
+    response: "data", // Response handling mode
+})
+    .validator((data: { slug: string; preload?: boolean }) => data)
+    .handler(async ({ data: { slug, preload } }) => {
+        const trackInfo = getTrackIdFromSlug(slug);
+        if (!trackInfo) {
             return null;
         }
-        preload && (await fetch(`${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.id}`));
-        return { type: "track" as const, data: track };
-    }
 
-    return { type: "prerelease" as const, meta: await getPrereleaseData(trackInfo.id) };
-}, "track");
+        if (trackInfo.type === "track") {
+            const track = await getTrackData(trackInfo.id);
+            if (!track) {
+                return null;
+            }
+            preload && (await fetch(`${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.id}`));
+            return { type: "track" as const, data: track };
+        }
+
+        return { type: "prerelease" as const, meta: await getPrereleaseData(trackInfo.id) };
+    });
