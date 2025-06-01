@@ -12,7 +12,8 @@
             "!.sqlx/",
             "!.pnpm-store",
             "!apps/web/src/api/client/**",
-            "!apps/web/src/components/ui/**" // from solidui
+            "!apps/web/src/components/ui/**", // from solidui
+            "!apps/web/src/routeTree.gen.ts"
         ]
     },
     "assist": {

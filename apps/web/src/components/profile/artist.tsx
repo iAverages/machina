@@ -7,7 +7,6 @@ export const TopArtist = (song: SelfProfile["topArtists"][number]) => (
         <div class="flex items-center gap-2 rounded-lg border p-3 group cursor-pointer bg-black/20 backdrop-blur-sm">
             <div class="relative h-16 w-16 flex-shrink-0">
                 {/* <Show when={song.albumArt}> */}
-                {/* biome-ignore lint/style/noNonNullAssertion: we checked */}
                 {/*     <img src={song.albumArt!} alt={`${song.trackName} album cover`} class="rounded-md object-cover" /> */}
                 {/* </Show> */}
             </div>
