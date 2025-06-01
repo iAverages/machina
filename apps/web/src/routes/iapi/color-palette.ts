@@ -1,4 +1,3 @@
-import type { APIEvent } from "@solidjs/start/server";
 import { createAPIFileRoute } from "@tanstack/solid-start/api";
 import { Vibrant } from "node-vibrant/node";
 

@@ -1,4 +1,3 @@
-import { Show } from "solid-js";
 import type { SelfProfile } from "~/api/client";
 import { ExternalLink } from "~/icons/external";
 

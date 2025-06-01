@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { QueryClient } from "@tanstack/solid-query";
 import { createRouter as createTanStackRouter } from "@tanstack/solid-router";
 import { DefaultErrorComponent } from "~/components/default-error-component";
 import { routeTree } from "./routeTree.gen";

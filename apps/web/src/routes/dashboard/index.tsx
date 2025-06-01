@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard/")({
 });
 
 function RouteComponent() {
-    const [activeTab, setActiveTab] = createSignal("");
+    const [_activeTab, setActiveTab] = createSignal("");
 
     const profile = useSelfProfile();
     const topTracks = () => profile.data?.topTracks.slice(0, 5) ?? [];

@@ -1,6 +1,6 @@
 import { useWindowSize } from "@solid-primitives/resize-observer";
 import { createFileRoute, notFound } from "@tanstack/solid-router";
-import { createEffect, For, Match, Show, Switch } from "solid-js";
+import { Match, Show, Switch } from "solid-js";
 import { FadeImage } from "~/components/fade-image";
 import { GradientBackground } from "~/components/gradient-background";
 import { env } from "~/env-client";
@@ -16,6 +16,7 @@ const songHead = (track: SongData) => [
         property: "og:url",
         content: `${env.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track.data.id}`,
     },
+    // TODO: add color
     // { property: "theme-color", content: colors?.baseColor ?? "#7e22ce" },
     { property: "theme-color", content: "#7e22ce" },
     { property: "og:image", content: `${track.og}&baddiscord=true` },
@@ -30,15 +31,14 @@ const songHead = (track: SongData) => [
     },
 ];
 
-const prereleaseHead = (data: unknown) => [];
+// TODO: add meta for prereleases
+const prereleaseHead = (_: unknown) => [];
 
 export const Route = createFileRoute("/$")({
     component: RouteComponent,
     loader: async ({ params }) => {
         if (!params._splat) throw notFound();
-        console.log("fetching track data");
         const song = await trackDataQuery({ data: { slug: params._splat } });
-        console.log({ song });
         return song;
     },
     head: ({ loaderData }) => ({
@@ -49,27 +49,6 @@ export const Route = createFileRoute("/$")({
 function RouteComponent() {
     const data = Route.useLoaderData();
 
-    createEffect(() => {
-        console.log("data", data());
-    });
-    // const colors = createAsync(
-    //     async () => {
-    //         const d = data();
-    //         if (!d) return null;
-    //         let artUrl: string | undefined = undefined;
-    //         if (d.type === "track") artUrl = d.data?.data.album.images[0]?.url;
-    //         else if (d.type === "prerelease") artUrl = d.meta.twitter.image;
-    //         if (!artUrl) return null;
-    //
-    //         // const palette = await globalThis.$getVibrantPalette(artUrl);
-    //         // const baseColor = palette.Vibrant?.hex ?? "#000";
-    //         // const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
-    //         // return { baseColor, gradientColor };
-    //         return { baseColor: undefined, gradientColor: undefined };
-    //     },
-    //     { deferStream: true },
-    // );
-
     const clientSize = useWindowSize();
 
     return (
@@ -77,7 +56,7 @@ function RouteComponent() {
             {(info) => (
                 <Switch>
                     <Match when={info().meta}>
-                        {(track) => (
+                        {(_) => (
                             <>
                                 {/* <For each={Object.entries(track().twitter)}> */}
                                 {/*     {([prop, content]) => <Meta name={`twitter:${prop}`} content={content} />} */}
@@ -93,9 +72,9 @@ function RouteComponent() {
                     <Match when={info().data}>
                         {(track) => (
                             <div class="flex min-h-screen w-full flex-col">
-                                {/* <Show when={track().data.album.images[0]?.url}> */}
-                                {/*     {(albumArt) => <GradientBackground src={albumArt()} />} */}
-                                {/* </Show> */}
+                                <Show when={track().data.album.images[0]?.url}>
+                                    {(albumArt) => <GradientBackground src={albumArt()} />}
+                                </Show>
                                 <div class="z-10 min-h-screen">
                                     <Show when={track().data.album.images[0]?.url}>
                                         {(albumArt) => (

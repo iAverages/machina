@@ -11,7 +11,9 @@
         },
         "lint": {},
         "format:check": {},
-        "typecheck": {},
+        "typecheck": {
+            "dependsOn": ["^typecheck"]
+        },
         "clean": {}
     }
 }

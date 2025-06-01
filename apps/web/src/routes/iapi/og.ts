@@ -1,10 +1,9 @@
-import satori from "satori";
 import { OpenGraph } from "@machina/og";
-import type { APIEvent } from "@solidjs/start/server";
-import { Vibrant } from "node-vibrant/node";
 import { Resvg } from "@resvg/resvg-js";
-import { getFont } from "~/utils/og-font";
 import { createAPIFileRoute } from "@tanstack/solid-start/api";
+import { Vibrant } from "node-vibrant/node";
+import satori from "satori";
+import { getFont } from "~/utils/og-font";
 
 const inter = await getFont({
     family: "Inter",

@@ -31,7 +31,6 @@ export default defineConfig({
     },
     vite: {
         envPrefix: "PUBLIC_",
-        server: { allowedHosts: ["belle-extending-pas-boc.trycloudflare.com"] },
         plugins: [
             devtools(),
             tailwindcss(),

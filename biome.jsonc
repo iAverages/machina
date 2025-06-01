@@ -9,11 +9,14 @@
         "ignoreUnknown": true,
         "includes": [
             "**",
-            "!.sqlx/",
             "!.pnpm-store",
-            "!apps/web/src/api/client/**",
             "!apps/web/src/components/ui/**", // from solidui
-            "!apps/web/src/routeTree.gen.ts"
+
+            // Generated code
+            "!apps/web/src/api/client/**",
+            "!apps/web/src/routeTree.gen.ts",
+            "!apps/web/src/api/client/@tanstack/solid-query.gen.ts",
+            "!apps/api/.sqlx"
         ]
     },
     "assist": {
