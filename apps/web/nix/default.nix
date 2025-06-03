@@ -41,7 +41,7 @@ in
       # TODO: move this to own derivation to reduce installs
       pnpmDeps = pnpm.fetchDeps {
         inherit (finalAttrs) pname version src;
-        hash = "sha256-k5lKWhFL2iip9fI+qf83HnJSfNj4P/5NNaIOessc3YU=";
+        hash = "sha256-oimVM/VKjqAgSAVwZ+eLzjH7erAw3Vqs9BmanwyUwM8=";
       };
 
       buildPhase = ''
