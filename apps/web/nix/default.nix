@@ -4,6 +4,16 @@
   ...
 }: let
   root = ./../../../.;
+  rootFiles = [
+    "patches"
+    "apps"
+    "packages"
+    "turbo.json"
+    "package.json"
+    "pnpm-workspace.yaml"
+    "pnpm-lock.yaml"
+    "tsconfig.json"
+  ];
 in
   pkgs.stdenv.mkDerivation (finalAttrs:
     with pkgs; {
@@ -13,17 +23,11 @@ in
 
       src = lib.fileset.toSource {
         inherit root;
-        fileset = lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource root)) (
-          lib.fileset.unions [
-            ./../../../apps
-            ./../../../packages
-            ./../../../turbo.json
-            ./../../../package.json
-            ./../../../pnpm-workspace.yaml
-            ./../../../pnpm-lock.yaml
-            ./../../../tsconfig.json
-          ]
-        );
+        fileset = lib.pipe rootFiles [
+          (map (path: root + "/${path}"))
+          lib.fileset.unions
+          (lib.fileset.intersection (lib.fileset.fromSource (lib.sources.cleanSource root)))
+        ];
       };
 
       nativeBuildInputs = [
