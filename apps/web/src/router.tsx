@@ -1,11 +1,14 @@
 import { QueryClient } from "@tanstack/solid-query";
 import { createRouter as createTanStackRouter } from "@tanstack/solid-router";
+import superjson from "superjson";
 import { DefaultErrorComponent } from "~/components/default-error-component";
 import { routeTree } from "./routeTree.gen";
 
 export const createRouterContext = () => {
     const queryClient = new QueryClient({
         defaultOptions: {
+            dehydrate: { serializeData: superjson.serialize },
+            hydrate: { deserializeData: superjson.deserialize },
             queries: {
                 experimental_prefetchInRender: true,
             },

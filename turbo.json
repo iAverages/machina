@@ -10,6 +10,7 @@
             "env": ["PUBLIC_*"]
         },
         "lint": {},
+        "//#lint": {},
         "format:check": {},
         "typecheck": {
             "dependsOn": ["^typecheck"]

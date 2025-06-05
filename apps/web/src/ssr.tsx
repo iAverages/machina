@@ -24,6 +24,7 @@ client.setConfig({
 });
 
 export default createStartHandler({
+    // @ts-expect-error - why is tsc erroring here?
     createRouter,
     getRouterManifest,
 })(defaultStreamHandler);

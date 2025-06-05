@@ -1,9 +1,9 @@
 import { QueryClientProvider } from "@tanstack/solid-query";
+import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
 import { createRootRouteWithContext, HeadContent, Outlet } from "@tanstack/solid-router";
 import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
 import { onMount, Suspense } from "solid-js";
 import appCss from "~/app.css?url";
-import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
 import type { RouterContext } from "~/router";
 
 export const Route = createRootRouteWithContext<RouterContext>()({

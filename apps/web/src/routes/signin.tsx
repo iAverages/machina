@@ -36,7 +36,7 @@ function RouteComponent() {
     }));
 
     return (
-        <div class="flex min-h-screen flex-col items-center justify-center bg-black text-white gap-6">
+        <div class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-zinc-900 to-black text-white gap-6">
             <Show when={searchParams().error}>
                 {(error) => (
                     <div class="max-w-md w-full">

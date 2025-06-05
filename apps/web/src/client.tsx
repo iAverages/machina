@@ -17,4 +17,5 @@ client.setConfig({
 
 const router = createRouter();
 
+// @ts-expect-error - why is tsc erroring here?
 hydrate(() => <StartClient router={router} />, document.body);

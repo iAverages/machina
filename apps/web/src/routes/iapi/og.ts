@@ -3,6 +3,7 @@ import { Resvg } from "@resvg/resvg-js";
 import { createAPIFileRoute } from "@tanstack/solid-start/api";
 import { Vibrant } from "node-vibrant/node";
 import satori from "satori";
+import { DEFAULT_GRADIENT } from "~/utils/consts";
 import { getFont } from "~/utils/og-font";
 
 const inter = await getFont({
@@ -30,8 +31,8 @@ export const APIRoute = createAPIFileRoute("/iapi/og")({
             }
 
             const palette = await Vibrant.from(albumArt).getPalette();
-            const baseColor = palette.Vibrant?.hex ?? "#000";
-            const gradientColor = palette.DarkVibrant?.hex ?? "#fff";
+            const baseColor = palette.Vibrant?.hex ?? DEFAULT_GRADIENT.from;
+            const gradientColor = palette.DarkVibrant?.hex ?? DEFAULT_GRADIENT.to;
 
             const svgComp = OpenGraph({
                 baseColor,
