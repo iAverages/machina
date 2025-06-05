@@ -1,4 +1,6 @@
 import { JSDOM } from "jsdom";
+import { vibrant } from "~/hooks/use-vibrant";
+import { DEFAULT_GRADIENT, DEFAULT_THEME_COLOR } from "~/utils/consts";
 
 export type MetaTags = {
     og: {
@@ -56,15 +58,19 @@ const getData = async (id: string) => {
     if (titleElement?.textContent) {
         metaTags.basic.title = titleElement.textContent;
     }
+    let color = DEFAULT_THEME_COLOR;
+    if (metaTags.twitter.image) {
+        const colors = await vibrant({ data: { src: metaTags.twitter.image } });
+        if (colors.baseColor !== DEFAULT_GRADIENT.to) color = colors.baseColor;
+    }
 
-    return { type: "prerelease" as const, metaTags, id };
+    return { type: "prerelease" as const, metaTags, id, color };
 };
 
-const getHeadMeta = ({ metaTags }: Awaited<ReturnType<typeof getData>>) => [
+const getHeadMeta = ({ metaTags, color }: Awaited<ReturnType<typeof getData>>) => [
     ...Object.entries(metaTags.twitter).map(([prop, content]) => ({ name: `twitter:${prop}`, content })),
     ...Object.entries(metaTags.og).map(([prop, content]) => ({ name: `og:${prop}`, content })),
-    // TODO: get dynamic color
-    { property: "theme-color", content: "#7e22ce" },
+    { property: "theme-color", content: color },
 ];
 
 export const prereleaseProcessor = async (id: string) => {

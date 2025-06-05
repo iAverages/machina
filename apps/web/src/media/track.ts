@@ -1,5 +1,7 @@
 import { env as envClient } from "~/env-client";
 import { env } from "~/env-server";
+import { vibrant } from "~/hooks/use-vibrant";
+import { DEFAULT_GRADIENT, DEFAULT_THEME_COLOR } from "~/utils/consts";
 import { trackApiSchema } from "~/utils/spotify";
 
 const getSpotifyAuth = async () => {
@@ -42,7 +44,14 @@ const getData = async (id: string) => {
     }
     const data = validation.data;
     const params = new URLSearchParams();
-    if (data.album.images[0]) params.set("albumArt", data.album.images[0].url);
+    const albumArt = data.album.images[0];
+    let color = DEFAULT_THEME_COLOR;
+
+    if (albumArt) {
+        params.set("albumArt", albumArt.url);
+        const colors = await vibrant({ data: { src: albumArt.url } });
+        if (colors.baseColor !== DEFAULT_GRADIENT.to) color = colors.baseColor;
+    }
     if (data.artists[0]) params.set("artist", data.artists[0].name);
     params.set("songName", data.name);
     const og = `${envClient.PUBLIC_APP_URL}/iapi/og?${params.toString()}`;
@@ -50,6 +59,7 @@ const getData = async (id: string) => {
     return {
         type: "track" as const,
         id: id,
+        color,
         data: {
             og,
             data,
@@ -59,7 +69,7 @@ const getData = async (id: string) => {
 
 export type TrackData = NonNullable<Awaited<ReturnType<typeof getData>>>;
 
-const getHeadData = ({ data: track }: TrackData) => [
+const getHeadData = ({ data: track, color }: TrackData) => [
     { title: "machina" },
     { property: "og:title", content: track.data.name },
     { property: "og:description", content: track.data.artists[0]?.name },
@@ -68,9 +78,7 @@ const getHeadData = ({ data: track }: TrackData) => [
         property: "og:url",
         content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track.data.id}`,
     },
-    // TODO: add color
-    // { property: "theme-color", content: colors?.baseColor ?? "#7e22ce" },
-    { property: "theme-color", content: "#7e22ce" },
+    { property: "theme-color", content: color },
     { property: "og:image", content: `${track.og}&baddiscord=true` },
     { property: "og:type", content: "video" },
     { property: "og:video", content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.data.id}.mp4` },
