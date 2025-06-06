@@ -76,18 +76,21 @@ const getHeadData = ({ data: track, color }: TrackData) => [
     { property: "description", content: track.data.artists[0]?.name },
     {
         property: "og:url",
-        content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/https:/open.spotify.com/track/${track.data.id}`,
+        content: `${envClient.PUBLIC_APP_URL}/https:/open.spotify.com/track/${track.data.id}`,
     },
     { property: "theme-color", content: color },
     { property: "og:image", content: `${track.og}&baddiscord=true` },
     { property: "og:type", content: "video" },
-    { property: "og:video", content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.data.id}.mp4` },
+    {
+        property: "og:video",
+        content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/api/generate/video/${track.data.id}.mp4`,
+    },
     { property: "og:video:type", content: "video/mp4" },
     { property: "og:video:height", content: "300" },
     { property: "og:video:width", content: "800" },
     {
         property: "og:video:secure_url",
-        content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/${track.data.id}.mp4`,
+        content: `${envClient.PUBLIC_VIDEO_GENERATION_URL}/api/generate/video/${track.data.id}.mp4`,
     },
 ];
 export const trackProcessor = async (id: string) => {

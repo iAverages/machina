@@ -38,7 +38,7 @@ export const mediaDataQuery = createServerFn({
         // before it responses to the request. This is basically used for discord embeds to stop them
         // from breaking if the video is not ready
         if (mediaInfo.type === "track") {
-            preload && (await fetch(`${envClient.PUBLIC_VIDEO_GENERATION_URL}/${mediaInfo.id}`));
+            preload && (await fetch(`${envClient.PUBLIC_VIDEO_GENERATION_URL}/api/generate/video/${mediaInfo.id}`));
         }
 
         return data;

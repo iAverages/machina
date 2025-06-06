@@ -118,7 +118,7 @@ async fn main() {
         .split_for_parts();
 
     let app = Router::new()
-        .route("/{trackId}", get(get_preview_video))
+        .route("/api/generate/video/{trackId}", get(get_preview_video))
         .route("/openapi.json", get(Json(api.clone())))
         .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default())
