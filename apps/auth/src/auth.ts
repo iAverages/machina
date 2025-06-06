@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { genericOAuth, openAPI } from "better-auth/plugins";
 import { createPool } from "mysql2/promise";
 import { env } from "./env";
-import { getBaseDomain, removeTrailingSlash } from "./utils";
+import { removeTrailingSlash } from "./utils";
 
 export const auth = betterAuth({
     database: createPool({
@@ -11,17 +11,6 @@ export const auth = betterAuth({
     baseURL: env.AUTH_URL,
     trustedOrigins: [removeTrailingSlash(env.APP_URL)],
     advanced: {
-        crossSubDomainCookies: {
-            enabled: true,
-            // leading dot allows for all subdomains of APP_URL
-            domain: `.${getBaseDomain(env.APP_URL)}`,
-        },
-        defaultCookieAttributes: {
-            secure: true,
-            httpOnly: true,
-            sameSite: "none", // Allows CORS-based cookie sharing across subdomains
-            partitioned: true, // New browser standards will mandate this for foreign cookies
-        },
         // TODO: setup prefix for deployment type (i.e prod vs dev)
         cookiePrefix: "machina",
     },
