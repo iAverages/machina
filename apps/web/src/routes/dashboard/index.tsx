@@ -14,10 +14,9 @@ export const Route = createFileRoute("/dashboard/")({
     // TODO: work out why ssr loads fine, then shows pendingComponent
     // on client for a second
     ssr: false,
-    loader: async ({ context: { queryClient } }) => {
-        console.log("loading self profile");
-        await queryClient.ensureQueryData(getSelfProfileQueryOptions);
-    },
+    // loader: async ({ context: { queryClient } }) => {
+    //     await queryClient.ensureQueryData(getSelfProfileQueryOptions);
+    // },
 });
 
 function RouteComponent() {
