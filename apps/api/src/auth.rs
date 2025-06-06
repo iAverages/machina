@@ -53,7 +53,13 @@ pub async fn get_user_from_session_id(token: &str) -> Option<User> {
     tracing::info!("getting user : {}", token);
     let res = get_session_get(&Configuration {
         client: get_authed_client(token)?,
-        base_path: format!("{}/api/auth", &MACHINA_CONFIG.app_url),
+        base_path: format!(
+            "{}/api/auth",
+            &MACHINA_CONFIG
+                .app_url
+                .strip_suffix("/")
+                .unwrap_or(&MACHINA_CONFIG.app_url)
+        ),
         ..Default::default()
     })
     .await
