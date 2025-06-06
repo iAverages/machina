@@ -11,8 +11,14 @@ use reqwest::{Client, Url, cookie::Jar};
 
 use auth_api_client::apis::{configuration::Configuration, default_api::get_session_get};
 
+use crate::MACHINA_CONFIG;
+
 static AUTH_COOKE_NAME: &str = "machina.session_token";
 static AUTH_COOKE_NAME_SECURE: &str = "__Secure-machina.session_token";
+
+fn is_dev() -> bool {
+    !MACHINA_CONFIG.app_url.starts_with("https")
+}
 
 // cannot set the cookie in the generated code, the apiKey prop is never used
 fn get_authed_client(token: &str) -> Option<Client> {
@@ -23,8 +29,11 @@ fn get_authed_client(token: &str) -> Option<Client> {
         })
         .ok()?;
 
-    jar.add_cookie_str(format!("{AUTH_COOKE_NAME}={}", token).as_str(), &url);
-    jar.add_cookie_str(format!("{AUTH_COOKE_NAME_SECURE}={}", token).as_str(), &url);
+    if is_dev() {
+        jar.add_cookie_str(format!("{AUTH_COOKE_NAME}={}", token).as_str(), &url);
+    } else {
+        jar.add_cookie_str(format!("{AUTH_COOKE_NAME_SECURE}={}", token).as_str(), &url);
+    }
 
     reqwest::Client::builder()
         .cookie_provider(jar)
