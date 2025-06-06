@@ -52,8 +52,6 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: ${{ secrets.DOCKER_REGISTRY }}/${{ env.DEPLOYMENT_NAME }}:${{ inputs.environment }}-${{ github.sha }}
-          cache-from: type=gha,scope=${{ github.workflow_ref }}
-          cache-to: type=gha,scope=${{ github.workflow_ref }},mode=max
           build-args: |
             ENVIRONMENT=${{ inputs.environment }}
             GITHUB_SHA=${{ github.sha }}
