@@ -9,6 +9,13 @@ export const useProfile = (props: { userId: string }) =>
         deferStream: true,
     }));
 
+export const getSelfProfileQueryOptions = {
+    ...selfProfileOptions(),
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: true,
+    deferStream: true,
+};
+
 export const useSelfProfile = () =>
     useQuery(() => ({
         ...selfProfileOptions(),

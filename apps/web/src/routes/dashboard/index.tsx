@@ -1,3 +1,4 @@
+import { createFileRoute } from "@tanstack/solid-router";
 import { createSignal, For, Show } from "solid-js";
 import { CurrentSongBg } from "~/components/current-song-page-bg";
 import { OverviewStats } from "~/components/pages/dashboard/overview-stats";
@@ -6,10 +7,20 @@ import { TopTrack } from "~/components/profile/track";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ExternalLink } from "~/icons/external";
-import { useSelfProfile } from "~/queries/profile";
+import { getSelfProfileQueryOptions, useSelfProfile } from "~/queries/profile";
 
-const Page = () => {
-    const [activeTab, setActiveTab] = createSignal("");
+export const Route = createFileRoute("/dashboard/")({
+    component: RouteComponent,
+    // TODO: work out why ssr loads fine, then shows pendingComponent
+    // on client for a second
+    ssr: false,
+    loader: async ({ context: { queryClient } }) => {
+        await queryClient.fetchQuery(getSelfProfileQueryOptions);
+    },
+});
+
+function RouteComponent() {
+    const [_activeTab, setActiveTab] = createSignal("");
 
     const profile = useSelfProfile();
     const topTracks = () => profile.data?.topTracks.slice(0, 5) ?? [];
@@ -110,6 +121,4 @@ const Page = () => {
             </Show>
         </CurrentSongBg>
     );
-};
-
-export default Page;
+}

@@ -1,0 +1,372 @@
+diff --git a/build/dev.cjs b/build/dev.cjs
+index 6de1ea0c524f9c7b6d7e6175ce4a174a3ff25a2c..8be8eacc852dfaccfcb2bcd90bf9725afae9dbf1 100644
+--- a/build/dev.cjs
++++ b/build/dev.cjs
+@@ -18,7 +18,6 @@ var __export = (target, all) => {
+ // src/devtools.tsx
+ var devtools_exports = {};
+ __export(devtools_exports, {
+-  clientOnly: () => clientOnly,
+   default: () => SolidQueryDevtools
+ });
+ function SolidQueryDevtools(props) {
+@@ -69,6 +68,12 @@ function SolidQueryDevtools(props) {
+     return _el$;
+   })();
+ }
++var _tmpl$;
++var init_devtools = __esm({
++  "src/devtools.tsx"() {
++    _tmpl$ = /* @__PURE__ */ web.template(`<div class=tsqd-parent-container>`);
++  }
++});
+ function clientOnly(fn) {
+   if (web.isServer) return (props) => props.fallback;
+   const [comp, setComp] = solidJs.createSignal();
+@@ -83,15 +88,8 @@ function clientOnly(fn) {
+     return solidJs.createMemo(() => (Comp = comp(), m = mounted(), solidJs.untrack(() => Comp && m ? Comp(rest) : props.fallback)));
+   };
+ }
+-var _tmpl$;
+-var init_devtools = __esm({
+-  "src/devtools.tsx"() {
+-    _tmpl$ = /* @__PURE__ */ web.template(`<div class=tsqd-parent-container>`);
+-  }
+-});
+ 
+ // src/index.tsx
+-init_devtools();
+ exports.SolidQueryDevtools = web.isDev ? clientOnly(() => Promise.resolve().then(() => (init_devtools(), devtools_exports))) : function() {
+   return null;
+ };
+diff --git a/build/dev.js b/build/dev.js
+index 5526e91e25fc28f919c64a92d8e649a36bfa9e88..0e1087d88fd58763ed00be3810987d55853db2c5 100644
+--- a/build/dev.js
++++ b/build/dev.js
+@@ -1,7 +1,24 @@
+-import { clientOnly } from './chunk/PQQXEPYU.js';
+-import { isDev } from 'solid-js/web';
++import { isDev, isServer } from 'solid-js/web';
++import { createSignal, splitProps, sharedConfig, onMount, createMemo, untrack } from 'solid-js';
+ 
+-var SolidQueryDevtools = isDev ? clientOnly(() => import('./devtools/C4J3FRGT.js')) : function() {
++// src/index.tsx
++function clientOnly(fn) {
++  if (isServer) return (props) => props.fallback;
++  const [comp, setComp] = createSignal();
++  fn().then((m) => setComp(() => m.default));
++  return (props) => {
++    let Comp;
++    let m;
++    const [, rest] = splitProps(props, ["fallback"]);
++    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
++    const [mounted, setMounted] = createSignal(!sharedConfig.context);
++    onMount(() => setMounted(true));
++    return createMemo(() => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback)));
++  };
++}
++
++// src/index.tsx
++var SolidQueryDevtools = isDev ? clientOnly(() => import('./devtools/LBUQ2A5B.js')) : function() {
+   return null;
+ };
+ 
+diff --git a/build/dev.jsx b/build/dev.jsx
+index 23edf12adbdfab9d7a9b033f60a8c27e469965ff..9d86c51ac6bf4037910c3e7af5f463f2f9ed8f09 100644
+--- a/build/dev.jsx
++++ b/build/dev.jsx
+@@ -1,10 +1,36 @@
++// src/index.tsx
++import { isDev } from "solid-js/web";
++
++// src/clientOnly.tsx
+ import {
+-  clientOnly
+-} from "./chunk/AU5TFTIU.jsx";
++  createMemo,
++  createSignal,
++  onMount,
++  sharedConfig,
++  splitProps,
++  untrack
++} from "solid-js";
++import { isServer } from "solid-js/web";
++function clientOnly(fn) {
++  if (isServer)
++    return (props) => props.fallback;
++  const [comp, setComp] = createSignal();
++  fn().then((m) => setComp(() => m.default));
++  return (props) => {
++    let Comp;
++    let m;
++    const [, rest] = splitProps(props, ["fallback"]);
++    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
++    const [mounted, setMounted] = createSignal(!sharedConfig.context);
++    onMount(() => setMounted(true));
++    return createMemo(
++      () => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback))
++    );
++  };
++}
+ 
+ // src/index.tsx
+-import { isDev } from "solid-js/web";
+-var SolidQueryDevtools = isDev ? clientOnly(() => import("./devtools/IXR2SZ26.jsx")) : function() {
++var SolidQueryDevtools = isDev ? clientOnly(() => import("./devtools/O4DODHQV.jsx")) : function() {
+   return null;
+ };
+ export {
+diff --git a/build/devtools/C4J3FRGT.js b/build/devtools/C4J3FRGT.js
+deleted file mode 100644
+index 85a01a05c528bc1e582ed66776a4f96e293145f7..0000000000000000000000000000000000000000
+diff --git a/build/devtools/IXR2SZ26.jsx b/build/devtools/IXR2SZ26.jsx
+deleted file mode 100644
+index e8af65630500046dea4fad8b3623647e996b5b70..0000000000000000000000000000000000000000
+diff --git a/build/chunk/PQQXEPYU.js b/build/devtools/LBUQ2A5B.js
+similarity index 65%
+rename from build/chunk/PQQXEPYU.js
+rename to build/devtools/LBUQ2A5B.js
+index a2249a9365953bc4179af2301d0d6b25eed1c016..6b9949b626283369bb8612b090c348e6ba99d6cf 100644
+--- a/build/chunk/PQQXEPYU.js
++++ b/build/devtools/LBUQ2A5B.js
+@@ -1,5 +1,5 @@
+-import { template, use, isServer } from 'solid-js/web';
+-import { createMemo, createEffect, onMount, onCleanup, createSignal, splitProps, sharedConfig, untrack } from 'solid-js';
++import { template, use } from 'solid-js/web';
++import { createMemo, createEffect, onMount, onCleanup } from 'solid-js';
+ import { useQueryClient, onlineManager } from '@tanstack/solid-query';
+ import { TanstackQueryDevtools } from '@tanstack/query-devtools';
+ 
+@@ -53,19 +53,5 @@ function SolidQueryDevtools(props) {
+     return _el$;
+   })();
+ }
+-function clientOnly(fn) {
+-  if (isServer) return (props) => props.fallback;
+-  const [comp, setComp] = createSignal();
+-  fn().then((m) => setComp(() => m.default));
+-  return (props) => {
+-    let Comp;
+-    let m;
+-    const [, rest] = splitProps(props, ["fallback"]);
+-    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
+-    const [mounted, setMounted] = createSignal(!sharedConfig.context);
+-    onMount(() => setMounted(true));
+-    return createMemo(() => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback)));
+-  };
+-}
+ 
+-export { SolidQueryDevtools, clientOnly };
++export { SolidQueryDevtools as default };
+diff --git a/build/chunk/AU5TFTIU.jsx b/build/devtools/O4DODHQV.jsx
+similarity index 62%
+rename from build/chunk/AU5TFTIU.jsx
+rename to build/devtools/O4DODHQV.jsx
+index 706c23f1144e15d96f8629c123ded4dbb42b30ca..6649f3948f0b69e764b664374b33342f6591878f 100644
+--- a/build/chunk/AU5TFTIU.jsx
++++ b/build/devtools/O4DODHQV.jsx
+@@ -1,16 +1,6 @@
+ // src/devtools.tsx
+-import {
+-  createEffect,
+-  createMemo,
+-  createSignal,
+-  onCleanup,
+-  onMount,
+-  sharedConfig,
+-  splitProps,
+-  untrack
+-} from "solid-js";
++import { createEffect, createMemo, onCleanup, onMount } from "solid-js";
+ import { onlineManager, useQueryClient } from "@tanstack/solid-query";
+-import { isServer } from "solid-js/web";
+ import { TanstackQueryDevtools } from "@tanstack/query-devtools";
+ function SolidQueryDevtools(props) {
+   const queryClient = useQueryClient();
+@@ -55,25 +45,6 @@ function SolidQueryDevtools(props) {
+   });
+   return <div class="tsqd-parent-container" ref={ref} />;
+ }
+-function clientOnly(fn) {
+-  if (isServer)
+-    return (props) => props.fallback;
+-  const [comp, setComp] = createSignal();
+-  fn().then((m) => setComp(() => m.default));
+-  return (props) => {
+-    let Comp;
+-    let m;
+-    const [, rest] = splitProps(props, ["fallback"]);
+-    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
+-    const [mounted, setMounted] = createSignal(!sharedConfig.context);
+-    onMount(() => setMounted(true));
+-    return createMemo(
+-      () => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback))
+-    );
+-  };
+-}
+-
+ export {
+-  SolidQueryDevtools,
+-  clientOnly
++  SolidQueryDevtools as default
+ };
+diff --git a/build/index.cjs b/build/index.cjs
+index 6de1ea0c524f9c7b6d7e6175ce4a174a3ff25a2c..8be8eacc852dfaccfcb2bcd90bf9725afae9dbf1 100644
+--- a/build/index.cjs
++++ b/build/index.cjs
+@@ -18,7 +18,6 @@ var __export = (target, all) => {
+ // src/devtools.tsx
+ var devtools_exports = {};
+ __export(devtools_exports, {
+-  clientOnly: () => clientOnly,
+   default: () => SolidQueryDevtools
+ });
+ function SolidQueryDevtools(props) {
+@@ -69,6 +68,12 @@ function SolidQueryDevtools(props) {
+     return _el$;
+   })();
+ }
++var _tmpl$;
++var init_devtools = __esm({
++  "src/devtools.tsx"() {
++    _tmpl$ = /* @__PURE__ */ web.template(`<div class=tsqd-parent-container>`);
++  }
++});
+ function clientOnly(fn) {
+   if (web.isServer) return (props) => props.fallback;
+   const [comp, setComp] = solidJs.createSignal();
+@@ -83,15 +88,8 @@ function clientOnly(fn) {
+     return solidJs.createMemo(() => (Comp = comp(), m = mounted(), solidJs.untrack(() => Comp && m ? Comp(rest) : props.fallback)));
+   };
+ }
+-var _tmpl$;
+-var init_devtools = __esm({
+-  "src/devtools.tsx"() {
+-    _tmpl$ = /* @__PURE__ */ web.template(`<div class=tsqd-parent-container>`);
+-  }
+-});
+ 
+ // src/index.tsx
+-init_devtools();
+ exports.SolidQueryDevtools = web.isDev ? clientOnly(() => Promise.resolve().then(() => (init_devtools(), devtools_exports))) : function() {
+   return null;
+ };
+diff --git a/build/index.d.cts b/build/index.d.cts
+index 25aa573da9576a89f41e9bbeb0e64ddb5392efa7..f6b6104e99fc13ac9201054c53be08342b6568ff 100644
+--- a/build/index.d.cts
++++ b/build/index.d.cts
+@@ -1,6 +1,6 @@
++import * as solid_js from 'solid-js';
+ import { DevtoolsButtonPosition, DevtoolsPosition, DevtoolsErrorType } from '@tanstack/query-devtools';
+ import { QueryClient } from '@tanstack/solid-query';
+-import { JSX } from 'solid-js';
+ 
+ interface DevtoolsOptions {
+     /**
+@@ -36,7 +36,7 @@ interface DevtoolsOptions {
+      */
+     shadowDOMTarget?: ShadowRoot;
+ }
+-declare function SolidQueryDevtools$1(props: DevtoolsOptions): JSX.Element;
++declare function SolidQueryDevtools$1(props: DevtoolsOptions): solid_js.JSX.Element;
+ 
+ declare const SolidQueryDevtools: typeof SolidQueryDevtools$1;
+ 
+diff --git a/build/index.d.ts b/build/index.d.ts
+index 25aa573da9576a89f41e9bbeb0e64ddb5392efa7..f6b6104e99fc13ac9201054c53be08342b6568ff 100644
+--- a/build/index.d.ts
++++ b/build/index.d.ts
+@@ -1,6 +1,6 @@
++import * as solid_js from 'solid-js';
+ import { DevtoolsButtonPosition, DevtoolsPosition, DevtoolsErrorType } from '@tanstack/query-devtools';
+ import { QueryClient } from '@tanstack/solid-query';
+-import { JSX } from 'solid-js';
+ 
+ interface DevtoolsOptions {
+     /**
+@@ -36,7 +36,7 @@ interface DevtoolsOptions {
+      */
+     shadowDOMTarget?: ShadowRoot;
+ }
+-declare function SolidQueryDevtools$1(props: DevtoolsOptions): JSX.Element;
++declare function SolidQueryDevtools$1(props: DevtoolsOptions): solid_js.JSX.Element;
+ 
+ declare const SolidQueryDevtools: typeof SolidQueryDevtools$1;
+ 
+diff --git a/build/index.js b/build/index.js
+index 5526e91e25fc28f919c64a92d8e649a36bfa9e88..0e1087d88fd58763ed00be3810987d55853db2c5 100644
+--- a/build/index.js
++++ b/build/index.js
+@@ -1,7 +1,24 @@
+-import { clientOnly } from './chunk/PQQXEPYU.js';
+-import { isDev } from 'solid-js/web';
++import { isDev, isServer } from 'solid-js/web';
++import { createSignal, splitProps, sharedConfig, onMount, createMemo, untrack } from 'solid-js';
+ 
+-var SolidQueryDevtools = isDev ? clientOnly(() => import('./devtools/C4J3FRGT.js')) : function() {
++// src/index.tsx
++function clientOnly(fn) {
++  if (isServer) return (props) => props.fallback;
++  const [comp, setComp] = createSignal();
++  fn().then((m) => setComp(() => m.default));
++  return (props) => {
++    let Comp;
++    let m;
++    const [, rest] = splitProps(props, ["fallback"]);
++    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
++    const [mounted, setMounted] = createSignal(!sharedConfig.context);
++    onMount(() => setMounted(true));
++    return createMemo(() => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback)));
++  };
++}
++
++// src/index.tsx
++var SolidQueryDevtools = isDev ? clientOnly(() => import('./devtools/LBUQ2A5B.js')) : function() {
+   return null;
+ };
+ 
+diff --git a/build/index.jsx b/build/index.jsx
+index 23edf12adbdfab9d7a9b033f60a8c27e469965ff..9d86c51ac6bf4037910c3e7af5f463f2f9ed8f09 100644
+--- a/build/index.jsx
++++ b/build/index.jsx
+@@ -1,10 +1,36 @@
++// src/index.tsx
++import { isDev } from "solid-js/web";
++
++// src/clientOnly.tsx
+ import {
+-  clientOnly
+-} from "./chunk/AU5TFTIU.jsx";
++  createMemo,
++  createSignal,
++  onMount,
++  sharedConfig,
++  splitProps,
++  untrack
++} from "solid-js";
++import { isServer } from "solid-js/web";
++function clientOnly(fn) {
++  if (isServer)
++    return (props) => props.fallback;
++  const [comp, setComp] = createSignal();
++  fn().then((m) => setComp(() => m.default));
++  return (props) => {
++    let Comp;
++    let m;
++    const [, rest] = splitProps(props, ["fallback"]);
++    if ((Comp = comp()) && !sharedConfig.context) return Comp(rest);
++    const [mounted, setMounted] = createSignal(!sharedConfig.context);
++    onMount(() => setMounted(true));
++    return createMemo(
++      () => (Comp = comp(), m = mounted(), untrack(() => Comp && m ? Comp(rest) : props.fallback))
++    );
++  };
++}
+ 
+ // src/index.tsx
+-import { isDev } from "solid-js/web";
+-var SolidQueryDevtools = isDev ? clientOnly(() => import("./devtools/IXR2SZ26.jsx")) : function() {
++var SolidQueryDevtools = isDev ? clientOnly(() => import("./devtools/O4DODHQV.jsx")) : function() {
+   return null;
+ };
+ export {

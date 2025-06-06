@@ -4,3 +4,4 @@ packages:
   - packages/config/*
 patchedDependencies:
   better-auth: patches/better-auth.patch
+  '@tanstack/solid-query-devtools': patches/@tanstack__solid-query-devtools.patch

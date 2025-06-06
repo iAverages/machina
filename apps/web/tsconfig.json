@@ -9,8 +9,6 @@
         "paths": {
             "~/*": ["./src/*"]
         },
-        "types": [
-      "unplugin-icons/types/solid",
-        ]
+        "types": ["unplugin-icons/types/solid"]
     }
 }

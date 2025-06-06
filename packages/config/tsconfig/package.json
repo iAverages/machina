@@ -2,5 +2,9 @@
     "name": "@machina/tsconfig",
     "private": true,
     "type": "module",
-    "files": ["./base.json", "./react.json", "./dom.json"]
+    "files": [
+        "./base.json",
+        "./react.json",
+        "./dom.json"
+    ]
 }

@@ -17,7 +17,7 @@
         inherit system overlays;
       };
 
-      pnpm = pkgs.nodePackages.pnpm;
+      pnpm = pkgs.pnpm;
 
       # rust = pkgs.rust-bin.selectLatestNightlyWith (toolchain:
       #   toolchain.default.override {

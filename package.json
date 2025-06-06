@@ -17,13 +17,13 @@
     "devDependencies": {
         "@biomejs/biome": "2.0.0-beta.2",
         "@machina/tsconfig": "workspace:^",
-        "@openapitools/openapi-generator-cli": "^2.20.0",
+        "@openapitools/openapi-generator-cli": "^2.20.2",
         "tsx": "^4.19.4",
-        "turbo": "^2.5.2",
+        "turbo": "^2.5.4",
         "typescript": "^5.8.3"
     },
     "packageManager": "pnpm@10.7.1",
     "dependencies": {
-        "@dotenvx/dotenvx": "^1.41.0"
+        "@dotenvx/dotenvx": "^1.44.1"
     }
 }
