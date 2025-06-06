@@ -41,6 +41,7 @@
         "embla-carousel-solid": "^8.6.0",
         "jsdom": "^26.1.0",
         "node-vibrant": "^4.0.3",
+        "posthog-js": "^1.249.4",
         "prisma": "^6.8.2",
         "satori": "^0.13.1",
         "solid-js": "^1.9.7",
