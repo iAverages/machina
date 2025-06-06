@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::format, sync::Arc};
 
 use axum::{
     extract::{FromRequestParts, Request},
@@ -23,7 +23,7 @@ fn is_dev() -> bool {
 // cannot set the cookie in the generated code, the apiKey prop is never used
 fn get_authed_client(token: &str) -> Option<Client> {
     let jar = Arc::new(Jar::default());
-    let url = Url::parse(Configuration::default().base_path.as_str())
+    let url = Url::parse(&MACHINA_CONFIG.app_url)
         .inspect_err(|err| {
             tracing::error!("parsing url for auth server: {}", err);
         })
@@ -53,6 +53,7 @@ pub async fn get_user_from_session_id(token: &str) -> Option<User> {
     tracing::info!("getting user : {}", token);
     let res = get_session_get(&Configuration {
         client: get_authed_client(token)?,
+        base_path: format!("{}/api/auth", &MACHINA_CONFIG.app_url),
         ..Default::default()
     })
     .await
@@ -109,6 +110,7 @@ where
 pub async fn session_middleware(jar: CookieJar, mut request: Request, next: Next) -> Response {
     let token = jar
         .get(AUTH_COOKE_NAME_SECURE)
+        .inspect(|value| tracing::debug!("secure session cookie: {value}"))
         .or_else(|| jar.get(AUTH_COOKE_NAME));
 
     let user = if let Some(session_cookie) = token {
