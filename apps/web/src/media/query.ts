@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/solid-start";
+import { z } from "zod";
 import { env as envClient } from "~/env-client";
 import { type MediaType, mediaTypes } from "~/media";
 import { mediaTypeProcessor } from "~/media/processors";
@@ -26,7 +27,7 @@ export const mediaDataQuery = createServerFn({
     method: "GET",
     response: "data",
 })
-    .validator((data: { slug: string; preload?: boolean }) => data)
+    .validator((data) => z.object({ slug: z.string(), preload: z.boolean().default(false) }).parse(data))
     .handler(async ({ data: { slug, preload } }) => {
         const mediaInfo = getMediaIdFromSlug(slug);
         if (!mediaInfo) return null;

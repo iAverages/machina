@@ -13,7 +13,8 @@ export const Route = createFileRoute("/$")({
     component: RouteComponent,
     loader: async ({ params, context: { queryClient } }) => {
         if (!params._splat) throw notFound();
-        const media = await mediaDataQuery({ data: { slug: params._splat } });
+        // TODO: only preload if request is from discord
+        const media = await mediaDataQuery({ data: { slug: params._splat, preload: true } });
         if (!media) throw notFound();
 
         // temp work around until we can ssr the query client correctly
