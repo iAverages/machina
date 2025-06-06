@@ -7,7 +7,7 @@ import { TopTrack } from "~/components/profile/track";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { ExternalLink } from "~/icons/external";
-import { getSelfProfileQueryOptions, useSelfProfile } from "~/queries/profile";
+import { useSelfProfile } from "~/queries/profile";
 
 export const Route = createFileRoute("/dashboard/")({
     component: RouteComponent,
