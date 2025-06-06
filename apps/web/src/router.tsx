@@ -4,6 +4,7 @@ import superjson from "superjson";
 import { DefaultErrorComponent } from "~/components/default-error-component";
 import { routeTree } from "./routeTree.gen";
 import posthog from "posthog-js";
+import { DefaultNotFoundComponent } from "~/components/default-not-found-component";
 
 export const createRouterContext = () => {
     const queryClient = new QueryClient({
@@ -30,7 +31,7 @@ export function createRouter() {
         defaultPreload: "intent",
         // defaultViewTransition: true,
         defaultErrorComponent: DefaultErrorComponent,
-        defaultNotFoundComponent: () => <div>bad not found</div>,
+        defaultNotFoundComponent: DefaultNotFoundComponent,
         defaultOnCatch: (error) => {
             console.error("error in router:", error);
             posthog.captureException(error);

@@ -1,4 +1,4 @@
-import Warning from "~icons/lucide/triangle-alert";
+import FileX from "~icons/lucide/file-x";
 
 export const DefaultErrorComponent = () => {
     return (
@@ -6,7 +6,7 @@ export const DefaultErrorComponent = () => {
             <div class="text-center space-y-6">
                 <div class="flex justify-center">
                     <div class="h-16 w-16 rounded-full bg-red-500/20 flex items-center justify-center">
-                        <Warning class="h-8 w-8 text-red-500/60" />
+                        <FileX class="h-8 w-8 text-red-500/60" />
                     </div>
                 </div>
 
