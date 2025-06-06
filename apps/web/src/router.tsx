@@ -3,6 +3,7 @@ import { createRouter as createTanStackRouter } from "@tanstack/solid-router";
 import superjson from "superjson";
 import { DefaultErrorComponent } from "~/components/default-error-component";
 import { routeTree } from "./routeTree.gen";
+import posthog from "posthog-js";
 
 export const createRouterContext = () => {
     const queryClient = new QueryClient({
@@ -31,7 +32,8 @@ export function createRouter() {
         defaultErrorComponent: DefaultErrorComponent,
         defaultNotFoundComponent: () => <div>bad not found</div>,
         defaultOnCatch: (error) => {
-            console.error("render onCatch:", error);
+            console.error("error in router:", error);
+            posthog.captureException(error);
         },
         scrollRestoration: true,
         context,
