@@ -1,0 +1,44 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    artist.id AS artist_id,\n    artist.name AS artist_name,\n    COUNT(listen.id) AS listen_count\nFROM\n    listen\n    JOIN track ON listen.track_id = track.id\n    JOIN artist ON track.artist_id = artist.id -- WHERE\nWHERE\n    listen.user_id = ?\nGROUP BY\n    artist.id,\n    artist.name\nORDER BY\n    listen_count DESC\nLIMIT\n    5;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "artist_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | PRIMARY_KEY | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "artist_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 764
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "listen_count",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY",
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "82e50a6ad3062563c2201c1c92f93f774446bed6401ea873754964c75cf5a655"
+}

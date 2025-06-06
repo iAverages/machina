@@ -1,0 +1,54 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    ROUND(CAST(SUM(t.duration) / 3600 AS DOUBLE), 2) AS `total_listening_hours!: f64`,\n    COUNT(DISTINCT l.track_id) AS unique_tracks,\n    COUNT(*) AS total_plays,\n    ROUND(\n        CAST(\n            SUM(t.duration) / 3600 / GREATEST(\n                1,\n                DATEDIFF(\n                    FROM_UNIXTIME(MAX(l.id) / 1000000),\n                    FROM_UNIXTIME(MIN(l.id) / 1000000)\n                ) / 7\n            ) AS DOUBLE\n        ),\n        2\n    ) AS `weekly_average!: f64`\nFROM\n    listen l\n    JOIN track t ON t.id = l.track_id\nWHERE\n    l.user_id = ?;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total_listening_hours!: f64",
+        "type_info": {
+          "type": "Double",
+          "flags": "BINARY",
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "unique_tracks",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "total_plays",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "weekly_average!: f64",
+        "type_info": {
+          "type": "Double",
+          "flags": "BINARY",
+          "max_size": 19
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "4e50c7cc9b77d9c1da47af5afdc0095eca3d33c09da46ceca81340de916b6ad4"
+}
