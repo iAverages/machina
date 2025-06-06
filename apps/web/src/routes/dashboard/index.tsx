@@ -15,7 +15,8 @@ export const Route = createFileRoute("/dashboard/")({
     // on client for a second
     ssr: false,
     loader: async ({ context: { queryClient } }) => {
-        await queryClient.fetchQuery(getSelfProfileQueryOptions);
+        console.log("loading self profile");
+        await queryClient.ensureQueryData(getSelfProfileQueryOptions);
     },
 });
 
