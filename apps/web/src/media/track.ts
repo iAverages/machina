@@ -3,6 +3,7 @@ import { env } from "~/env-server";
 import { vibrant } from "~/hooks/use-vibrant";
 import { DEFAULT_GRADIENT, DEFAULT_THEME_COLOR } from "~/utils/consts";
 import { trackApiSchema } from "~/utils/spotify";
+import { MediaType } from ".";
 
 const getSpotifyAuth = async () => {
     const client_id = env.SPOTIFY_CLIENT_ID;
@@ -57,7 +58,7 @@ const getData = async (id: string) => {
     const og = `${envClient.PUBLIC_APP_URL}/iapi/og?${params.toString()}`;
 
     return {
-        type: "track" as const,
+        type: MediaType.Track,
         id: id,
         color,
         data: {

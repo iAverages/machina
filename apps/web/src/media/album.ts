@@ -27,7 +27,7 @@ export type MetaTags = {
 };
 
 const getData = async (id: string) => {
-    const url = `https://open.spotify.com/prerelease/${id}`;
+    const url = `https://open.spotify.com/album/${id}`;
     const response = await fetch(url);
     const html = await response.text();
     const dom = new JSDOM(html);
@@ -65,7 +65,7 @@ const getData = async (id: string) => {
         if (colors.baseColor !== DEFAULT_GRADIENT.to) color = colors.baseColor;
     }
 
-    return { type: MediaType.Prerelease, metaTags, id, color };
+    return { type: MediaType.Album, metaTags, id, color };
 };
 
 const getHeadMeta = ({ metaTags, color }: Awaited<ReturnType<typeof getData>>) => [
@@ -74,7 +74,7 @@ const getHeadMeta = ({ metaTags, color }: Awaited<ReturnType<typeof getData>>) =
     { property: "theme-color", content: color },
 ];
 
-export const prereleaseProcessor = async (id: string) => {
+export const albumProcessor = async (id: string) => {
     const data = await getData(id);
     if (!data) return null;
     const meta = getHeadMeta(data);

@@ -56,6 +56,10 @@ function RouteComponent() {
             case MediaType.Prerelease: {
                 return <ExternalNavigate href={`https://open.spotify.com/prerelease/${data.data.id}`} />;
             }
+
+            case MediaType.Album: {
+                return <ExternalNavigate href={`https://open.spotify.com/album/${data.data.id}`} />;
+            }
             default:
                 return unreachable(type, "missing case for media preview");
         }

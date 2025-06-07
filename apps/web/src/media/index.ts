@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 import { capitalize } from "~/utils/string";
 
-export const mediaTypes = ["track", "prerelease"] as const;
+export const mediaTypes = ["track", "prerelease", "album"] as const;
 export type MediaType = (typeof mediaTypes)[number];
 
 export const MediaType = Object.fromEntries(mediaTypes.map((type) => [capitalize(type), type])) as {

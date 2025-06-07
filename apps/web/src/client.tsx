@@ -12,7 +12,6 @@ globalThis.$getVibrantPalette = async (src: string) => {
     return vib.Vibrant.from(src).getPalette();
 };
 
-console.log("api url:", env.PUBLIC_VIDEO_GENERATION_URL);
 client.setConfig({
     baseUrl: env.PUBLIC_VIDEO_GENERATION_URL,
 });
