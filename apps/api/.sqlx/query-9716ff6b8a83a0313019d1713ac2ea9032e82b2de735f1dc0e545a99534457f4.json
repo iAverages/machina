@@ -1,0 +1,74 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                account\n        ) AS SIGNED\n    ) AS `account!: i64`,\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                album\n        ) AS SIGNED\n    ) AS `album!: i64`,\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                artist\n        ) AS SIGNED\n    ) AS `artist!: i64`,\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                listen\n        ) AS SIGNED\n    ) AS `listen!: i64`,\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                track\n        ) AS SIGNED\n    ) AS `track!: i64`,\n    CAST(\n        (\n            SELECT\n                COUNT(*)\n            FROM\n                `user`\n        ) AS SIGNED\n    ) AS `user!: i64`;\n",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "account!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "album!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "artist!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "listen!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "track!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "user!: i64",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "BINARY",
+          "max_size": 21
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "9716ff6b8a83a0313019d1713ac2ea9032e82b2de735f1dc0e545a99534457f4"
+}
