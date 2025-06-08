@@ -1,4 +1,5 @@
 use crate::embeds::spotify_embed::EmbedJsonData;
+use crate::metrics::{FAILED_VIDEO_GENERATIONS, VIDEO_GEN_DURATION};
 use crate::utils::{
     get_audio_output_path, get_b2_video_path, get_og_output_path, get_track_output_path,
     get_video_output_path, upload_to_b2,
@@ -232,6 +233,8 @@ async fn get_track_preview_audio(track_id: String) -> Result<File> {
 
 #[instrument(name = "ffmpeg::generate", skip_all)]
 async fn generate_video_from_id(track_id: String) -> Result<File> {
+    // HistogramTimer impls drop, and will stop the timer automatically
+    let _timer = VIDEO_GEN_DURATION.start_timer();
     tracing::info!("preparing assets for video");
     let (track_og, preview_audio) = tokio::join!(
         get_track_og(track_id.clone()),
@@ -342,6 +345,7 @@ pub async fn get_preview_video(
             let mut tasks = state.generation_tasks.lock().await;
             tasks.remove(&track_id);
         }
+        FAILED_VIDEO_GENERATIONS.inc();
         return Err((
             StatusCode::INTERNAL_SERVER_ERROR,
             "Error generating video".to_string(),

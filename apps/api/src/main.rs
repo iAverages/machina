@@ -2,6 +2,7 @@ mod auth;
 mod config;
 mod database;
 mod embeds;
+mod metrics;
 mod routes;
 mod spotify;
 mod sync;
@@ -11,6 +12,7 @@ use self::auth::session_middleware;
 use self::config::{MachinaConfig, get_config};
 use self::embeds::cache_manager::CacheManger;
 use self::embeds::preview::{B2Video, LocalVideo, get_preview_video};
+use self::metrics::get_prometheus_metrics;
 use self::sync::start_sync_loop;
 use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
 use axum::http::HeaderValue;
@@ -119,6 +121,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/generate/video/{trackId}", get(get_preview_video))
+        .route("/metrics", get(get_prometheus_metrics))
         .route("/openapi.json", get(Json(api.clone())))
         .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default())
