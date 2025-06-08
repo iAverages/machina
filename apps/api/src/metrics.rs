@@ -74,6 +74,10 @@ lazy_static::lazy_static! {
     ).unwrap();
 }
 
+pub fn metric_setup() {
+    FAILED_VIDEO_GENERATIONS.reset();
+}
+
 #[derive(Debug, FromRow)]
 struct TableCounts {
     account: i64,
@@ -92,7 +96,6 @@ async fn set_db_values(pool: &Pool<MySql>) -> Result<(), ()> {
             tracing::error!("failed to generate db metric stats: {error}");
         })?;
 
-    let v = 0 as f64;
     TOTAL_ACCOUNTS.set(count.account as f64);
     TOTAL_ALBUMS.set(count.album as f64);
     TOTAL_ARTISTS.set(count.artist as f64);

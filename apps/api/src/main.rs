@@ -64,6 +64,7 @@ static MACHINA_CONFIG: Lazy<MachinaConfig> = Lazy::new(|| get_config().expect("c
 #[tokio::main]
 async fn main() {
     let _guard = init_tracing_opentelemetry::tracing_subscriber_ext::init_subscribers().unwrap();
+    metric_setup();
 
     let pool = MySqlPoolOptions::new()
         .max_connections(5)
