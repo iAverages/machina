@@ -12,7 +12,7 @@ use self::auth::session_middleware;
 use self::config::{MachinaConfig, get_config};
 use self::embeds::cache_manager::CacheManger;
 use self::embeds::preview::{B2Video, LocalVideo, get_preview_video};
-use self::metrics::get_prometheus_metrics;
+use self::metrics::{get_prometheus_metrics, metric_setup};
 use self::sync::start_sync_loop;
 use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
 use axum::http::HeaderValue;
