@@ -81,8 +81,8 @@ importers:
         specifier: ^5.2.5
         version: 5.2.5
       '@hey-api/client-fetch':
-        specifier: ^0.11.0
-        version: 0.11.0(@hey-api/openapi-ts@0.69.1(magicast@0.3.5)(typescript@5.8.3))
+        specifier: ^0.13.0
+        version: 0.13.1(@hey-api/openapi-ts@0.69.1(magicast@0.3.5)(typescript@5.8.3))
       '@kobalte/core':
         specifier: ^0.13.10
         version: 0.13.10(solid-js@1.9.7)
@@ -891,8 +891,8 @@ packages:
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
 
-  '@hey-api/client-fetch@0.11.0':
-    resolution: {integrity: sha512-Wafgv5BMCVjdYPgE60CL8NSC6Fi3j3PZYES8Qg23xO+9JNrjN5PguOIHQS2FMKaZ8jMtpa3S4I3ni0XBh/VeSg==}
+  '@hey-api/client-fetch@0.13.1':
+    resolution: {integrity: sha512-29jBRYNdxVGlx5oewFgOrkulZckpIpBIRHth3uHFn1PrL2ucMy52FvWOY3U3dVx2go1Z3kUmMi6lr07iOpUqqA==}
     deprecated: Starting with v0.73.0, this package is bundled directly inside @hey-api/openapi-ts.
     peerDependencies:
       '@hey-api/openapi-ts': < 2
@@ -6346,7 +6346,7 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hey-api/client-fetch@0.11.0(@hey-api/openapi-ts@0.69.1(magicast@0.3.5)(typescript@5.8.3))':
+  '@hey-api/client-fetch@0.13.1(@hey-api/openapi-ts@0.69.1(magicast@0.3.5)(typescript@5.8.3))':
     dependencies:
       '@hey-api/openapi-ts': 0.69.1(magicast@0.3.5)(typescript@5.8.3)
 
