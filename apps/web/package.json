@@ -5,9 +5,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vinxi dev",
-        "build": "vinxi build",
-        "start": "vinxi start",
+        "dev": "vite dev --port 3000",
+        "build": "vite build",
         "gen-api": "bun run ./scripts/openapi-ts.ts",
         "typecheck": "tsc --noEmit",
         "clean": "bun run rm -rf .output node_modules *.tsbuildinfo"
@@ -26,11 +25,11 @@
         "@solid-primitives/refs": "^1.1.1",
         "@solid-primitives/resize-observer": "^2.1.1",
         "@t3-oss/env-core": "^0.13.6",
-        "@tanstack/solid-query": "5.79.0",
-        "@tanstack/solid-query-devtools": "5.79.0",
-        "@tanstack/solid-router": "^1.120.13",
-        "@tanstack/solid-router-devtools": "^1.120.13",
-        "@tanstack/solid-start": "^1.120.13",
+        "@tanstack/solid-query": "5.80.7",
+        "@tanstack/solid-query-devtools": "5.80.7",
+        "@tanstack/solid-router": "^1.121.21",
+        "@tanstack/solid-router-devtools": "^1.121.21",
+        "@tanstack/solid-start": "^1.121.23",
         "@vercel/og": "^0.6.8",
         "better-auth": "^1.2.8",
         "chart.js": "^4.4.9",
@@ -49,7 +48,6 @@
         "superjson": "^2.2.2",
         "tailwind-merge": "^3.3.0",
         "tailwindcss-animate": "^1.0.7",
-        "vinxi": "^0.5.6",
         "zod": "^3.25.46"
     },
     "devDependencies": {

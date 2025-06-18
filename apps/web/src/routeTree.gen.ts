@@ -8,146 +8,291 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { createServerRootRoute } from '@tanstack/solid-start/server'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as TermsImport } from './routes/terms'
-import { Route as SigninImport } from './routes/signin'
-import { Route as PrivacyImport } from './routes/privacy'
-import { Route as DashboardImport } from './routes/dashboard'
-import { Route as SplatImport } from './routes/$'
-import { Route as IndexImport } from './routes/index'
-import { Route as DashboardIndexImport } from './routes/dashboard/index'
-import { Route as PUserIdImport } from './routes/p/$userId'
-import { Route as DirectSplatImport } from './routes/direct/$'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DanRouteImport } from './routes/dan'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as PUserIdRouteImport } from './routes/p/$userId'
+import { Route as HUserIdRouteImport } from './routes/h/$userId'
+import { Route as DirectSplatRouteImport } from './routes/direct/$'
+import { ServerRoute as IapiOgServerRouteImport } from './routes/iapi/og'
 
-// Create/Update Routes
+const rootServerRouteImport = createServerRootRoute()
 
-const TermsRoute = TermsImport.update({
+const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SigninRoute = SigninImport.update({
+const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PrivacyRoute = PrivacyImport.update({
+const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DashboardRoute = DashboardImport.update({
+const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SplatRoute = SplatImport.update({
+const DanRoute = DanRouteImport.update({
+  id: '/dan',
+  path: '/dan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DashboardIndexRoute = DashboardIndexImport.update({
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-
-const PUserIdRoute = PUserIdImport.update({
+const PUserIdRoute = PUserIdRouteImport.update({
   id: '/p/$userId',
   path: '/p/$userId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DirectSplatRoute = DirectSplatImport.update({
+const HUserIdRoute = HUserIdRouteImport.update({
+  id: '/h/$userId',
+  path: '/h/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectSplatRoute = DirectSplatRouteImport.update({
   id: '/direct/$',
   path: '/direct/$',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IapiOgServerRoute = IapiOgServerRouteImport.update({
+  id: '/iapi/og',
+  path: '/iapi/og',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dan': typeof DanRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/direct/$': typeof DirectSplatRoute
+  '/h/$userId': typeof HUserIdRoute
+  '/p/$userId': typeof PUserIdRoute
+  '/dashboard/': typeof DashboardIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dan': typeof DanRoute
+  '/privacy': typeof PrivacyRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/direct/$': typeof DirectSplatRoute
+  '/h/$userId': typeof HUserIdRoute
+  '/p/$userId': typeof PUserIdRoute
+  '/dashboard': typeof DashboardIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/dan': typeof DanRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/privacy': typeof PrivacyRoute
+  '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
+  '/direct/$': typeof DirectSplatRoute
+  '/h/$userId': typeof HUserIdRoute
+  '/p/$userId': typeof PUserIdRoute
+  '/dashboard/': typeof DashboardIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/$'
+    | '/dan'
+    | '/dashboard'
+    | '/privacy'
+    | '/signin'
+    | '/terms'
+    | '/direct/$'
+    | '/h/$userId'
+    | '/p/$userId'
+    | '/dashboard/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/$'
+    | '/dan'
+    | '/privacy'
+    | '/signin'
+    | '/terms'
+    | '/direct/$'
+    | '/h/$userId'
+    | '/p/$userId'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/dan'
+    | '/dashboard'
+    | '/privacy'
+    | '/signin'
+    | '/terms'
+    | '/direct/$'
+    | '/h/$userId'
+    | '/p/$userId'
+    | '/dashboard/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  DanRoute: typeof DanRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
+  SigninRoute: typeof SigninRoute
+  TermsRoute: typeof TermsRoute
+  DirectSplatRoute: typeof DirectSplatRoute
+  HUserIdRoute: typeof HUserIdRoute
+  PUserIdRoute: typeof PUserIdRoute
+}
+export interface FileServerRoutesByFullPath {
+  '/iapi/og': typeof IapiOgServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/iapi/og': typeof IapiOgServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/iapi/og': typeof IapiOgServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/iapi/og'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/iapi/og'
+  id: '__root__' | '/iapi/og'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  IapiOgServerRoute: typeof IapiOgServerRoute
+}
 
 declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/$': {
-      id: '/$'
-      path: '/$'
-      fullPath: '/$'
-      preLoaderRoute: typeof SplatImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
-      parentRoute: typeof rootRoute
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyImport
-      parentRoute: typeof rootRoute
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/signin': {
       id: '/signin'
       path: '/signin'
       fullPath: '/signin'
-      preLoaderRoute: typeof SigninImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsImport
-      parentRoute: typeof rootRoute
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/direct/$': {
-      id: '/direct/$'
-      path: '/direct/$'
-      fullPath: '/direct/$'
-      preLoaderRoute: typeof DirectSplatImport
-      parentRoute: typeof rootRoute
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/p/$userId': {
-      id: '/p/$userId'
-      path: '/p/$userId'
-      fullPath: '/p/$userId'
-      preLoaderRoute: typeof PUserIdImport
-      parentRoute: typeof rootRoute
+    '/dan': {
+      id: '/dan'
+      path: '/dan'
+      fullPath: '/dan'
+      preLoaderRoute: typeof DanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexImport
-      parentRoute: typeof DashboardImport
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/p/$userId': {
+      id: '/p/$userId'
+      path: '/p/$userId'
+      fullPath: '/p/$userId'
+      preLoaderRoute: typeof PUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/h/$userId': {
+      id: '/h/$userId'
+      path: '/h/$userId'
+      fullPath: '/h/$userId'
+      preLoaderRoute: typeof HUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/direct/$': {
+      id: '/direct/$'
+      path: '/direct/$'
+      fullPath: '/direct/$'
+      preLoaderRoute: typeof DirectSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-// Create and export the route tree
+declare module '@tanstack/solid-start/server' {
+  interface ServerFileRoutesByPath {
+    '/iapi/og': {
+      id: '/iapi/og'
+      path: '/iapi/og'
+      fullPath: '/iapi/og'
+      preLoaderRoute: typeof IapiOgServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
+}
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -161,151 +306,24 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/$': typeof SplatRoute
-  '/dashboard': typeof DashboardRouteWithChildren
-  '/privacy': typeof PrivacyRoute
-  '/signin': typeof SigninRoute
-  '/terms': typeof TermsRoute
-  '/direct/$': typeof DirectSplatRoute
-  '/p/$userId': typeof PUserIdRoute
-  '/dashboard/': typeof DashboardIndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/$': typeof SplatRoute
-  '/privacy': typeof PrivacyRoute
-  '/signin': typeof SigninRoute
-  '/terms': typeof TermsRoute
-  '/direct/$': typeof DirectSplatRoute
-  '/p/$userId': typeof PUserIdRoute
-  '/dashboard': typeof DashboardIndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/$': typeof SplatRoute
-  '/dashboard': typeof DashboardRouteWithChildren
-  '/privacy': typeof PrivacyRoute
-  '/signin': typeof SigninRoute
-  '/terms': typeof TermsRoute
-  '/direct/$': typeof DirectSplatRoute
-  '/p/$userId': typeof PUserIdRoute
-  '/dashboard/': typeof DashboardIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/$'
-    | '/dashboard'
-    | '/privacy'
-    | '/signin'
-    | '/terms'
-    | '/direct/$'
-    | '/p/$userId'
-    | '/dashboard/'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/$'
-    | '/privacy'
-    | '/signin'
-    | '/terms'
-    | '/direct/$'
-    | '/p/$userId'
-    | '/dashboard'
-  id:
-    | '__root__'
-    | '/'
-    | '/$'
-    | '/dashboard'
-    | '/privacy'
-    | '/signin'
-    | '/terms'
-    | '/direct/$'
-    | '/p/$userId'
-    | '/dashboard/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  SplatRoute: typeof SplatRoute
-  DashboardRoute: typeof DashboardRouteWithChildren
-  PrivacyRoute: typeof PrivacyRoute
-  SigninRoute: typeof SigninRoute
-  TermsRoute: typeof TermsRoute
-  DirectSplatRoute: typeof DirectSplatRoute
-  PUserIdRoute: typeof PUserIdRoute
-}
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  DanRoute: DanRoute,
   DashboardRoute: DashboardRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   SigninRoute: SigninRoute,
   TermsRoute: TermsRoute,
   DirectSplatRoute: DirectSplatRoute,
+  HUserIdRoute: HUserIdRoute,
   PUserIdRoute: PUserIdRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/$",
-        "/dashboard",
-        "/privacy",
-        "/signin",
-        "/terms",
-        "/direct/$",
-        "/p/$userId"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/$": {
-      "filePath": "$.tsx"
-    },
-    "/dashboard": {
-      "filePath": "dashboard.tsx",
-      "children": [
-        "/dashboard/"
-      ]
-    },
-    "/privacy": {
-      "filePath": "privacy.tsx"
-    },
-    "/signin": {
-      "filePath": "signin.tsx"
-    },
-    "/terms": {
-      "filePath": "terms.tsx"
-    },
-    "/direct/$": {
-      "filePath": "direct/$.tsx"
-    },
-    "/p/$userId": {
-      "filePath": "p/$userId.tsx"
-    },
-    "/dashboard/": {
-      "filePath": "dashboard/index.tsx",
-      "parent": "/dashboard"
-    }
-  }
+const rootServerRouteChildren: RootServerRouteChildren = {
+  IapiOgServerRoute: IapiOgServerRoute,
 }
-ROUTE_MANIFEST_END */
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()

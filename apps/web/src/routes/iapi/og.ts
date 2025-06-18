@@ -1,6 +1,6 @@
 import { OpenGraph } from "@machina/og";
 import { Resvg } from "@resvg/resvg-js";
-import { createAPIFileRoute } from "@tanstack/solid-start/api";
+import { createServerFileRoute } from "@tanstack/solid-start/server";
 import { Vibrant } from "node-vibrant/node";
 import satori from "satori";
 import { DEFAULT_GRADIENT } from "~/utils/consts";
@@ -16,7 +16,7 @@ const notoSans = await getFont({
     weights: [400, 700] as const,
 });
 
-export const APIRoute = createAPIFileRoute("/iapi/og")({
+export const ServerRoute = createServerFileRoute("/iapi/og").methods({
     GET: async ({ request: req }) => {
         try {
             const { searchParams } = new URL(req.url as string, "http://localhost:3000");
