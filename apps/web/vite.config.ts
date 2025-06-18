@@ -8,8 +8,9 @@ import tsConfigPaths from "vite-tsconfig-paths";
 import "./src/env-client";
 
 export default defineConfig({
+    build: { target: "esnext" },
     esbuild: {
-        target: "es2024",
+        target: "esnext",
     },
     server: {
         // TODO: find better replacement, for now have just

@@ -1,5 +1,4 @@
-/// <reference types="vinxi/types/client" />
-
+/// <reference types="vite/client" />
 import { StartClient } from "@tanstack/solid-start";
 import posthog from "posthog-js";
 import { hydrate } from "solid-js/web";
@@ -46,5 +45,4 @@ router.subscribe("onBeforeNavigate", (navigation) => {
 
 capturePageView(window.location.pathname);
 
-// @ts-expect-error - why is tsc erroring here?
 hydrate(() => <StartClient router={router} />, document.body);

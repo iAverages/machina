@@ -54,3 +54,4 @@ yarn-error.log*
 # nix build output
 result 
 .machina
+.nitro
