@@ -51,7 +51,7 @@
         "zod": "^3.25.46"
     },
     "devDependencies": {
-        "@hey-api/openapi-ts": "^0.69.1",
+        "@hey-api/openapi-ts": "^0.79.0",
         "@iconify-json/logos": "^1.2.4",
         "@iconify-json/lucide": "^1.2.45",
         "@machina/tsconfig": "workspace:^",
