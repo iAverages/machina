@@ -8,5 +8,13 @@
             "automerge": true
         }
     ],
+    "extends": [
+		"config:recommended",
+		":label(dependencies)",
+		"group:allNonMajor",
+		"schedule:weekly",
+		":automergeMinor",
+		":disablePeerDependencies"
+	],
     "gitIgnoredAuthors": ["41898282+github-actions[bot]@users.noreply.github.com"]
 }
