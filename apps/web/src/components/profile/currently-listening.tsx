@@ -37,6 +37,10 @@ export function CurrentlyListening(props: { userId: string }) {
                 return;
             }
 
+            if (playing.progress !== progress()) {
+                setProgress(playing.progress);
+            }
+
             // timer already started
             if (timer) return;
             timer = setInterval(() => {
