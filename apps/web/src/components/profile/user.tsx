@@ -1,7 +1,7 @@
-import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { cn } from "~/utils/cn";
+import { Card, CardContent } from "~/components/ui/card";
 import { useProfile } from "~/queries/profile";
+import { cn } from "~/utils/cn";
 import { CurrentlyListening } from "./currently-listening";
 
 interface UserProfileProps {

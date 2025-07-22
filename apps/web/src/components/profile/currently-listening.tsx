@@ -1,9 +1,9 @@
 import { createEffect, createMemo, createSignal, on, Show } from "solid-js";
-import { Progress } from "../ui/progress";
+import type { Profile } from "~/api/client";
 import { ExternalLink } from "~/icons/external";
 import { useProfile } from "~/queries/profile";
-import type { Profile } from "~/api/client";
 import { FadeImage } from "../fade-image";
+import { Progress } from "../ui/progress";
 
 export function CurrentlyListening(props: { userId: string }) {
     const profile = useProfile({ userId: props.userId });
