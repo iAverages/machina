@@ -8,7 +8,7 @@
         "better-auth": "^1.2.8",
         "hono": "^4.7.11",
         "mysql2": "^3.14.1",
-        "zod": "^3.25.46"
+        "zod": "^4.0.0"
     },
     "devDependencies": {
         "@types/bun": "^1.2.15"
