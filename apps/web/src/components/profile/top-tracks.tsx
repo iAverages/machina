@@ -1,7 +1,7 @@
+import { createMemo, createSignal, For, Show } from "solid-js";
+import { useProfile } from "~/queries/profile";
 import { cn } from "~/utils/cn";
 import { Button } from "../ui/button";
-import { useProfile } from "~/queries/profile";
-import { createMemo, createSignal, For, Show } from "solid-js";
 import { Collapsible, CollapsibleTrigger } from "../ui/collapsible";
 import { TopTrack } from "./track";
 

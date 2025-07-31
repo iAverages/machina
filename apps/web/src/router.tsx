@@ -1,10 +1,10 @@
 import { QueryClient } from "@tanstack/solid-query";
 import { createRouter as createTanStackRouter } from "@tanstack/solid-router";
+import posthog from "posthog-js";
 import superjson from "superjson";
 import { DefaultErrorComponent } from "~/components/default-error-component";
-import { routeTree } from "./routeTree.gen";
-import posthog from "posthog-js";
 import { DefaultNotFoundComponent } from "~/components/default-not-found-component";
+import { routeTree } from "./routeTree.gen";
 
 export const createRouterContext = () => {
     const queryClient = new QueryClient({
