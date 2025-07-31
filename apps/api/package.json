@@ -1,6 +1,8 @@
 {
     "name": "@machina/api",
     "scripts": {
-        "lint": "cargo clippy"
+        "lint": "cargo clippy",
+        "build": "cargo build --release",
+        "build:dev": "cargo build"
     }
 }
