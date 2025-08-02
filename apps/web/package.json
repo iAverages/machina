@@ -26,7 +26,7 @@
         "@solid-primitives/resize-observer": "^2.1.3",
         "@t3-oss/env-core": "^0.13.8",
         "@tanstack/solid-query": "5.83.1",
-        "@tanstack/solid-query-devtools": "5.83.1",
+        "@tanstack/solid-query-devtools": "5.84.0",
         "@tanstack/solid-router": "^1.130.9",
         "@tanstack/solid-router-devtools": "^1.130.9",
         "@tanstack/solid-start": "^1.130.9",
@@ -67,5 +67,5 @@
         "vite": "^7.0.6",
         "vite-tsconfig-paths": "^5.1.4"
     },
-    "packageManager": "pnpm@10.7.1"
+    "packageManager": "pnpm@10.14.0"
 }
