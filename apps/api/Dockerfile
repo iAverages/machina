@@ -1,4 +1,4 @@
-FROM rust:1.86.0 AS backend
+FROM rust:1.88.0 AS backend
 
 WORKDIR /machina
 
