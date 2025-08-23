@@ -22,6 +22,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as PUserIdRouteImport } from './routes/p/$userId'
 import { Route as HUserIdRouteImport } from './routes/h/$userId'
 import { Route as DirectSplatRouteImport } from './routes/direct/$'
+import { Route as DashboardImportRouteImport } from './routes/dashboard/import'
 import { ServerRoute as IapiOgServerRouteImport } from './routes/iapi/og'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -81,6 +82,11 @@ const DirectSplatRoute = DirectSplatRouteImport.update({
   path: '/direct/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardImportRoute = DashboardImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const IapiOgServerRoute = IapiOgServerRouteImport.update({
   id: '/iapi/og',
   path: '/iapi/og',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
+  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
+    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
+    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
+    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
@@ -280,6 +292,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof DirectSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/import': {
+      id: '/dashboard/import'
+      path: '/import'
+      fullPath: '/dashboard/import'
+      preLoaderRoute: typeof DashboardImportRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 declare module '@tanstack/solid-start/server' {
@@ -295,10 +314,12 @@ declare module '@tanstack/solid-start/server' {
 }
 
 interface DashboardRouteChildren {
+  DashboardImportRoute: typeof DashboardImportRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardImportRoute: DashboardImportRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
