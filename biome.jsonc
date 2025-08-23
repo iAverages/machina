@@ -55,7 +55,7 @@
                 "useExponentiationOperator": "error",
                 "useTemplate": "error",
                 "noParameterAssign": "error",
-                "noNonNullAssertion": "error",
+                "noNonNullAssertion": "off",
                 "useDefaultParameterLast": "error",
                 "useImportType": "error",
                 "useExportType": "error",
