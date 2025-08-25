@@ -12,6 +12,7 @@ FROM
 WHERE
     listen.user_id = ?
     AND listen.id < ?
+    AND listen.track_id IS NOT NULL
 ORDER BY
     `time` DESC
 LIMIT

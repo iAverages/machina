@@ -64,8 +64,8 @@ model Listen {
     user_id String
     user    User   @relation(fields: [user_id], references: [id])
 
-    track_id String
-    track    Track  @relation(fields: [track_id], references: [id])
+    track_id String?
+    track    Track?  @relation(fields: [track_id], references: [id])
 
     @@map("listen")
 }
