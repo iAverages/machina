@@ -1,30 +1,24 @@
-import { Input } from "@kobalte/core/text-field";
 import { createFileRoute } from "@tanstack/solid-router";
 import JSZip from "jszip";
-import { createSignal, For, Match, Show, Switch } from "solid-js";
+import { type Accessor, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
+import z from "zod";
+import { FileDropzone, FileDropzoneError } from "~/components/file-dropzone";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Label } from "~/components/ui/label";
-import { TextField } from "~/components/ui/text-field";
+import { Progress } from "~/components/ui/progress";
+import { Separator } from "~/components/ui/separator";
 import { cn } from "~/utils/cn";
-import Upload from "~icons/lucide/upload";
+import { trytmSync } from "~/utils/trytm";
+import CheckCircle from "~icons/lucide/check-circle";
+import FileText from "~icons/lucide/file-text";
 import Loader2 from "~icons/lucide/loader-circle";
-import XCircle from "~icons/lucide/x-circle";
-import { FileDropzone } from "~/components/file-dropzone";
+import Upload from "~icons/lucide/upload";
 
 export const Route = createFileRoute("/dashboard/import")({
     component: RouteComponent,
 });
-
-// Define the expected structure for a valid JSON file
-interface ProcessedJsonFile {
-    name: string;
-    content: string;
-    isValid: boolean;
-    validationError?: string;
-    processedData?: any; // The parsed JSON data
-}
 
 const Steps = {
     Upload: "upload",
@@ -36,29 +30,97 @@ const Steps = {
 type Steps = (typeof Steps)[keyof typeof Steps];
 
 function RouteComponent() {
-    const [uploadedFiles, setUploadedFiles] = createSignal<
-        { name: string; content: string; type: "json" | "zip"; selected: boolean }[]
-    >([]);
     const [step, setStep] = createSignal<Steps>(Steps.Upload);
-    const [messages, setMessages] = createSignal<{ message: string; type: "info" | "error" }[]>([]);
-    const [isProcessing, setIsProcessing] = createSignal(false);
-    // biome-ignore lint/style/noNonNullAssertion: solid
-    let fileInputRef: HTMLInputElement = null!;
+    const [files, _setFiles] = createSignal<UploadedFile[]>([]);
+    const [selectedFiles, setSelectedFiles] = createSignal<UploadedFile[]>([]);
 
+    const handleFileSelect = (newFiles: UploadedFile[]) => {
+        _setFiles(newFiles);
+        setStep(Steps.Select);
+    };
+
+    return (
+        <div class="max-w-4xl mx-auto space-y-6 w-full">
+            <div class="text-center space-y-2">
+                <h1 class="text-3xl font-bold text-foreground">Spotify History Importer</h1>
+                <p class="text-muted-foreground">Upload .json or .zip file from Spotify export</p>
+            </div>
+            <div class="flex items-center justify-center space-x-4 mb-8">
+                <For
+                    each={[
+                        { step: "upload", label: "Upload", icon: Upload },
+                        { step: "select", label: "Select", icon: CheckCircle },
+                        { step: "process", label: "Process", icon: FileText },
+                        { step: "complete", label: "Complete", icon: CheckCircle },
+                    ]}
+                >
+                    {({ step: stepName, label, icon: Icon }, index) => (
+                        <div class="flex items-center">
+                            <div
+                                class={cn(
+                                    "flex items-center justify-center w-10 h-10 rounded-full border-2",
+                                    stepName === step()
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : index() < ["upload", "select", "process", "complete"].indexOf(stepName)
+                                          ? "bg-green-100 text-green-600 border-green-200"
+                                          : "bg-muted text-muted-foreground border-border",
+                                )}
+                            >
+                                <Icon class="w-5 h-5" />
+                            </div>
+                            <span class="ml-2 text-sm font-medium">{label}</span>
+                            <Show when={index() < 3}>
+                                <div class="w-8 h-px bg-border ml-4" />
+                            </Show>
+                        </div>
+                    )}
+                </For>
+            </div>
+            <Switch>
+                <Match when={step() === Steps.Upload}>
+                    <UploadStep
+                        files={files()}
+                        setFiles={(newFiles) => {
+                            handleFileSelect(typeof newFiles === "function" ? newFiles(files()) : newFiles);
+                        }}
+                    />
+                </Match>
+
+                <Match when={step() === Steps.Select}>
+                    <SelectStep
+                        files={files}
+                        startProcessing={(files) => {
+                            console.log("selected files for importing", files);
+                            setSelectedFiles(files);
+                            setStep(Steps.Process);
+                        }}
+                    />
+                </Match>
+                <Match when={step() === Steps.Process}>
+                    <ProcessStep files={selectedFiles} />
+                </Match>
+            </Switch>
+        </div>
+    );
+}
+
+type UploadedFile = { name: string; content: string };
+
+type UploadStepProps = {
+    files: UploadedFile[];
+    setFiles: (files: UploadedFile[] | ((files: UploadedFile[]) => UploadedFile[])) => void;
+};
+
+const UploadStep = (props: UploadStepProps) => {
+    const [isExtractingZip, setIsExtractingZip] = createSignal(false);
+
+    const [messages, setMessages] = createSignal<{ message: string; type: "info" | "error" }[]>([]);
     const addMessage = (message: string) => setMessages((prev) => [...prev, { message, type: "info" }]);
 
     const addError = (message: string) => setMessages((prev) => [...prev, { message, type: "error" }]);
 
-    const handleFileChange = async (event) => {
-        setMessages([]);
-        setUploadedFiles([]);
-
-        const files = event.target.files;
-        if (!files || files.length === 0) {
-            addError("No file selected.");
-            return;
-        }
-
+    const handleFileSelect = async (files: File[]) => {
+        const validFiles: UploadedFile[] = [];
         for (const file of files) {
             addMessage(`Selected file: ${file.name}`);
 
@@ -66,24 +128,23 @@ function RouteComponent() {
                 addMessage("Reading JSON file...");
                 try {
                     const content = await file.text();
-                    setUploadedFiles((prev) => [...prev, { name: file.name, content, type: "json", selected: true }]);
+                    validFiles.push({ name: file.name, content, type: "json", selected: true });
                     addMessage("JSON file loaded successfully.");
                 } catch (error) {
                     addError(`Failed to read JSON file: ${(error as Error).message}`);
                 }
             } else if (file.type === "application/zip" || file.name.endsWith(".zip")) {
                 addMessage("Unzipping file client-side...");
-                setIsProcessing(true);
+                setIsExtractingZip(true);
 
                 try {
                     const arrayBuffer = await file.arrayBuffer();
                     const zip = await JSZip.loadAsync(arrayBuffer);
 
-                    const jsonFiles: { name: string; content: string }[] = [];
+                    const jsonFiles: UploadedFile[] = [];
                     let foundJson = false;
 
                     for (const filename in zip.files) {
-                        // biome-ignore lint/style/noNonNullAssertion: will exist
                         const zipEntry = zip.files[filename]!;
 
                         if (zipEntry.dir || !filename.toLowerCase().endsWith(".json")) {
@@ -99,201 +160,28 @@ function RouteComponent() {
                         addError("ZIP file contains no JSON files or is empty.");
                     } else {
                         addMessage(`Found ${jsonFiles.length} JSON files in ZIP.`);
-                        setUploadedFiles(
-                            jsonFiles.map((f) => ({
+                        validFiles.push(
+                            ...jsonFiles.map((f) => ({
                                 name: f.name,
                                 content: f.content,
-                                type: "json",
-                                selected: true,
                             })),
                         );
                     }
                 } catch (error) {
                     addError(`ZIP processing error: ${(error as Error).message}`);
                 } finally {
-                    setIsProcessing(false);
+                    setIsExtractingZip(false);
                 }
             } else {
                 addError("Unsupported file type. Please upload a .json or .zip file.");
             }
         }
+
+        props.setFiles(validFiles);
     };
 
-    const handleToggleSelect = (fileName: string) => {
-        setUploadedFiles((prev) =>
-            prev.map((file) => (file.name === fileName ? { ...file, selected: !file.selected } : file)),
-        );
-    };
-
-    const processJsonFile = (file: { name: string; content: string }): ProcessedJsonFile => {
-        try {
-            const parsedData = JSON.parse(file.content);
-            // Simple validation: check if it's an object and has 'title' and 'items'
-            if (
-                typeof parsedData === "object" &&
-                parsedData !== null &&
-                typeof parsedData.title === "string" &&
-                Array.isArray(parsedData.items)
-            ) {
-                return { name: file.name, content: file.content, isValid: true, processedData: parsedData };
-            }
-
-            return {
-                name: file.name,
-                content: file.content,
-                isValid: false,
-                validationError: "JSON does not match expected format (missing 'title' or 'items' array).",
-            };
-        } catch (error) {
-            return {
-                name: file.name,
-                content: file.content,
-                isValid: false,
-                validationError: `Invalid JSON format: ${(error as Error).message}`,
-            };
-        }
-    };
-
-    const handleProcessSelected = async () => {
-        setMessages([]);
-        setIsProcessing(true);
-        const selected = uploadedFiles().filter((f) => f.selected);
-
-        if (selected.length === 0) {
-            addError("No JSON files selected for processing.");
-            setIsProcessing(false);
-            return;
-        }
-
-        addMessage(`Starting processing of ${selected.length} selected JSON files...`);
-
-        const processedResults: ProcessedJsonFile[] = [];
-
-        for (const file of selected) {
-            addMessage(`Processing file: ${file.name}...`);
-            const result = processJsonFile(file);
-            processedResults.push(result);
-
-            if (result.isValid) {
-                addMessage(`Successfully processed ${file.name}. Title: "${result.processedData.title}"`);
-            } else {
-                addError(`Error in ${file.name}: ${result.validationError}`);
-            }
-        }
-
-        addMessage("All selected files processed.");
-        setIsProcessing(false);
-    };
-
-    return (
-        <div class="max-w-4xl mx-auto space-y-6">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-bold text-foreground">History Importe </h1>
-                <p class="text-muted-foreground">Upload .json or .zip file from Spotify export</p>
-            </div>
-            <Switch>
-                <Match when={step() === Steps.Upload}>
-                    <UploadStep />
-                </Match>
-            </Switch>
-        </div>
-    );
-    // return (
-    //     <div class="p-4 md:p-6 lg:p-8 grid grid-cols-12 gap-4">
-    //         <Card class="col-span-8">
-    //             <CardHeader>
-    //                 <CardTitle class="text-2xl font-bold">History Importer</CardTitle>
-    //             </CardHeader>
-    //             <CardContent class="space-y-6">
-    //                 <div class="grid gap-2">
-    //                     <Label for="file-upload">Upload .json or .zip file</Label>
-    //                     <input
-    //                         id="file-upload"
-    //                         type="file"
-    //                         accept=".json,.zip"
-    //                         multiple
-    //                         onChange={handleFileChange}
-    //                         ref={fileInputRef}
-    //                         disabled={isProcessing()}
-    //                     />
-    //                 </div>
-    //
-    //                 <Show when={uploadedFiles().length > 0}>
-    //                     <div class="space-y-4">
-    //                         <h3 class="text-lg font-semibold">Files to Process:</h3>
-    //                         {/* <ScrollArea class="h-48 w-full rounded-md border p-4"> */}
-    //
-    //                         <For each={uploadedFiles()}>
-    //                             {(file) => (
-    //                                 <div class="flex items-center space-x-2 py-1">
-    //                                     <Checkbox
-    //                                         id={`file-${file.name}`}
-    //                                         checked={file.selected}
-    //                                         onChange={() => handleToggleSelect(file.name)}
-    //                                         disabled={isProcessing()}
-    //                                     />
-    //                                     <Label for={`file-${file.name}`} class="flex items-center gap-2">
-    //                                         {file.type === "json" ? (
-    //                                             <FileJson class="h-4 w-4 text-blue-500" />
-    //                                         ) : (
-    //                                             <FileArchive class="h-4 w-4 text-purple-500" />
-    //                                         )}
-    //                                         {file.name}
-    //                                     </Label>
-    //                                 </div>
-    //                             )}
-    //                         </For>
-    //                         {/* </ScrollArea> */}
-    //                         <Button
-    //                             onClick={handleProcessSelected}
-    //                             class="w-full"
-    //                             disabled={isProcessing() || uploadedFiles().filter((f) => f.selected).length === 0}
-    //                         >
-    //                             {isProcessing() && <Loader2 class="mr-2 h-4 w-4 animate-spin" />}
-    //                             Process Selected Files
-    //                         </Button>
-    //                     </div>
-    //                 </Show>
-    //             </CardContent>
-    //         </Card>
-    //         <Card class="col-span-4 h-fit">
-    //             <CardHeader>
-    //                 <CardTitle>Activity Log</CardTitle>
-    //             </CardHeader>
-    //             <CardContent class="max-h-[500px] overflow-auto">
-    //                 <Show when={messages().length > 0}>
-    //                     <For each={messages()}>
-    //                         {({ message, type }) => (
-    //                             <Switch>
-    //                                 <Match when={type === "info"}>
-    //                                     <div class="flex gap-2 items-center">
-    //                                         <CheckCircle class="min-w-4 size-4 text-green-500" />
-    //                                         <p class="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2 truncate">
-    //                                             {message}
-    //                                         </p>
-    //                                     </div>
-    //                                 </Match>
-    //                                 <Match when={type === "error"}>
-    //                                     <p class="text-sm text-red-600 flex items-center gap-2 truncate">
-    //                                         <XCircle class="min-w-4 size-4 text-red-500" /> {message}
-    //                                     </p>
-    //                                 </Match>
-    //                             </Switch>
-    //                         )}
-    //                     </For>
-    //                 </Show>
-    //             </CardContent>
-    //         </Card>
-    //     </div>
-    // );
-}
-const UploadStep = () => {
-    const [isExtractingZip, setIsExtractingZip] = createSignal(false);
-
-    const handleFileSelect = (files: File[]) => {
-        console.log({ files });
-    };
-    const handleFileError = (error) => {
+    // TODO:
+    const handleFileError = (error: FileDropzoneError) => {
         console.log({ error });
     };
 
@@ -317,5 +205,197 @@ const UploadStep = () => {
                 </FileDropzone>
             </CardContent>
         </Card>
+    );
+};
+
+type SelectStepProps = {
+    files: Accessor<UploadedFile[]>;
+    startProcessing: (files: UploadedFile[]) => void;
+};
+
+const SelectStep = (props: SelectStepProps) => {
+    const [selectedFiles, setSelectedFiles] = createSignal<string[]>([]);
+    onMount(() => setSelectedFiles(props.files().map((f) => f.name)));
+
+    const selectAllFiles = () => setSelectedFiles(props.files().map((f) => f.name));
+    const deselectAllFiles = () => setSelectedFiles([]);
+    const toggleFileSelection = (fileName: string) => {
+        const isSelected = selectedFiles().find((file) => file === fileName);
+        if (isSelected) setSelectedFiles((prev) => prev.filter((file) => file !== fileName));
+        else setSelectedFiles((prev) => [...prev, fileName]);
+    };
+
+    return (
+        <Card>
+            <CardHeader class="gap-2">
+                <CardTitle>Select Files to Process</CardTitle>
+                <CardDescription>Choose which files you want to import into the system</CardDescription>
+                <div class="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={selectAllFiles}>
+                        Select All
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={deselectAllFiles}>
+                        Deselect All
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div class="max-h-96 overflow-scroll">
+                    <div class="space-y-2">
+                        <For each={props.files()}>
+                            {(file) => (
+                                <div class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50">
+                                    <Checkbox
+                                        checked={!!selectedFiles().find((f) => f === file.name)}
+                                        onChange={() => toggleFileSelection(file.name)}
+                                    />
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <FileText class="w-4 h-4 text-muted-foreground" />
+                                            <span class="font-medium truncate">{file.name}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </For>
+                    </div>
+                </div>
+                <Separator class="my-4" />
+                <div class="flex justify-between">
+                    <Button
+                        onClick={() =>
+                            props.startProcessing(
+                                props.files().filter((fileName) => !!selectedFiles().includes(fileName.name)),
+                            )
+                        }
+                        disabled={selectedFiles().length === 0}
+                    >
+                        Start Import ({selectedFiles().length} files)
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+type ProcessStepProps = {
+    files: Accessor<UploadedFile[]>;
+};
+
+const fileSchema = z.object({ ts: z.coerce.date(), spotify_track_uri: z.string().startsWith("spotify:track:") });
+
+const ProcessStep = (props: ProcessStepProps) => {
+    const [currentProcessingFile, setCurrentProcessingFile] = createSignal("");
+    const [completeFiles, setCompleteFiles] = createSignal<string[]>([]);
+    const [invalidFiles, setInvalidFiles] = createSignal<string[]>([]);
+
+    const processingProgress = () => (completeFiles().length / props.files().length) * 100;
+
+    onMount(async () => {
+        const bigFuckoffArray = [];
+        for (const file of props.files()) {
+            setCurrentProcessingFile(file.name);
+            const [json, error] = trytmSync(JSON.parse(file.content));
+            if (error) {
+                console.error("failed to json parse file", file.name);
+                setInvalidFiles((prev) => [...new Set([...prev, file.name])]);
+                continue;
+            }
+
+            let index = 0;
+            for (const listen of json) {
+                const validator = fileSchema.safeParse(listen);
+                if (validator.success) {
+                    bigFuckoffArray.push(validator.data);
+                } else {
+                    console.error("failed to validate listen", { file: file.name, listenIndex: index });
+                    setInvalidFiles((prev) => [...new Set([...prev, file.name])]);
+                }
+                index++;
+            }
+            // stops the ui from being blocked
+            await new Promise((res) => setTimeout(res, 1));
+            setCompleteFiles((prev) => [...prev, file.name]);
+        }
+        console.log(bigFuckoffArray);
+    });
+
+    return (
+        <div class="space-y-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Processing Files</CardTitle>
+                    <CardDescription>Importing your data into the system...</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Overall Progress</span>
+                                <span>{Math.round(processingProgress())}%</span>
+                            </div>
+                            <Progress value={processingProgress()} class="w-full" />
+                        </div>
+
+                        <div class="h-96 overflow-scroll">
+                            <div class="space-y-2">
+                                <For each={props.files()}>
+                                    {(file) => (
+                                        <div class="flex items-center justify-between p-2 border rounded">
+                                            <div class="flex items-center space-x-2">
+                                                <FileText class="w-4 h-4" />
+                                                <span class="text-sm font-medium">{file.name}</span>
+                                            </div>
+                                            <Switch>
+                                                <Match when={completeFiles().includes(file.name)}>
+                                                    <Badge variant={"success"}>Complete</Badge>
+                                                </Match>
+
+                                                <Match when={currentProcessingFile() === file.name}>
+                                                    <Badge variant={"warning"}>Processing</Badge>
+                                                </Match>
+
+                                                <Match when={invalidFiles().includes(file.name)}>
+                                                    <Badge variant={"error"}>Invalid</Badge>
+                                                </Match>
+                                                <Match when={true}>
+                                                    <Badge variant={"outline"}>Pending</Badge>
+                                                </Match>
+                                            </Switch>
+                                        </div>
+                                    )}
+                                </For>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* {showLogs && ( */}
+            {/*     <Card> */}
+            {/*         <CardHeader> */}
+            {/*             <CardTitle>Import Log</CardTitle> */}
+            {/*             <CardDescription>Real-time processing information</CardDescription> */}
+            {/*         </CardHeader> */}
+            {/*         <CardContent> */}
+            {/*             <ScrollArea class="h-48"> */}
+            {/*                 <div class="space-y-1 font-mono text-sm"> */}
+            {/*                     {logs.map((log) => ( */}
+            {/*                         <div key={log.id} class="flex items-start space-x-2"> */}
+            {/*                             <span class="text-muted-foreground text-xs"> */}
+            {/*                                 {log.timestamp.toLocaleTimeString()} */}
+            {/*                             </span> */}
+            {/*                             <span class={`font-medium ${getLogColor(log.level)}`}> */}
+            {/*                                 [{log.level.toUpperCase()}] */}
+            {/*                             </span> */}
+            {/*                             <span class="flex-1">{log.message}</span> */}
+            {/*                         </div> */}
+            {/*                     ))} */}
+            {/*                 </div> */}
+            {/*             </ScrollArea> */}
+            {/*         </CardContent> */}
+            {/*     </Card> */}
+            {/* )} */}
+        </div>
     );
 };

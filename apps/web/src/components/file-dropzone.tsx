@@ -151,7 +151,7 @@ export const FileDropzone = (props: FileDropzoneProps) => {
                 type="button"
                 aria-label="File upload area"
                 class={cn(
-                    "border-2 border-dashed rounded-lg p-12 text-center transition-colors",
+                    "border-2 border-dashed rounded-lg p-12 text-center transition-colors size-full",
                     props.disabled
                         ? "border-border/50 cursor-not-allowed opacity-50"
                         : isDragOver()
