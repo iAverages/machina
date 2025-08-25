@@ -22,7 +22,8 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as PUserIdRouteImport } from './routes/p/$userId'
 import { Route as HUserIdRouteImport } from './routes/h/$userId'
 import { Route as DirectSplatRouteImport } from './routes/direct/$'
-import { Route as DashboardImportRouteImport } from './routes/dashboard/import'
+import { Route as DashboardImportIndexRouteImport } from './routes/dashboard/import/index'
+import { Route as DashboardImportStatusRouteImport } from './routes/dashboard/import/status'
 import { ServerRoute as IapiOgServerRouteImport } from './routes/iapi/og'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -82,9 +83,14 @@ const DirectSplatRoute = DirectSplatRouteImport.update({
   path: '/direct/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardImportRoute = DashboardImportRouteImport.update({
-  id: '/import',
-  path: '/import',
+const DashboardImportIndexRoute = DashboardImportIndexRouteImport.update({
+  id: '/import/',
+  path: '/import/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardImportStatusRoute = DashboardImportStatusRouteImport.update({
+  id: '/import/status',
+  path: '/import/status',
   getParentRoute: () => DashboardRoute,
 } as any)
 const IapiOgServerRoute = IapiOgServerRouteImport.update({
@@ -101,11 +107,12 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
-  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/import/status': typeof DashboardImportStatusRoute
+  '/dashboard/import': typeof DashboardImportIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,11 +121,12 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
-  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/import/status': typeof DashboardImportStatusRoute
+  '/dashboard/import': typeof DashboardImportIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,11 +137,12 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
   '/terms': typeof TermsRoute
-  '/dashboard/import': typeof DashboardImportRoute
   '/direct/$': typeof DirectSplatRoute
   '/h/$userId': typeof HUserIdRoute
   '/p/$userId': typeof PUserIdRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/import/status': typeof DashboardImportStatusRoute
+  '/dashboard/import/': typeof DashboardImportIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,11 +154,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
-    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
     | '/dashboard/'
+    | '/dashboard/import/status'
+    | '/dashboard/import'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,11 +168,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
-    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
     | '/dashboard'
+    | '/dashboard/import/status'
+    | '/dashboard/import'
   id:
     | '__root__'
     | '/'
@@ -172,11 +183,12 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/signin'
     | '/terms'
-    | '/dashboard/import'
     | '/direct/$'
     | '/h/$userId'
     | '/p/$userId'
     | '/dashboard/'
+    | '/dashboard/import/status'
+    | '/dashboard/import/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -292,11 +304,18 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof DirectSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/import': {
-      id: '/dashboard/import'
+    '/dashboard/import/': {
+      id: '/dashboard/import/'
       path: '/import'
       fullPath: '/dashboard/import'
-      preLoaderRoute: typeof DashboardImportRouteImport
+      preLoaderRoute: typeof DashboardImportIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/import/status': {
+      id: '/dashboard/import/status'
+      path: '/import/status'
+      fullPath: '/dashboard/import/status'
+      preLoaderRoute: typeof DashboardImportStatusRouteImport
       parentRoute: typeof DashboardRoute
     }
   }
@@ -314,13 +333,15 @@ declare module '@tanstack/solid-start/server' {
 }
 
 interface DashboardRouteChildren {
-  DashboardImportRoute: typeof DashboardImportRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardImportStatusRoute: typeof DashboardImportStatusRoute
+  DashboardImportIndexRoute: typeof DashboardImportIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardImportRoute: DashboardImportRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardImportStatusRoute: DashboardImportStatusRoute,
+  DashboardImportIndexRoute: DashboardImportIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

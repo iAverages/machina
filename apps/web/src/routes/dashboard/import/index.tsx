@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/solid-router";
+import { createFileRoute, Link } from "@tanstack/solid-router";
 import JSZip from "jszip";
 import { type Accessor, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import z from "zod";
-import { FileDropzone, FileDropzoneError } from "~/components/file-dropzone";
+import { FileDropzone, type FileDropzoneError } from "~/components/file-dropzone";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -11,12 +12,13 @@ import { Progress } from "~/components/ui/progress";
 import { Separator } from "~/components/ui/separator";
 import { cn } from "~/utils/cn";
 import { trytmSync } from "~/utils/trytm";
+import AlertCircle from "~icons/lucide/alert-circle";
 import CheckCircle from "~icons/lucide/check-circle";
 import FileText from "~icons/lucide/file-text";
 import Loader2 from "~icons/lucide/loader-circle";
 import Upload from "~icons/lucide/upload";
 
-export const Route = createFileRoute("/dashboard/import")({
+export const Route = createFileRoute("/dashboard/import/")({
     component: RouteComponent,
 });
 
@@ -38,6 +40,8 @@ function RouteComponent() {
         _setFiles(newFiles);
         setStep(Steps.Select);
     };
+
+    const handleImportStats = (stats: ImportStatus) => {};
 
     return (
         <div class="max-w-4xl mx-auto space-y-6 w-full">
@@ -97,7 +101,10 @@ function RouteComponent() {
                     />
                 </Match>
                 <Match when={step() === Steps.Process}>
-                    <ProcessStep files={selectedFiles} />
+                    <ProcessStep files={selectedFiles} setImportStats={handleImportStats} />
+                </Match>
+                <Match when={step() === Steps.Complete}>
+                    <CompleteStep />
                 </Match>
             </Switch>
         </div>
@@ -280,6 +287,14 @@ const SelectStep = (props: SelectStepProps) => {
 
 type ProcessStepProps = {
     files: Accessor<UploadedFile[]>;
+    setImportStats: (stats: ImportStatus) => void;
+};
+
+type ImportStatus = {
+    files: number;
+    invalidFiles: number;
+    listens: number;
+    invalidListens: number;
 };
 
 const fileSchema = z.object({ ts: z.coerce.date(), spotify_track_uri: z.string().startsWith("spotify:track:") });
@@ -293,6 +308,8 @@ const ProcessStep = (props: ProcessStepProps) => {
 
     onMount(async () => {
         const bigFuckoffArray = [];
+        let invalidListensTotal = 0;
+
         for (const file of props.files()) {
             setCurrentProcessingFile(file.name);
             const [json, error] = trytmSync(JSON.parse(file.content));
@@ -309,6 +326,7 @@ const ProcessStep = (props: ProcessStepProps) => {
                     bigFuckoffArray.push(validator.data);
                 } else {
                     console.error("failed to validate listen", { file: file.name, listenIndex: index });
+                    invalidListensTotal++;
                     setInvalidFiles((prev) => [...new Set([...prev, file.name])]);
                 }
                 index++;
@@ -317,6 +335,14 @@ const ProcessStep = (props: ProcessStepProps) => {
             await new Promise((res) => setTimeout(res, 1));
             setCompleteFiles((prev) => [...prev, file.name]);
         }
+
+        props.setImportStats({
+            files: props.files.length,
+            invalidFiles: invalidFiles().length,
+            invalidListens: invalidListensTotal,
+            listens: bigFuckoffArray.length,
+        });
+
         console.log(bigFuckoffArray);
     });
 
@@ -397,5 +423,61 @@ const ProcessStep = (props: ProcessStepProps) => {
             {/*     </Card> */}
             {/* )} */}
         </div>
+    );
+};
+
+const CompleteStep = () => {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle class="flex items-center space-x-2">
+                    <CheckCircle class="w-6 h-6 text-green-600" />
+                    <span>Import Complete</span>
+                </CardTitle>
+                <CardDescription>Your data has been successfully imported into the system</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="space-y-4">
+                    <Alert>
+                        <AlertCircle class="h-4 w-4" />
+                        <AlertDescription>
+                            Your data is being processed and may take some time to complete. You can view the import
+                            progress on the next screen.
+                        </AlertDescription>
+                    </Alert>
+
+                    {/* <div class="grid grid-cols-3 gap-4 text-center"> */}
+                    {/*     <div class="p-4 border rounded-lg"> */}
+                    {/*         <div class="text-2xl font-bold text-green-600"> */}
+                    {/*             {files.filter((f) => f.status === "completed").length} */}
+                    {/*         </div> */}
+                    {/*         <div class="text-sm text-muted-foreground">Successful</div> */}
+                    {/*     </div> */}
+                    {/*     <div class="p-4 border rounded-lg"> */}
+                    {/*         <div class="text-2xl font-bold text-red-600"> */}
+                    {/*             {files.filter((f) => f.status === "error").length} */}
+                    {/*         </div> */}
+                    {/*         <div class="text-sm text-muted-foreground">Failed</div> */}
+                    {/*     </div> */}
+                    {/*     <div class="p-4 border rounded-lg"> */}
+                    {/*         <div class="text-2xl font-bold text-primary">{files.filter((f) => f.selected).length}</div> */}
+                    {/*         <div class="text-sm text-muted-foreground">Total Processed</div> */}
+                    {/*     </div> */}
+                    {/* </div> */}
+
+                    <div class="flex justify-between">
+                        <Link to="/dashboard/import/status">
+                            <Button
+                                onClick={() => {
+                                    alert("Proceeding to next step...");
+                                }}
+                            >
+                                View Import Status
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     );
 };

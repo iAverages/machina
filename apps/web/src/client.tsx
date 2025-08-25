@@ -15,13 +15,14 @@ client.setConfig({
     baseUrl: env.PUBLIC_VIDEO_GENERATION_URL,
 });
 
-posthog.init("phc_1iE1HrbynKxnVyMSP0pLwJvAjJ2lk4PVQ8Up4v1hP3Y", {
-    api_host: "https://eu.i.posthog.com",
-    // we handle page views manaully at the router level
-    capture_pageview: false,
-    autocapture: true,
-    defaults: "2025-05-24",
-});
+// posthog.init("phc_1iE1HrbynKxnVyMSP0pLwJvAjJ2lk4PVQ8Up4v1hP3Y", {
+//     debug: false,
+//     api_host: "https://eu.i.posthog.com",
+//     // we handle page views manaully at the router level
+//     capture_pageview: false,
+//     autocapture: true,
+//     defaults: "2025-05-24",
+// });
 
 const router = createRouter();
 
