@@ -13,6 +13,11 @@ FROM
     LEFT JOIN album al ON t.album_id = al.id
 WHERE
     l.user_id = ?
+    AND t.name IS NOT NULL
+    AND t.duration IS NOT NULL
+    AND t.explicit IS NOT NULL
+    AND t.artist_id IS NOT NULL
+    AND t.album_id IS NOT NULL
 GROUP BY
     t.id,
     t.name,

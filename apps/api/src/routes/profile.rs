@@ -71,7 +71,7 @@ struct TopArtists {
 #[serde(rename_all = "camelCase")]
 struct TopTrack {
     track_id: String,
-    track_name: String,
+    track_name: Option<String>,
     duration: Option<i32>,
     album_name: Option<String>,
     album_art: Option<String>,

@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Checkbox } from "~/components/ui/checkbox";
 import { Progress } from "~/components/ui/progress";
 import { Separator } from "~/components/ui/separator";
+import { useSpotifyIngest } from "~/mutations/import/spotify";
 import { cn } from "~/utils/cn";
 import { trytmSync } from "~/utils/trytm";
 import AlertCircle from "~icons/lucide/alert-circle";
@@ -300,6 +301,7 @@ type ImportStatus = {
 const fileSchema = z.object({ ts: z.coerce.date(), spotify_track_uri: z.string().startsWith("spotify:track:") });
 
 const ProcessStep = (props: ProcessStepProps) => {
+    const spotifyIngest = useSpotifyIngest();
     const [currentProcessingFile, setCurrentProcessingFile] = createSignal("");
     const [completeFiles, setCompleteFiles] = createSignal<string[]>([]);
     const [invalidFiles, setInvalidFiles] = createSignal<string[]>([]);
@@ -342,6 +344,8 @@ const ProcessStep = (props: ProcessStepProps) => {
             invalidListens: invalidListensTotal,
             listens: bigFuckoffArray.length,
         });
+
+        await spotifyIngest.mutateAsync({ body: bigFuckoffArray });
 
         console.log(bigFuckoffArray);
     });

@@ -1,6 +1,13 @@
 SELECT
     listen.id AS time,
-    track.*,
+    --
+    track.id,
+    track.duration,
+    track.explicit,
+    track.album_id,
+    track.artist_id,
+    track.name AS `name!: String`,
+    --
     artist.name AS artist_name,
     album.name AS album_name,
     album.cover_art AS cover_art
@@ -13,6 +20,7 @@ WHERE
     listen.user_id = ?
     AND listen.id < ?
     AND listen.track_id IS NOT NULL
+    AND track.name IS NOT NULL
 ORDER BY
     `time` DESC
 LIMIT

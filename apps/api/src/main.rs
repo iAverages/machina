@@ -15,20 +15,25 @@ use self::embeds::preview::{B2Video, LocalVideo, get_preview_video};
 use self::metrics::{get_prometheus_metrics, metric_setup};
 use self::sync::start_sync_loop;
 use self::utils::{get_track_output_path, get_video_output_path, upload_to_b2};
+use async_nats::jetstream::{self, Context, stream};
+use axum::extract::DefaultBodyLimit;
 use axum::http::HeaderValue;
 use axum::routing::get;
 use axum::{Json, Router};
 use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use backblaze_b2_client::client::B2Client;
+use futures::StreamExt;
 use once_cell::sync::{Lazy, OnceCell};
 use reqwest::Method;
 use sqlx::mysql::MySqlPoolOptions;
 use sqlx::{MySql, Pool};
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::fs::{self};
 use tokio::sync::{Mutex, Notify};
 use tokio::task;
+use tokio::time::sleep;
 use tower_http::cors::CorsLayer;
 use utoipa::OpenApi;
 use utoipa::openapi::LicenseBuilder;
@@ -40,6 +45,88 @@ struct AppState {
     cache_manager: Arc<CacheManger>,
     generation_tasks: Arc<Mutex<HashMap<String, Arc<Notify>>>>,
     db: &'static Pool<MySql>,
+    jetstream: Arc<jetstream::Context>,
+}
+
+async fn nats_stream_setup(jetstream: Arc<Context>) {
+    let stream = jetstream
+        .create_stream(jetstream::stream::Config {
+            name: "spotify_meta".to_string(),
+            retention: stream::RetentionPolicy::WorkQueue,
+            subjects: vec!["spotify_meta.>".to_string()],
+            ..Default::default()
+        })
+        .await
+        .expect("failed to create jetstream stream");
+
+    let jetstream = jetstream.clone();
+    tokio::spawn(async move {
+        loop {
+            tracing::info!("publishing to stream");
+            for i in 0..10 {
+                jetstream
+                    .publish("spotify_meta.artist", format!("{i}").into())
+                    .await
+                    .expect("some error in the publish")
+                    .await
+                    .expect("some error in the publish 2");
+            }
+            sleep(Duration::from_secs(5)).await;
+        }
+    });
+
+    let consumer = stream
+        .create_consumer(jetstream::consumer::pull::Config {
+            durable_name: Some("processor-1".to_string()),
+            ..Default::default()
+        })
+        .await
+        .expect("faield to create consumer");
+
+    let consumer2 = stream
+        .create_consumer(jetstream::consumer::pull::Config {
+            durable_name: Some("processor-1".to_string()),
+            ..Default::default()
+        })
+        .await
+        .expect("faield to create consumer");
+    tokio::spawn(async move {
+        loop {
+            println!("[1] getting messages");
+            let mut messages = consumer
+                .fetch()
+                .max_messages(50)
+                .expires(std::time::Duration::from_secs(2))
+                .messages()
+                .await
+                .expect("failed to fetch messages");
+
+            println!("[1] got  messages");
+            while let Some(message) = messages.next().await {
+                let m = message.expect("failed something something message");
+                println!("[1] got messsage: ");
+                println!("[1] {:?}", m.payload);
+                m.ack().await.expect("failed to ack message");
+            }
+        }
+    });
+
+    // tokio::spawn(async move {
+    //     loop {
+    //         let mut messages = consumer2
+    //             .fetch()
+    //             .max_messages(3)
+    //             .messages()
+    //             .await
+    //             .expect("failed to fetch messages");
+    //         while let Some(message) = messages.next().await {
+    //             let m = message.expect("failed something something message");
+    //             println!("[2] got messsage: ");
+    //             println!("[2] {:?}", m.payload);
+    //             m.ack().await.expect("failed to ack message");
+    //         }
+    //     }
+    // });
 }
 
 #[derive(OpenApi)]
@@ -83,10 +170,21 @@ async fn main() {
 
     let _ = B2.set(b2);
 
+    // TODO: handle error
+    let client = async_nats::connect(MACHINA_CONFIG.nats_url.clone())
+        .await
+        .unwrap();
+    let jetstream = Arc::new(jetstream::new(client));
+    let js = jetstream.clone();
+    // tokio::spawn(async move {
+    //     nats_stream_setup(js).await;
+    // });
+
     let state = AppState {
         cache_manager: Arc::new(CacheManger::new()),
         generation_tasks: Arc::new(Mutex::new(HashMap::new())),
         db: static_pool,
+        jetstream,
     };
 
     task::spawn(cache_upload_existing_tmp(state.cache_manager.clone()));
@@ -132,10 +230,11 @@ async fn main() {
         .merge(app)
         .merge(Scalar::with_url("/scalar", api))
         .layer(axum::middleware::from_fn(session_middleware))
+        .layer(DefaultBodyLimit::max(100 * 1024 * 1024)) // 100mb, max CF will allow
         .layer(cors);
 
     state.cache_manager.start_cleanup_thread();
-    start_sync_loop(state);
+    // start_sync_loop(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001").await.unwrap();
     tracing::info!("listening on :3001");
@@ -154,28 +253,31 @@ async fn cache_upload_existing_tmp(cache_manager: Arc<CacheManger>) {
         .unwrap();
     while let Some(entry) = entries.next_entry().await.unwrap() {
         let path = entry.path();
-        if path.is_dir() {
-            if let Some(folder_name) = path.file_name() {
-                if let Some(track_id) = folder_name.to_str() {
-                    tracing::debug!("found track {:?} in tmp, uploading to b2", track_id);
-                    let local_video = LocalVideo::new(
-                        track_id.to_string(),
-                        get_video_output_path(track_id.to_string()),
-                    )
-                    .await;
+        if !path.is_dir() {
+            continue;
+        }
+        let Some(folder_name) = path.file_name() else {
+            continue;
+        };
 
-                    if let Ok(video) = local_video {
-                        let _ = cache_manager.cache_video(&video).await;
-                        // if we error there was no b2 video so we should upload
-                        if B2Video::new(track_id.to_string()).await.is_err() {
-                            upload_to_b2(cache_manager.clone(), track_id.to_string()).await;
-                        }
-                    }
+        if let Some(track_id) = folder_name.to_str() {
+            tracing::debug!("found track {:?} in tmp, uploading to b2", track_id);
+            let local_video = LocalVideo::new(
+                track_id.to_string(),
+                get_video_output_path(track_id.to_string()),
+            )
+            .await;
 
-                    let _ = fs::remove_dir_all(get_track_output_path(track_id.to_string())).await;
-                    tracing::debug!("deleted tmp directory for {}", track_id);
+            if let Ok(video) = local_video {
+                let _ = cache_manager.cache_video(&video).await;
+                // if we error there was no b2 video so we should upload
+                if B2Video::new(track_id.to_string()).await.is_err() {
+                    upload_to_b2(cache_manager.clone(), track_id.to_string()).await;
                 }
             }
+
+            let _ = fs::remove_dir_all(get_track_output_path(track_id.to_string())).await;
+            tracing::debug!("deleted tmp directory for {}", track_id);
         }
     }
 }
