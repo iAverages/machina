@@ -21,6 +21,8 @@ pub struct MachinaConfig {
     pub b2_application_key: String,
     #[envconfig(from = "MACHINA_VIDEO_GENERATION_DIR", default = "/tmp/machina")]
     pub video_generator_dir: String,
+    #[envconfig(from = "NATS_URL")]
+    pub nats_url: String,
 }
 
 #[derive(Debug, thiserror::Error)]

@@ -1,4 +1,3 @@
-import { getRouterManifest } from "@tanstack/solid-start/router-manifest";
 import { createStartHandler, defaultStreamHandler, getHeaders } from "@tanstack/solid-start/server";
 import type { Vibrant } from "node-vibrant/node";
 import { client } from "./api/client/client.gen";
@@ -17,9 +16,7 @@ globalThis.$getVibrantPalette = async (src: string) => {
 // this looks weird but we cant call getHeaders() (or other h3 stuff) outside a request context.
 let hasSetup = false;
 export default createStartHandler({
-    // @ts-expect-error - why is tsc erroring here?
     createRouter,
-    getRouterManifest,
 })((...args) => {
     if (!hasSetup) {
         hasSetup = true;

@@ -21,8 +21,8 @@ model User {
 }
 
 model Track {
-    id   String @id
-    name String
+    id   String  @id
+    name String?
 
     duration Int?     @db.Int
     explicit Boolean?
@@ -42,6 +42,7 @@ model Artist {
     id   String @id
     name String
 
+    // TODO: make this required after backfilling this data
     imageUrl String?
     track    Track[]
 
@@ -59,7 +60,7 @@ model Album {
 }
 
 model Listen {
-    id BigInt @id
+    id BigInt
 
     user_id String
     user    User   @relation(fields: [user_id], references: [id])
@@ -67,6 +68,7 @@ model Listen {
     track_id String
     track    Track  @relation(fields: [track_id], references: [id])
 
+    @@id([id, user_id])
     @@map("listen")
 }
 

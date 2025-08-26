@@ -1,7 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { getHeaders } from "@tanstack/solid-start/server";
+import { CurrentSongBg } from "~/components/current-song-page-bg";
 import { ScreenLoader } from "~/components/screen-loader";
+import { useSelfProfile } from "~/queries/profile";
 import { authClient } from "~/utils/auth";
 
 const getSession = createServerFn().handler(async () => {
@@ -63,5 +65,11 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function RouteComponent() {
-    return <Outlet />;
+    const profile = useSelfProfile();
+
+    return (
+        <CurrentSongBg albumArt={profile.data?.currentPlaying.track?.albumArt}>
+            <Outlet />
+        </CurrentSongBg>
+    );
 }

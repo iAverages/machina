@@ -34,7 +34,7 @@ export function createRouter() {
         defaultNotFoundComponent: DefaultNotFoundComponent,
         defaultOnCatch: (error) => {
             console.error("error in router:", error);
-            posthog.captureException(error);
+            posthog?.captureException?.(error);
         },
         scrollRestoration: true,
         context,

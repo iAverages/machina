@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/solid-start";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { env as envClient } from "~/env-client";
 import { type MediaType, mediaTypes } from "~/media";
 import { mediaTypeProcessor } from "~/media/processors";

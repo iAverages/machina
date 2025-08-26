@@ -3,7 +3,7 @@ procs:
     cwd: "apps/auth"
     shell: "pnpm run dev"
   api:
-    shell: "bacon run"
+    shell: "cargo run"
   web:
     cwd: "apps/web"
     shell: "pnpm run dev"

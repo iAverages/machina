@@ -22,6 +22,11 @@ export type CursorPaginatedI64VecListen = {
     }>;
 };
 
+export type IngestListen = {
+    spotify_track_uri: string;
+    ts: string;
+};
+
 export type Listen = {
     albumId?: string | null;
     albumName?: string | null;
@@ -80,7 +85,7 @@ export type TopTrack = {
     duration?: number | null;
     listenCount: number;
     trackId: string;
-    trackName: string;
+    trackName?: string | null;
 };
 
 export type TotalListenStats = {
@@ -93,6 +98,22 @@ export type UserProfile = {
     image?: string | null;
     name: string;
 };
+
+export type IngestListensData = {
+    body: Array<IngestListen>;
+    path?: never;
+    query?: never;
+    url: '/api/ingest/spotify';
+};
+
+export type IngestListensResponses = {
+    /**
+     * listen data to ingest
+     */
+    200: Array<IngestListen>;
+};
+
+export type IngestListensResponse = IngestListensResponses[keyof IngestListensResponses];
 
 export type SelfProfileData = {
     body?: never;

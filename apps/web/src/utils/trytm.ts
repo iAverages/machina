@@ -8,3 +8,14 @@ export const trytm = async <T>(promise: Promise<T>): Promise<[T, null] | [null, 
         throw throwable;
     }
 };
+
+export const trytmSync = <T>(promise: T): [T, null] | [null, Error] => {
+    try {
+        const data = promise;
+        return [data, null];
+    } catch (throwable) {
+        if (throwable instanceof Error) return [null, throwable];
+
+        throw throwable;
+    }
+};

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/solid-query";
 import { createFileRoute, Link } from "@tanstack/solid-router";
 import { Match, Show, Switch } from "solid-js";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { env } from "~/env-client";
