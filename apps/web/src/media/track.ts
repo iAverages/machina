@@ -74,6 +74,7 @@ const getHeadData = ({ data: track, color }: TrackData) => [
     { title: "machina" },
     { property: "og:title", content: track.data.name },
     { property: "og:description", content: track.data.artists[0]?.name },
+    { property: "twitter:description", content: `${track.data.artists[0]?.name} - [open on spotify](https://open.spotify.com/track/${track.data.id})`},
     { property: "description", content: track.data.artists[0]?.name },
     {
         property: "og:url",
