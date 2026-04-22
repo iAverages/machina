@@ -25,8 +25,7 @@ WORKDIR /app/apps/auth
 
 COPY --from=installer /app /app
 
-RUN addgroup --system --gid 1001 machina
-RUN adduser --system --uid 1001 machina
+RUN useradd --system --uid 1001 machina
 USER machina
 
 CMD bun src/index.ts
