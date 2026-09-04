@@ -14,19 +14,19 @@ axum = { version = "0.8.1", features = ["macros", "query"] }
 axum-macros = "0.5.0"
 cuid = "1.3.3"
 futures = "0.3.31"
-reqwest = { version = "0.12.14", features = ["json", "stream", "cookies"] }
-scraper = "0.23.1"
+reqwest = { version = "0.13.0", features = ["json", "stream", "cookies"] }
+scraper = "0.27.0"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 tokio = { version = "1.44.2", features = ["full"] }
 tokio-util = { version = "0.7.14", features = ["io"] }
-tower-http = { version = "0.6.2", features = ["cors", "trace"] }
+tower-http = { version = "0.7.0", features = ["cors", "trace"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 dotenvy = "0.15.7"
 chrono = { version = "0.4.40", features = ["serde"] }
-rspotify = "0.14.0"
-sqlx = { version = "0.8.3", features = [
+rspotify = "0.16.0"
+sqlx = { version = "0.9.0", features = [
     "runtime-tokio",
     "tls-native-tls",
     "mysql",
@@ -45,14 +45,14 @@ utoipa-scalar = { version = "0.3.0", features = ["axum"] }
 backblaze-b2-client = { git = "https://github.com/iAverages/backblaze-b2-client-rs" }
 bytes = "1.10.1"
 tokio-stream = "0.1.17"
-opentelemetry = "0.29.1"
-opentelemetry-otlp = { version = "0.29.0", features = ["grpc-tonic"] }
-axum-tracing-opentelemetry = "0.28.0"
-init-tracing-opentelemetry = { version = "0.28.0", features = [
+opentelemetry = "0.32.0"
+opentelemetry-otlp = { version = "0.32.0", features = ["grpc-tonic"] }
+axum-tracing-opentelemetry = "0.39.0"
+init-tracing-opentelemetry = { version = "0.41.0", features = [
     "otlp",
     "tracing_subscriber_ext",
 ] }
-axum-extra = { version = "0.10.1", features = ["cookie"] }
+axum-extra = { version = "0.12.0", features = ["cookie"] }
 sea-query = { version = "0.32.5", features = ["backend-mysql"] }
 sea-query-binder = { version = "0.7.0", features = ["sqlx-mysql"] }
 auth-api-client = { path = "../../packages/auth-api-client/" }
