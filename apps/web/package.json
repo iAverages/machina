@@ -31,7 +31,7 @@
         "@tanstack/solid-router": "^1.120.13",
         "@tanstack/solid-router-devtools": "^1.120.13",
         "@tanstack/solid-start": "^1.120.13",
-        "@vercel/og": "^0.6.8",
+        "@vercel/og": "^1.0.0",
         "better-auth": "^1.2.8",
         "chart.js": "^4.4.9",
         "class-variance-authority": "^0.7.1",
